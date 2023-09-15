@@ -1,0 +1,62 @@
+{
+  "name": "@lightningjs/solid",
+  "version": "0.3.0",
+  "description": "Lightning renderer for solid universal",
+  "type": "module",
+  "main": "./src/index.js",
+  "sideEffects": false,
+  "scripts": {
+    "start": "npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npm run lint:prettier && npm run lint:eslint",
+    "lint:fix": "npm run lint:fix:prettier && npm run lint:fix:eslint",
+    "lint:prettier": "prettier --check \"**/*.{ts,js,cjs,md}\"",
+    "lint:fix:prettier": "prettier --write \"**/*.{ts,js,cjs,md}\"",
+    "lint:eslint": "eslint .",
+    "lint:fix:eslint": "eslint --fix .",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "dev": "concurrently -c \"auto\" \"npm:watch\" \"npm:vite\"",
+    "vite": "vite --open \"/test/index.html\" --host",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "lightning",
+    "javascript",
+    "canvas",
+    "web",
+    "tv"
+  ],
+  "author": "Chris Lorenzo",
+  "license": "ISC",
+  "peerDependencies": {
+    "solid-js": "^1.6.12"
+  },
+  "devDependencies": {
+    "@lightningjs/renderer": "file:../renderer/",
+    "@lightningjs/solid": "file:./",
+    "@solid-primitives/keyboard": "^1.2.3",
+    "@solid-primitives/rootless": "^1.4.1",
+    "@typescript-eslint/eslint-plugin": "^6.3.0",
+    "@typescript-eslint/parser": "^6.3.0",
+    "eslint": "^8.46.0",
+    "eslint-config-prettier": "^9.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
+    "prettier": "^3.0.1",
+    "solid-js": "^1.7.8",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.9",
+    "vite-tsconfig-paths": "^4.2.0"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{js,cjs,md}": "prettier --write"
+  },
+  "dependencies": {
+    "@solid-primitives/scheduled": "^1.4.1"
+  }
+}
