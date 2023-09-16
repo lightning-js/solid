@@ -24,24 +24,6 @@ const injectCSS = (css) => {
   document.head.appendChild(el);
 };
 
-injectCSS(`
-  #inspector {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    zIndex: 5;
-  }
-  div {
-    position: absolute;
-    display: inline-block;
-  }
-  .text {
-    visibility: hidden;
-  }
-`);
-
 const updateRootStyleFromCanvas = function (bcr) {
   //const p = self.stage.getRenderPrecision() / self.stage.getOption('devicePixelRatio');
   const p = 0.6666667;
@@ -54,15 +36,45 @@ const updateRootStyleFromCanvas = function (bcr) {
   root.style.transform = 'scale(' + p + ',' + p + ')';
 };
 
-setTimeout(function () {
-  const c = document.getElementsByTagName('canvas')[0];
-  updateRootStyleFromCanvas(c.getBoundingClientRect());
-}, 1000);
+export function attachInspector() {
+  injectCSS(`
+    #inspector {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      zIndex: 5;
+    }
+    div {
+      position: absolute;
+      display: inline-block;
+    }
+    .text {
+      visibility: hidden;
+    }
+  `);
+
+  const dom = document.createElement('div');
+  dom.id = 'inspector';
+  document.body.appendChild(dom);
+
+  setTimeout(function () {
+    const c = document.getElementsByTagName('canvas')[0];
+    updateRootStyleFromCanvas(c.getBoundingClientRect());
+  }, 1000);
+}
 
 export default {
   ...universalLightning,
   createElement(name) {
-    const dom = document.createElement('div');
+    let dom;
+    if (name === 'canvas') {
+      dom = document.getElementById('inspector');
+    } else {
+      dom = document.createElement('div');
+    }
+
     if (name === 'text') {
       dom.classList.add('text');
     }
@@ -92,12 +104,14 @@ export default {
     textNode._dom.data = value;
   },
   insertNode(parent, node, anchor) {
-    if (anchor) {
-      parent._dom.insertBefore(node._dom, anchor._dom);
-    } else {
-      parent._dom.appendChild(node._dom);
+    if (parent) {
+      if (anchor) {
+        parent._dom.insertBefore(node._dom, anchor._dom);
+      } else {
+        parent._dom.appendChild(node._dom);
+      }
+      universalLightning.insertNode(parent, node, anchor);
     }
-    universalLightning.insertNode(parent, node, anchor);
   },
   removeNode(parent, node) {
     parent._dom.removeChild(node._dom);

@@ -34,5 +34,3 @@ export * from './primitives/Row';
 export * from './primitives/Column';
 export * from './primitives/createSpriteMap';
 export { config as Config } from './config';
-import { Render } from './core/render';
-export default Render;

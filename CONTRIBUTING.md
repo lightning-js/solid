@@ -2,8 +2,6 @@
 
 Thank you for considering helping out!
 
-Looking to update information or feature your project? Feel free to make the change yourself. [This is the right place to get started](https://github.com/Comcast).
-
 First, please read the [code of conduct](https://github.com/Comcast/Comcast.github.io/blob/main/CODE_OF_CONDUCT.md). We take it very seriously!
 
 Next, if you want to help out, do the following:

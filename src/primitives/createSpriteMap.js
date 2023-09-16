@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { renderer } from '../core/render';
+import { renderer } from '../';
 
 export function createSpriteMap(src, subTextures) {
   const spriteMapTexture = renderer.makeTexture('ImageTexture', {

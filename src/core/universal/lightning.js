@@ -15,6 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { renderer } from '../../';
 import { createEffect } from 'solid-js';
 import { log } from '../utils';
 import Node from '../node';
@@ -23,7 +24,7 @@ export default {
   createElement(name) {
     log('Creating: ', name);
     const node = new Node(name);
-    createEffect(() => node.render());
+    renderer.root && createEffect(() => node.render());
     return node;
   },
   createTextNode(text) {
@@ -55,13 +56,15 @@ export default {
   },
   insertNode(parent, node, anchor) {
     log('INSERT: ', parent, node, anchor);
-    parent.children.insert(node, anchor);
+    if (parent) {
+      parent.children.insert(node, anchor);
 
-    if (node.name === 'TextNode') {
-      if (!parent.isTextNode()) {
-        console.error('Inserting text outside of a <Text> node is not allowed');
+      if (node.name === 'TextNode') {
+        if (!parent.isTextNode()) {
+          console.error('Inserting text outside of a <Text> node is not allowed');
+        }
+        parent.text = parent.getText();
       }
-      parent.text = parent.getText();
     }
   },
   isTextNode(node) {
