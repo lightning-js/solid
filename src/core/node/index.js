@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { renderer, makeShader } from '../render';
+import { renderer, makeShader } from '../../';
 import Children from './children';
 import States from './states';
 import calculateFlex from '../flex';
@@ -176,7 +176,11 @@ Node.prototype.animate = function (props, animationSettings) {
 };
 
 Node.prototype.setFocus = function () {
-  setActiveElement(this);
+  if (this.lng) {
+    setActiveElement(this);
+  } else {
+    this.autofocus = true;
+  }
 };
 
 Node.prototype.getProps = function () {

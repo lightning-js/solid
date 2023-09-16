@@ -16,12 +16,13 @@
  */
 
 import { createRenderer } from 'solid-js/universal';
-import startLightningRenderer from './renderer';
-import Node from './node';
 import universalLightning from './universal/lightning';
-import universalInspector from './universal/dom-inspector';
+import universalInspector, { attachInspector } from './universal/dom-inspector';
 
 const loadInspector = import.meta.env.MODE === 'development';
+if (loadInspector) {
+  attachInspector();
+}
 const solidRenderer = createRenderer(
   loadInspector ? universalInspector : universalLightning,
 );
@@ -39,30 +40,3 @@ export const {
   mergeProps,
   use,
 } = solidRenderer;
-
-export let renderer;
-export let makeShader;
-
-export const Render = function (App, options = {}) {
-  renderer = startLightningRenderer({
-    width: 1920,
-    height: 1080,
-    ...options,
-  });
-
-  renderer.init().then(() => {
-    const rootNode = new Node('App', renderer.root);
-
-    if (loadInspector) {
-      const dom = document.createElement('div');
-      dom.id = 'inspector';
-      rootNode._dom = dom;
-      dom.solid = rootNode;
-      document.body.appendChild(rootNode._dom);
-    }
-
-    rootNode.zIndex = 0.1;
-    makeShader = renderer.makeShader;
-    render(App, rootNode);
-  });
-};
