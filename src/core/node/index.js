@@ -25,6 +25,7 @@ import {
   isFunc,
   isObject,
   isArray,
+  isNumber,
   keyExists,
 } from '../utils';
 import { config } from '../../config';
@@ -39,9 +40,13 @@ function normalizeProps(obj) {
       //Filter out functions and private vars and sub objects
       continue;
     }
-    props[key] = key.startsWith('color') ? normalizeColor(value) : value;
+    props[key] = convertColor(key, value);
   }
   return props;
+}
+
+function convertColor(key, value) {
+  return key.startsWith('color') ? normalizeColor(value) : value;
 }
 
 function convertEffectsToShader(styleEffects) {
@@ -71,7 +76,7 @@ function forwardToLightning(node, name, value) {
   } else if (isObject(value)) {
     props = normalizeProps(value);
   } else {
-    props = normalizeProps({ [name]: value });
+    props = { [name]: convertColor(name, value) };
   }
 
   if (node._animate && !CORE_PROPS.includes(name)) {
@@ -81,10 +86,9 @@ function forwardToLightning(node, name, value) {
   }
 }
 
-const DONT_FORWARD = ['selected'];
 const NodeHandler = {
   set(node, name, value) {
-    if (node.lng && !name.startsWith('_') && !DONT_FORWARD.includes(name)) {
+    if (node.lng && !name.startsWith('_')) {
       forwardToLightning(node, name, value);
     }
 
@@ -93,18 +97,36 @@ const NodeHandler = {
   },
 };
 
-export default function Node(name, lng) {
+function borderAccessor(direction = '') {
+  return {
+    enumerable: false,
+    set(props) {
+      // Format: width || { width, color }
+      if (isNumber(props)) {
+        props = { width: props, color: '#000000' };
+      }
+      this.addEffect({ ['border' + direction]: props });
+      this[`_border${direction}`] = props;
+    },
+    get() {
+      return this[`_border${direction}`];
+    },
+  }
+}
+
+const NonEnumerable = {
+  enumerable: false,
+  writable: true,
+}
+
+export default function Node(name) {
   const node = new Proxy(this, NodeHandler);
   Object.defineProperties(this, {
     name: {
       value: name,
       enumerable: false,
     },
-    lng: {
-      value: lng,
-      writable: true,
-      enumerable: false,
-    },
+    lng: NonEnumerable,
     children: {
       value: new Children(node),
       enumerable: false,
@@ -115,10 +137,7 @@ export default function Node(name, lng) {
         return this.children.length > 0;
       },
     },
-    forwardStates: {
-      enumerable: false,
-      writable: true,
-    },
+    forwardStates: NonEnumerable,
     states: {
       enumerable: false,
       set(v) {
@@ -132,22 +151,11 @@ export default function Node(name, lng) {
         return this._states;
       },
     },
-    parent: {
-      writable: true,
-      enumerable: false,
-    },
-    shader: {
-      writable: true,
-      enumerable: false,
-    },
-    style: {
-      writable: true,
-      enumerable: false,
-    },
-    stateStyles: {
-      writable: true,
-      enumerable: false,
-    },
+    parent: NonEnumerable,
+    shader: NonEnumerable,
+    selected: NonEnumerable,
+    style: NonEnumerable,
+    stateStyles: NonEnumerable,
     animationSettings: {
       get() {
         return this._animationSettings || defaultAnimationSettings;
@@ -167,6 +175,21 @@ export default function Node(name, lng) {
       },
       enumerable: false,
     },
+    borderRadius: {
+      enumerable: false,
+      set(radius) {
+        this._radius = radius;
+        this.addEffect({ radius : { radius }});
+      },
+      get() {
+        return this._radius;
+      },
+    },
+    border: borderAccessor(),
+    borderLeft: borderAccessor('Left'),
+    borderRight: borderAccessor('Right'),
+    borderTop: borderAccessor('Top'),
+    borderBottom: borderAccessor('Bottom'),
   });
   return node;
 }
@@ -263,6 +286,16 @@ Node.prototype.updateLayout = function () {
     calculateFlex(this);
   }
 };
+
+Node.prototype.addEffect = function(effect) {
+  this.effects = {
+    ...(this.effects || {}),
+    ...effect
+  }
+  if (this.lng) {
+    forwardToLightning(this, 'effects', this.effects);
+  }
+}
 
 Node.prototype.render = function () {
   const node = this;

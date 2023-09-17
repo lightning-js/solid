@@ -19,9 +19,26 @@ Clone starter template:
 
 # Usage
 
-Most of the things you do with Solid will carry over to using Solid-Lightning with some key differences as Lightning does not use HTML / DOM / CSS / Mouse Input.
+Most of the things you do with Solid will carry over to using Solid-Lightning with some key differences as Lightning does not use HTML / DOM / CSS / Mouse Input. 
+
+### Hello World
+
+```jsx
+import { render, Canvas, Text } from '@lightningjs/solid';
+
+render(() =>  (
+  <Canvas>
+    <Text>Hello World</Text>
+  </Canvas>
+));
+```
 
 ## Built In Components
+
+### Canvas
+The <Canvas> element boots up the Lightning Renderer. This should be the first component passed into the render function. It takes an `options` param which is passed to the Lightning Renderer.
+
+### View and Text
 
 Everything is built with two primitive components: <View> and <Text>. Think of <View> like div tag for HTML, all encompassing. Whenever you want to display text, wrap it in a <Text> tag like so `<Text>Hello World</Text>`
 
@@ -29,7 +46,7 @@ Everything is built with two primitive components: <View> and <Text>. Think of <
 import { View, Text } from '@lightningjs/solid';
 <View style={OverviewContainer}>
   <Text style={Title}>Hello World!</Text>
-</View>;
+</View>
 ```
 
 Also included is a Row and Column component which handles key navigation between children by automatically calling setFocus on selected child.
@@ -142,6 +159,25 @@ The style attribute takes an object of properties and passes them to the Lightni
 ### Color
 
 Can be HEX string ('#ffffff') or RGBA number 0x00000000 or string 'RRGGBBAA'
+
+### Border and borderRadius
+
+`border` and `borderRadius` are special props which create effects for the DynamicShader found in the Lightning Renderer. These props can be set on the JSX or style object. The order in which you set the props determine how they are applied in the shader. Meaning you probably want to set borderRadius first. You can also set individual borders via `borderLeft`, `borderRight`, `borderTop`, `borderBottom`. These properties do not support animations.
+
+```
+const style = {
+  borderRadius: 30,
+  border: { width: 10, color: '#000000' }
+}
+
+// or 
+
+const style = {
+  borderLeft: { width: 10, color: '#000000' },
+  borderRight: { width: 10, color: '#000000' }
+}
+
+```
 
 ## Flex
 
@@ -324,21 +360,9 @@ function Button(props) {
 }
 ```
 
-## Shaders
+## Shaders and Effects
 
-````jsx
-const RoundedRectangle = ['RoundedRectangle', { radius: 6 }];
-function Button(props) {
-  return (
-    <View {...props} forwardStates animate
-      style={buttonStyles.container} shader={RoundedRectangle}>
-      <View style={buttonStyles.topBar} shader={RoundedRectangle}></View>
-      <Text style={buttonStyles.text}>{props.children}</Text>
-    </View>
-  );
-}
-
-## Effects
+The shader prop allows you to specify a custom shader. Most of the common use ones have shortcuts like `borderRadius`, `border`. 
 
 ```jsx
 const RoundedRectangle = ['RoundedRectangle', { radius: 6 }];
@@ -351,8 +375,7 @@ function Button(props) {
     </View>
   );
 }
-
-````
+```
 
 ## Config
 
@@ -368,6 +391,7 @@ Config.debug = false;
 // Set defaults for all <Text>
 Config.fontSettings.fontFamily = 'Ubuntu';
 Config.fontSettings.color = 0xffffffff;
+Config.fontSettings.fontSize = 100;
 
 // Set key handling map for on{Name}
 Config.keyMap.m = 'Menu';

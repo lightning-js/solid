@@ -44,7 +44,7 @@ export default {
         if (key === 'animate') {
           key = '_animate';
         }
-        if (!(key in node)) {
+        if (!(node[key])) {
           node[key] = value[key];
         }
       }

@@ -54,6 +54,10 @@ export function isString(item) {
   return typeof item === 'string';
 }
 
+export function isNumber(item) {
+  return typeof item === 'number';
+}
+
 export function keyExists(obj, keys) {
   for (const key of keys) {
     if (key in obj) {

@@ -15,10 +15,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/**
- * Children class
- */
-
 import { isArray, isObject, isString } from '../utils';
 export default class States extends Array {
   constructor(node, initialState = []) {
