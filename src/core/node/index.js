@@ -391,7 +391,7 @@ export default class Node extends Object {
       }
 
       if (!node.width || !node.height) {
-        node.lng.on('textLoaded', (elm, { width, height }) => {
+        node.lng.once('textLoaded', (elm, { width, height }) => {
           node.width = width;
           node.height = height;
           node.parent.updateLayout();
