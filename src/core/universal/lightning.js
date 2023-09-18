@@ -38,20 +38,9 @@ export default {
   },
   setProperty(node, name, value = true) {
     log('Set ', name, value);
-    if (name === 'style') {
-      // Keys set in JSX are more important
-      for (let key in value) {
-        if (key === 'animate') {
-          key = '_animate';
-        }
-        if (!(node[key])) {
-          node[key] = value[key];
-        }
-      }
-    } else if (name === 'animate') {
+    if (name === 'animate') {
       return (node._animate = value);
     }
-
     node[name] = value;
   },
   insertNode(parent, node, anchor) {

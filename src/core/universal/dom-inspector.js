@@ -45,6 +45,7 @@ export function attachInspector() {
       width: 100%;
       height: 100%;
       zIndex: 5;
+      overflow: hidden;
     }
     div {
       position: absolute;

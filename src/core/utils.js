@@ -28,6 +28,10 @@ export function normalizeColor(color = '') {
       return color.replace('#', '0x') + 'ff';
     }
 
+    if (color.startsWith('0x')) {
+      return color;
+    }
+
     return '0x' + (color.length === 6 ? color + 'ff' : color);
   }
 }
