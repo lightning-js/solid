@@ -20,15 +20,14 @@ import {
   RendererMain,
   ThreadXRenderDriver,
 } from '@lightningjs/renderer';
-import coreWorkerUrl from './worker.js?importChunkUrl';
 
 const defaultOptions = {
-  driver: 'main',
   width: 1920,
   height: 1080,
   deviceLogicalPixelRatio: 0.6666667,
   devicePhysicalPixelRatio: 1,
   rootId: 'app',
+  threadXCoreWorkerUrl: undefined,
 };
 
 export default (options = {}) => {
@@ -38,10 +37,12 @@ export default (options = {}) => {
     ...options,
   };
 
-  if (options.driver === 'main') {
+  if (!options.threadXCoreWorkerUrl) {
     driver = new MainRenderDriver();
   } else {
-    driver = new ThreadXRenderDriver({ coreWorkerUrl });
+    driver = new ThreadXRenderDriver({
+      coreWorkerUrl: options.threadXCoreWorkerUrl,
+    });
   }
 
   return new RendererMain(options, options.rootId, driver);
