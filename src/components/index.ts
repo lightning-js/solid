@@ -15,16 +15,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { handleNavigation } from "./navigation";
-
-export function Column(props) {
-  const up = handleNavigation('up');
-  const down = handleNavigation('down');
-
-  return <node
-    onUp={up}
-    onDown={down}
-    onFocus={props.onFocus || (elm => elm.children[elm.selected]?.setFocus())}
-    selected={0}
-    {...props}>{props.children}</node>
-}
+export * from './Text.jsx';
+export * from './View.jsx';
+export * from './Canvas.jsx';

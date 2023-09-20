@@ -15,39 +15,42 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { isArray, isObject, isString } from '../utils';
+import { isArray, isString } from '../utils.js';
+import type SolidNode from './index.js';
 export default class States extends Array {
-  constructor(node, initialState = []) {
+  private _node: SolidNode;
+
+  constructor(node: SolidNode, initialState: string[] | string | Record<string, unknown> = []) {
     if (isArray(initialState)) {
-      super(...initialState);
-    } else if (isObject(initialState)) {
-      super(
-        ...Object.entries(initialState)
-          .filter(([key, value]) => value)
-          .map(([key]) => key),
-      );
+      super(...initialState as any);
     } else if (isString(initialState)) {
-      super(initialState);
+      super(initialState as any);
+    } else {
+      super(
+        ...(Object.entries(initialState)
+          .filter(([key, value]) => value)
+          .map(([key]) => key) as any),
+      );
     }
 
     this._node = node;
     return this;
   }
 
-  has(state) {
+  has(state: string) {
     return this.indexOf(state) >= 0;
   }
 
-  is(state) {
+  is(state: string) {
     return this.indexOf(state) >= 0;
   }
 
-  add(state) {
+  add(state: string) {
     this.push(state);
-    this._node._stateChanged('add', state);
+    this._node._stateChanged();
   }
 
-  toggle(state) {
+  toggle(state: string) {
     if (this.has(state)) {
       this.remove(state);
     } else {
@@ -55,11 +58,11 @@ export default class States extends Array {
     }
   }
 
-  remove(state) {
+  remove(state: string) {
     const stateIndexToRemove = this.indexOf(state);
     if (stateIndexToRemove >= 0) {
       this.splice(stateIndexToRemove, 1);
-      this._node._stateChanged('remove', state);
+      this._node._stateChanged();
     }
   }
 }

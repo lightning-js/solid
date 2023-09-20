@@ -19,31 +19,44 @@ import {
   MainRenderDriver,
   RendererMain,
   ThreadXRenderDriver,
+  type RendererMainSettings
 } from '@lightningjs/renderer';
 
-const defaultOptions = {
-  width: 1920,
-  height: 1080,
+export interface SolidRendererOptions extends RendererMainSettings {
+  threadXCoreWorkerUrl?: string;
+  rootId: string
+}
+
+const defaultOptions: SolidRendererOptions = {
+  appWidth: 1920,
+  appHeight: 1080,
   deviceLogicalPixelRatio: 0.6666667,
   devicePhysicalPixelRatio: 1,
   rootId: 'app',
   threadXCoreWorkerUrl: undefined,
 };
 
-export default (options = {}) => {
+export function startLightningRenderer(options: Partial<SolidRendererOptions> = {}): RendererMain {
   let driver;
-  options = {
+  const resolvedOptions: SolidRendererOptions = {
     ...defaultOptions,
     ...options,
   };
 
-  if (!options.threadXCoreWorkerUrl) {
+  if (!resolvedOptions.threadXCoreWorkerUrl) {
     driver = new MainRenderDriver();
   } else {
     driver = new ThreadXRenderDriver({
-      coreWorkerUrl: options.threadXCoreWorkerUrl,
+      coreWorkerUrl: resolvedOptions.threadXCoreWorkerUrl,
     });
   }
 
-  return new RendererMain(options, options.rootId, driver);
+  return new RendererMain({
+    appWidth: resolvedOptions.appWidth,
+    appHeight: resolvedOptions.appHeight,
+    deviceLogicalPixelRatio: resolvedOptions.deviceLogicalPixelRatio,
+    devicePhysicalPixelRatio: resolvedOptions.devicePhysicalPixelRatio,
+    clearColor: resolvedOptions.clearColor,
+    coreExtensionModule: resolvedOptions.coreExtensionModule,
+  }, resolvedOptions.rootId, driver);
 };

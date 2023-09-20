@@ -15,6 +15,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export * from './Text';
-export * from './View';
-export * from './Canvas';
+import { handleNavigation } from "./navigation.js";
+import { type IntrinsicNodeProps } from "../intrinsicTypes.js";
+
+export function Column(props: IntrinsicNodeProps) {
+  const up = handleNavigation('up');
+  const down = handleNavigation('down');
+
+  return <node
+    onUp={up}
+    onDown={down}
+    onFocus={props.onFocus || (elm => elm.children[elm.selected]?.setFocus())}
+    selected={0}
+    {...props}>{props.children}</node>
+}

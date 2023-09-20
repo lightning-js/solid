@@ -25,12 +25,12 @@ export {
   Index,
   ErrorBoundary,
 } from 'solid-js';
-export * from './core/activeElement';
-export * from './components';
-export * from './core/render';
-export * from './primitives/useFocusManager';
-export * from './primitives/Announcer';
-export * from './primitives/Row';
-export * from './primitives/Column';
-export * from './primitives/createSpriteMap';
-export { config as Config } from './config';
+export * from './core/activeElement.js';
+export * from './components/index.js';
+export * from './core/render.js';
+export * from './primitives/useFocusManager.js';
+export * from './primitives/Announcer/index.js';
+export * from './primitives/Row.jsx';
+export * from './primitives/Column.jsx';
+export * from './primitives/createSpriteMap.js';
+export { config as Config } from './config.js';

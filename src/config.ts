@@ -17,7 +17,22 @@
  * limitations under the License.
  */
 
-export const config = {
+import type { KeyMap } from "./intrinsicTypes.js";
+
+interface Config {
+  debug: boolean;
+  animationSettings: {
+    duration: number;
+    easing: string;
+  };
+  fontSettings: {
+    fontFamily: string;
+    fontSize: number;
+  };
+  keyMap: KeyMap
+}
+
+export const config: Config = {
   debug: false,
   animationSettings: {
     duration: 250,

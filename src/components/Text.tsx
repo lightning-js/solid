@@ -15,6 +15,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export function Text(props) {
+import type { IntrinsicTextProps } from "../intrinsicTypes.js";
+
+export function Text(props: IntrinsicTextProps) {
   return <text {...props}></text>
 }

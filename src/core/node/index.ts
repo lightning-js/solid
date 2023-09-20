@@ -15,23 +15,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { renderer, makeShader } from '../../';
-import Children from './children';
-import States from './states';
-import calculateFlex from '../flex';
-import { normalizeColor, log, isArray, isNumber, keyExists } from '../utils';
-import { config } from '../../config';
-import { setActiveElement } from '../activeElement';
+import { renderer, makeShader } from '../../index.js';
+import Children from './children.js';
+import States from './states.js';
+import calculateFlex from '../flex.js';
+import { normalizeColor, log, isArray, isNumber, keyExists } from '../utils.js';
+import { config } from '../../config.js';
+import { setActiveElement } from '../activeElement.js';
+import type { INode, INodeAnimatableProps, INodeWritableProps, ShaderDesc } from '@lightningjs/renderer';
+import { assertTruthy } from '@lightningjs/renderer/utils';
 
 const { animationSettings: defaultAnimationSettings } = config;
 
-function convertColor(key, value) {
+function convertColor(key: string, value: number | string) {
   return {
     [key]: key.startsWith('color') ? normalizeColor(value) : value,
   };
 }
 
-function convertEffectsToShader(styleEffects) {
+function convertEffectsToShader(styleEffects: any) {
   const effects = [];
 
   for (const [type, props] of Object.entries(styleEffects)) {
@@ -43,9 +45,15 @@ function convertEffectsToShader(styleEffects) {
   return makeShader('DynamicShader', { effects });
 }
 
-function borderAccessor(direction = '') {
+function borderAccessor(direction: '' | 'Top' | 'Right' | 'Bottom' | 'Left' = '') {
   return {
-    set(props) {
+    effects: any,
+    _border: any,
+    _borderLeft: any,
+    _borderRight: any,
+    _borderTop: any,
+    _borderBottom: any,
+    set(props: any) {
       // Format: width || { width, color }
       if (isNumber(props)) {
         props = { width: props, color: '#000000' };
@@ -104,12 +112,31 @@ const LightningRendererNonAnimatingProps = [
   'textAlign',
 ];
 
-export default class Node extends Object {
-  constructor(name) {
+export default class SolidNode extends Object {
+  name: string;
+  lng?: INode;
+  rendered: boolean;
+  autofocus: boolean;
+  zIndex?: number;
+  selected?: number;
+  private _renderProps: any;
+  private _effects: any;
+  private _parent?: SolidNode;
+  private _shader?: ShaderDesc;
+  private _animate?: any;
+  private _style?: any;
+  private _states?: States;
+  private _animationSettings?: any;
+  private _updateLayoutOn?: any;
+  public _isDirty?: boolean; // Public but uses _ prefix
+  children: Children;
+
+
+  constructor(name: string) {
     super();
     this.name = name;
-    this.lng;
     this.rendered = false;
+    this.autofocus = false;
     this._renderProps = {};
     this.children = new Children(this);
 
@@ -189,16 +216,16 @@ export default class Node extends Object {
 
   set parent(p) {
     this._parent = p;
-    if (this.rendered) {
-      this.lng.parent = p.lng;
+    if (this.rendered && this.lng) {
+      this.lng.parent = p?.lng ?? null;
     }
   }
 
-  get shader() {
+  get shader(): ShaderDesc | undefined {
     return this._shader;
   }
 
-  set shader(v) {
+  set shader(v: Parameters<typeof makeShader> | ShaderDesc | undefined) {
     if (isArray(v)) {
       this._shader = makeShader(...v);
     } else {
@@ -207,10 +234,10 @@ export default class Node extends Object {
     this._sendToLightning('shader', this._shader);
   }
 
-  _sendToLightningAnimatable(name, value) {
-    if (this.rendered) {
+  _sendToLightningAnimatable(name: string, value: [value: number | string, settings: any] | number) {
+    if (this.rendered && this.lng) {
       if (isArray(value)) {
-        let prop = convertColor(name, value[0]);
+        const prop = convertColor(name, value[0]);
         return this.animate(prop, value[1]).start();
       }
 
@@ -218,27 +245,28 @@ export default class Node extends Object {
         return this.animate({ [name]: value }).start();
       }
 
-      this.lng[name] = value;
+      (this.lng[name as keyof INode] as number) = value;
     } else {
       this._renderProps[name] = value;
     }
   }
 
-  _sendToLightning(name, value) {
-    if (this.rendered) {
-      this.lng[name] = value;
+  _sendToLightning(name: string, value: unknown) {
+    if (this.rendered && this.lng) {
+      (this.lng[name as keyof INodeWritableProps] as unknown) = value;
     } else {
       this._renderProps[name] = value;
     }
   }
 
-  animate(props, animationSettings) {
+  animate(props: Partial<INodeAnimatableProps>, animationSettings?: any) {
+    assertTruthy(this.lng, 'Node must be rendered before animating');
     return this.lng.animate(props, animationSettings || this.animationSettings);
   }
 
   setFocus() {
     if (this.rendered) {
-      setActiveElement(this);
+      setActiveElement<SolidNode>(this);
     } else {
       this.autofocus = true;
     }
@@ -256,15 +284,15 @@ export default class Node extends Object {
     this.lng && renderer.destroyNode(this.lng);
   }
 
-  set style(value) {
+  set style(value: any) {
     // Keys set in JSX are more important
     for (let key in value) {
       if (key === 'animate') {
         key = '_animate';
       }
 
-      if (!this[key]) {
-        this[key] = value[key];
+      if (!this[key as keyof this]) {
+        this[key as keyof this] = value[key as keyof SolidNode];
       }
     }
 
@@ -377,14 +405,15 @@ export default class Node extends Object {
   }
 
   render() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const node = this;
     const parent = this.parent;
     node.x = node.x || 0;
     node.y = node.y || 0;
 
     // Parent is dirty whenever a node is inserted after initial render
-    if (parent._isDirty) {
-      node.parent.updateLayout();
+    if (parent?._isDirty) {
+      parent.updateLayout();
       parent._applyZIndexToChildren();
       parent._isDirty = false;
     }
@@ -397,7 +426,7 @@ export default class Node extends Object {
 
     let props = node._renderProps;
 
-    if (parent.lng) {
+    if (parent?.lng) {
       props.parent = parent.lng;
     }
 

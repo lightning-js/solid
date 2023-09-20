@@ -15,6 +15,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export function View(props) {
-  return <node {...props}></node>
-}
+import { createSignal } from 'solid-js';
+import type SolidNode from './node/index.js';
+export const [activeElement, setActiveElement] = createSignal<SolidNode | null>(null);

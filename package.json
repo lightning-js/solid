@@ -3,7 +3,17 @@
   "version": "0.3.1",
   "description": "Lightning renderer for solid universal",
   "type": "module",
-  "main": "./src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "main": "./dist/src/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    },
+    "./jsx-runtime": {
+      "types": "./jsx-runtime.d.ts"
+    }
+  },
   "sideEffects": false,
   "scripts": {
     "start": "npm run dev",
@@ -38,7 +48,7 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "prettier": "^3.0.1",
-    "typescript": "^5.1.6",
+    "typescript": "^5.2.2",
     "vite": "^4.4.9",
     "vite-tsconfig-paths": "^4.2.0"
   },
@@ -57,7 +67,8 @@
     "solid-js": "^1.7.12"
   },
   "files": [
-    "src",
+    "dist",
+    "jsx-runtime.d.ts",
     "LICENSE",
     "NOTICE",
     "README.md"

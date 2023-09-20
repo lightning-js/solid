@@ -15,16 +15,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export default function (node) {
-  let children = node.children;
-  let direction = node.flexDirection || 'row';
-  let dimension = direction === 'row' ? 'width' : 'height';
-  let prop = direction === 'row' ? 'x' : 'y';
-  let containerSize = node[dimension];
-  let itemSize = children.reduce((prev, c) => prev + c[dimension], 0);
-  let gap = node.gap || 0;
-  let numChildren = children.length;
-  let justify = node.justifyContent || 'flexStart';
+import type SolidNode from "./node/index.js";
+
+export default function (node: SolidNode) {
+  const children = node.children;
+  const direction = node.flexDirection || 'row';
+  const dimension = direction === 'row' ? 'width' : 'height';
+  const prop = direction === 'row' ? 'x' : 'y';
+  const containerSize = node[dimension];
+  const itemSize = children.reduce((prev, c) => prev + c[dimension], 0);
+  const gap = node.gap || 0;
+  const numChildren = children.length;
+  const justify = node.justifyContent || 'flexStart';
 
   if (justify === 'flexStart') {
     let start = 0;
@@ -35,8 +37,8 @@ export default function (node) {
   }
   if (justify === 'flexEnd') {
     let start = containerSize;
-    for (var i = numChildren - 1; i >= 0; i--) {
-      let c = children[i];
+    for (let i = numChildren - 1; i >= 0; i--) {
+      const c = children[i];
       c[prop] = start - c[dimension];
       start -= c[dimension] + gap;
     }
@@ -49,7 +51,7 @@ export default function (node) {
     });
   }
   if (justify === 'spaceBetween') {
-    let toPad = (containerSize - itemSize) / numChildren - 1;
+    const toPad = (containerSize - itemSize) / numChildren - 1;
     let start = 0;
     children.forEach((c) => {
       c[prop] = start;
@@ -57,7 +59,7 @@ export default function (node) {
     });
   }
   if (justify === 'spaceEvenly') {
-    let toPad = (containerSize - itemSize) / numChildren;
+    const toPad = (containerSize - itemSize) / numChildren;
     let start = toPad;
     children.forEach((c) => {
       c[prop] = start;
