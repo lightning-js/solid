@@ -19,13 +19,7 @@ import { renderer, makeShader } from '../../';
 import Children from './children';
 import States from './states';
 import calculateFlex from '../flex';
-import {
-  normalizeColor,
-  log,
-  isArray,
-  isNumber,
-  keyExists,
-} from '../utils';
+import { normalizeColor, log, isArray, isNumber, keyExists } from '../utils';
 import { config } from '../../config';
 import { setActiveElement } from '../activeElement';
 
@@ -33,8 +27,8 @@ const { animationSettings: defaultAnimationSettings } = config;
 
 function convertColor(key, value) {
   return {
-    [key]: key.startsWith('color') ? normalizeColor(value) : value
-  }
+    [key]: key.startsWith('color') ? normalizeColor(value) : value,
+  };
 }
 
 function convertEffectsToShader(styleEffects) {
@@ -58,29 +52,56 @@ function borderAccessor(direction = '') {
       }
       this.effects = {
         ...(this.effects || {}),
-        ...{ [`border${direction}`]: props }
+        ...{ [`border${direction}`]: props },
       };
       this[`_border${direction}`] = props;
     },
     get() {
       return this[`_border${direction}`];
     },
-  }
+  };
 }
 
 const LightningRendererNumberProps = [
-  'alpha', 'height', 'fontSize', 'lineHeight', 'mount', 'mountX', 'mountY',
-  'pivot', 'pivotX', 'pivotY', 'rotation', 'scale', 'width',
-  'worldX', 'worldY', 'x', 'y', 'zIndex'
+  'alpha',
+  'height',
+  'fontSize',
+  'lineHeight',
+  'mount',
+  'mountX',
+  'mountY',
+  'pivot',
+  'pivotX',
+  'pivotY',
+  'rotation',
+  'scale',
+  'width',
+  'worldX',
+  'worldY',
+  'x',
+  'y',
+  'zIndex',
 ];
 
 const LightningRendererColorProps = [
-  'color', 'colorTop', 'colorRight', 'colorLeft', 'colorBottom',
-  'colorTl', 'colorTr', 'colorBl', 'colorBr'
+  'color',
+  'colorTop',
+  'colorRight',
+  'colorLeft',
+  'colorBottom',
+  'colorTl',
+  'colorTr',
+  'colorBl',
+  'colorBr',
 ];
 
 const LightningRendererNonAnimatingProps = [
-  'text', 'src', 'fontFamily', 'contain', 'textAlign'
+  'text',
+  'texture',
+  'src',
+  'fontFamily',
+  'contain',
+  'textAlign',
 ];
 
 export default class Node extends Object {
@@ -95,19 +116,19 @@ export default class Node extends Object {
     for (const key of LightningRendererNumberProps) {
       Object.defineProperty(this, key, {
         get() {
-          return this[`_${key}`] || this.lng && this.lng[key];
+          return this[`_${key}`] || (this.lng && this.lng[key]);
         },
         set(v) {
           this[`_${key}`] = v;
           this._sendToLightningAnimatable(key, v);
-        }
+        },
       });
     }
 
     for (const key of LightningRendererColorProps) {
       Object.defineProperty(this, key, {
         get() {
-          return this[`_${key}`] || this.lng && this.lng[key];
+          return this[`_${key}`] || (this.lng && this.lng[key]);
         },
         set(v) {
           this[`_${key}`] = v;
@@ -115,19 +136,19 @@ export default class Node extends Object {
             v = normalizeColor(v);
           }
           this._sendToLightningAnimatable(key, v);
-        }
+        },
       });
     }
 
     for (const key of LightningRendererNonAnimatingProps) {
       Object.defineProperty(this, key, {
         get() {
-          return this[`_${key}`] || this.lng && this.lng[key];
+          return this[`_${key}`] || (this.lng && this.lng[key]);
         },
         set(v) {
           this[`_${key}`] = v;
           this._sendToLightning(key, v);
-        }
+        },
       });
     }
 
@@ -138,8 +159,8 @@ export default class Node extends Object {
           this._borderRadius = radius;
           this.effects = {
             ...(this.effects || {}),
-            ...{ radius : { radius }}
-          }
+            ...{ radius: { radius } },
+          };
         },
         get() {
           return this._borderRadius;
@@ -150,7 +171,7 @@ export default class Node extends Object {
       borderRight: borderAccessor('Right'),
       borderTop: borderAccessor('Top'),
       borderBottom: borderAccessor('Bottom'),
-    })
+    });
   }
 
   get effects() {
@@ -194,7 +215,7 @@ export default class Node extends Object {
       }
 
       if (this._animate) {
-        return this.animate({ [name] : value }).start();
+        return this.animate({ [name]: value }).start();
       }
 
       this.lng[name] = value;
@@ -242,7 +263,7 @@ export default class Node extends Object {
         key = '_animate';
       }
 
-      if (!(this[key])) {
+      if (!this[key]) {
         this[key] = value[key];
       }
     }
@@ -283,7 +304,7 @@ export default class Node extends Object {
   }
 
   set updateLayoutOn(v) {
-      this._updateLayoutOn = v;
+    this._updateLayoutOn = v;
     queueMicrotask(() => this.updateLayout());
   }
 
@@ -315,7 +336,10 @@ export default class Node extends Object {
       this.children.forEach((c) => (c.states = states));
     }
 
-    if (this._undoStates || (this.style && keyExists(this.style, this.states))) {
+    if (
+      this._undoStates ||
+      (this.style && keyExists(this.style, this.states))
+    ) {
       this._undoStates = this._undoStates || {};
       let stylesToUndo = {};
 
@@ -381,7 +405,7 @@ export default class Node extends Object {
       props = {
         ...config.fontSettings,
         ...props,
-        text: node.getText()
+        text: node.getText(),
       };
       log('Rendering: ', node.name, props);
       node.lng = renderer.createTextNode(props);
