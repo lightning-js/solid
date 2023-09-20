@@ -25,12 +25,6 @@ import { setActiveElement } from '../activeElement';
 
 const { animationSettings: defaultAnimationSettings } = config;
 
-function convertColor(key, value) {
-  return {
-    [key]: key.startsWith('color') ? normalizeColor(value) : value,
-  };
-}
-
 function convertEffectsToShader(styleEffects) {
   const effects = [];
 
@@ -132,7 +126,9 @@ export default class Node extends Object {
         },
         set(v) {
           this[`_${key}`] = v;
-          if (!isArray(v)) {
+          if (isArray(v)) {
+            v[0] = normalizeColor(v[0]);
+          } else {
             v = normalizeColor(v);
           }
           this._sendToLightningAnimatable(key, v);
@@ -172,6 +168,24 @@ export default class Node extends Object {
       borderTop: borderAccessor('Top'),
       borderBottom: borderAccessor('Bottom'),
     });
+
+    Object.defineProperties(this, {
+      linearGradient: {
+        set(props) {
+          this._linearGradient = props;
+          if (props.colors) {
+            props.colors = props.colors.map((c) => normalizeColor(c));
+          }
+          this.effects = {
+            ...(this.effects || {}),
+            ...{ linearGradient: props },
+          };
+        },
+        get() {
+          return this._linearGradient;
+        },
+      },
+    });
   }
 
   get effects() {
@@ -210,8 +224,7 @@ export default class Node extends Object {
   _sendToLightningAnimatable(name, value) {
     if (this.rendered) {
       if (isArray(value)) {
-        let prop = convertColor(name, value[0]);
-        return this.animate(prop, value[1]).start();
+        return this.animate({ [name]: value[0] }, value[1]).start();
       }
 
       if (this._animate) {
@@ -220,6 +233,10 @@ export default class Node extends Object {
 
       this.lng[name] = value;
     } else {
+      // Need to render before animating
+      if (isArray(value)) {
+        value = value[0];
+      }
       this._renderProps[name] = value;
     }
   }
