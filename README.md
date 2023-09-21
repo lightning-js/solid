@@ -50,6 +50,8 @@ import { View, Text } from '@lightningjs/solid';
 </View>;
 ```
 
+### Row and Column
+
 Also included is a Row and Column component which handles key navigation between children by automatically calling setFocus on selected child.
 
 ```jsx
@@ -159,7 +161,7 @@ The style attribute takes an object of properties and passes them to the Lightni
 
 ### Color
 
-Can be HEX string ('#ffffff') or RGBA number 0x00000000 or string 'RRGGBBAA'
+Can be HEX string ('#rrggbb') or ('#rrggbbaa') or RGBA number 0x00000000 or string 'RRGGBBAA'. I recommend installing [VS Code color picker](https://marketplace.visualstudio.com/items?itemName=AntiAntiSepticeye.vscode-color-picker) and using hex format to see the colors in VS Code.
 
 ### Border and borderRadius
 
@@ -180,7 +182,61 @@ const style = {
 
 ```
 
-## Flex
+### linearGradient
+
+`linearGradient` is another special effect that can be used like a style with following syntax.
+
+```
+linearGradient:
+    {
+      angle: 225,
+      stops: [0.1, 0.5],
+      colors: [
+        0xff0000ff, 0x00000000,
+      ],
+    },
+```
+
+You can have as many stops or colors as you like.
+
+## Layout
+
+When a child element changes size onLayout will be called. You'll be notified with
+`(node, { width, height})` of the element. You can use this callback to resize the parent node. If you do, call `parent.updateLayout`.
+
+### withPadding
+
+`withPadding` is a [directive](https://www.solidjs.com/docs/latest/api#use___) to set padding when a child text node loads. It follows css by taking a single padding value or Array [top, bottom | left, right ] or [top | right, left | bottom ] or [top | right | bottom | left]
+
+```jsx
+import { View, Text, withPadding } from '@lightningjs/solid';
+
+const Badge = (props) => {
+  return (
+    <node
+      use:withPadding={[10, 15]}
+      {...props}
+      style={{
+        color: '#00000099',
+        borderRadius: 8,
+        border: { width: 2, color: '#ffffff' },
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 20,
+          lineHeight: 20,
+        }}
+      >
+        {props.children}
+      </Text>
+    </node>
+  );
+};
+<Badge>HD</Badge>;
+```
+
+### Flex
 
 At the moment there is a very barebone flex implementation (`display: flex`) made for one level of children. It only supports `flexDirection`, `justifyContent` and `gap` at the moment. But very useful for laying out rows and columns.
 

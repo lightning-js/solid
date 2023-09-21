@@ -25,7 +25,7 @@ export function normalizeColor(color = '') {
   if (typeof color === 'string') {
     // Renderer expects RGBA values
     if (color.startsWith('#')) {
-      return color.replace('#', '0x') + 'ff';
+      return color.replace('#', '0x') + (color.length === 7 ? 'ff' : '');
     }
 
     if (color.startsWith('0x')) {

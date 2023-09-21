@@ -29,6 +29,7 @@ export * from './core/activeElement';
 export * from './components';
 export * from './core/render';
 export * from './primitives/useFocusManager';
+export * from './primitives/withPadding';
 export * from './primitives/Announcer';
 export * from './primitives/Row';
 export * from './primitives/Column';

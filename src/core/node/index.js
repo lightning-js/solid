@@ -19,7 +19,14 @@ import { renderer, makeShader } from '../../';
 import Children from './children';
 import States from './states';
 import calculateFlex from '../flex';
-import { normalizeColor, log, isArray, isNumber, keyExists } from '../utils';
+import {
+  normalizeColor,
+  log,
+  isArray,
+  isNumber,
+  isFunc,
+  keyExists,
+} from '../utils';
 import { config } from '../../config';
 import { setActiveElement } from '../activeElement';
 
@@ -337,11 +344,13 @@ export default class Node extends Object {
     });
   }
 
-  updateLayout() {
+  updateLayout(...args) {
     if (this.display === 'flex' && this.hasChildren) {
       log('Layout: ', this);
       calculateFlex(this);
     }
+
+    isFunc(this.onLayout) && this.onLayout(...args);
   }
 
   _stateChanged() {
@@ -427,15 +436,15 @@ export default class Node extends Object {
       log('Rendering: ', node.name, props);
       node.lng = renderer.createTextNode(props);
 
-      if (node.onLoad) {
+      if (isFunc(node.onLoad)) {
         node.lng.once('textLoaded', node.onLoad);
       }
 
       if (!node.width || !node.height) {
-        node.lng.once('textLoaded', (elm, { width, height }) => {
-          node.width = width;
-          node.height = height;
-          node.parent.updateLayout();
+        node.lng.once('textLoaded', (elm, size) => {
+          node.width = size.width;
+          node.height = size.height;
+          node.parent.updateLayout(node, size);
         });
       }
     } else {
