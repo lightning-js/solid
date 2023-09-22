@@ -178,7 +178,7 @@ export default class Node extends Object {
 
     Object.defineProperties(this, {
       linearGradient: {
-        set(props) {
+        set(props = {}) {
           this._linearGradient = props;
           if (props.colors) {
             props.colors = props.colors.map((c) => normalizeColor(c));

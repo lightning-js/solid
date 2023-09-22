@@ -69,16 +69,21 @@ export const useFocusManager = createSingletonRoot(() => {
     if (e) {
       const key = keyMap[e.key] || e.key;
       untrack(() => {
-        focusPath().forEach((elm) => {
+        const fp = focusPath();
+        for (const elm of fp) {
           if (isFunc(elm[`on${key}`])) {
-            return elm[`on${key}`].call(elm, e, elm);
+            if (elm[`on${key}`].call(elm, e, elm) === true) {
+              break;
+            }
           }
 
           if (isFunc(elm.onKeyPress)) {
-            return elm.onKeyPress.call(elm, e, key, elm);
+            if (elm.onKeyPress.call(elm, e, key, elm) === true) {
+              break;
+            }
           }
-          return false;
-        });
+        }
+        return false;
       });
     }
   });
