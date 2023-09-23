@@ -19,6 +19,8 @@ export default function (node) {
   let children = node.children;
   let direction = node.flexDirection || 'row';
   let dimension = direction === 'row' ? 'width' : 'height';
+  let marginOne = direction === 'row' ? 'marginLeft' : 'marginTop';
+  let marginTwo = direction === 'row' ? 'marginRight' : 'marginBottom';
   let prop = direction === 'row' ? 'x' : 'y';
   let containerSize = node[dimension];
   let itemSize = children.reduce((prev, c) => prev + c[dimension], 0);
@@ -29,27 +31,27 @@ export default function (node) {
   if (justify === 'flexStart') {
     let start = 0;
     children.forEach((c) => {
-      c[prop] = start;
-      start += c[dimension] + gap;
+      c[prop] = start + (c[marginOne] || 0);
+      start += c[dimension] + gap + (c[marginOne] || 0) + (c[marginTwo] || 0);
     });
   }
   if (justify === 'flexEnd') {
     let start = containerSize;
     for (var i = numChildren - 1; i >= 0; i--) {
       let c = children[i];
-      c[prop] = start - c[dimension];
-      start -= c[dimension] + gap;
+      c[prop] = start - c[dimension] - (c[marginTwo] || 0);
+      start -= c[dimension] + gap + (c[marginOne] || 0) + (c[marginTwo] || 0);
     }
   }
   if (justify === 'center') {
-    let start = (containerSize - (itemSize + gap * numChildren)) / 2;
+    let start = (containerSize - (itemSize + gap * (numChildren - 1))) / 2;
     children.forEach((c) => {
       c[prop] = start;
       start += c[dimension] + gap;
     });
   }
   if (justify === 'spaceBetween') {
-    let toPad = (containerSize - itemSize) / numChildren - 1;
+    let toPad = (containerSize - itemSize) / (numChildren - 1);
     let start = 0;
     children.forEach((c) => {
       c[prop] = start;
@@ -57,7 +59,7 @@ export default function (node) {
     });
   }
   if (justify === 'spaceEvenly') {
-    let toPad = (containerSize - itemSize) / numChildren;
+    let toPad = (containerSize - itemSize) / (numChildren + 1);
     let start = toPad;
     children.forEach((c) => {
       c[prop] = start;
