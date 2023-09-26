@@ -30,7 +30,6 @@
   "author": "Chris Lorenzo",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@lightningjs/solid": "file:./",
     "@typescript-eslint/eslint-plugin": "^6.3.0",
     "@typescript-eslint/parser": "^6.3.0",
     "eslint": "^8.46.0",
@@ -50,10 +49,8 @@
     "*.{js,cjs,md}": "prettier --write"
   },
   "dependencies": {
+    "@lightningjs/solid": "file:./",
     "@lightningjs/renderer": "^0.3.0",
-    "@solid-primitives/keyboard": "^1.2.5",
-    "@solid-primitives/rootless": "^1.4.2",
-    "@solid-primitives/scheduled": "^1.4.1",
     "solid-js": "^1.7.12"
   },
   "files": [
