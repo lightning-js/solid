@@ -27,12 +27,4 @@ export const config = {
     fontFamily: 'Ubuntu',
     fontSize: 100,
   },
-  keyMap: {
-    ArrowLeft: 'Left',
-    ArrowRight: 'Right',
-    ArrowUp: 'Up',
-    ArrowDown: 'Down',
-    Enter: 'Enter',
-    l: 'Last',
-  },
 };

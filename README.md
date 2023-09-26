@@ -4,7 +4,7 @@
 
 # solid-lightning
 
-Solid-Lightning is a UI framework for [Lightning Renderer](https://lightningjs.io/) built with [SolidJS](https://www.solidjs.com/) Universal Renderer. It allows you to declaratively construct lightning nodes with reactive primitives, just as you would construct a DOM tree in SolidJS.
+Solid-Lightning is a UI framework for [Lightning Renderer](https://lightningjs.io/) built with [SolidJS](https://www.solidjs.com/) Universal Renderer. It allows you to declaratively construct lightning nodes with reactive primitives, just as you would construct a DOM tree in SolidJS. Also check out [Solid Lightning Primitives](https://github.com/lightning-js/solid-primitives) for additional primitives to speed up your development.
 
 ## Quick Start
 
@@ -50,20 +50,6 @@ import { View, Text } from '@lightningjs/solid';
 </View>;
 ```
 
-### Row and Column
-
-Also included is a Row and Column component which handles key navigation between children by automatically calling setFocus on selected child.
-
-```jsx
-import { Column, Row, View, Text } from '@lightningjs/solid';
-<Row y={400} style={styles.Row} gap={12} justifyContent="flexStart">
-  <Button autofocus>TV Shows</Button>
-  <Button>Movies</Button>
-  <Button>Sports</Button>
-  <Button>News</Button>
-</Row>;
-```
-
 ## Focus / activeElement
 
 activeElement is a global Solid Signal. At any time there is one element that can be the activeElement. You can also setActiveElement at any time to any element.
@@ -89,38 +75,6 @@ onMount(() => {
 })
 <Button ref={myButton}>Sports</Button>
 ```
-
-### useFocusManager
-
-`useFocusManager` adds key handling, focusPath tracking, and focus and blur events on components. You can do this once in your App component. It returns a signal, focusPath which is an array of elements that currently have focus. When `activeElement` changes, the focusPath will be recalculated. During which all elements in focus will have a `focus` state added and onFocus(currentFocusedElm, prevFocusedElm) event called. Elements losing focus will have `focus` state removed and onBlur(currentFocusedElm, prevFocusedElm) called.
-
-```jsx
-import { useFocusManager } from "@lightningjs/solid";
-
-const App = () => {
-  // Only need to do this once in Application, but you can call it anywhere
-  // if you need to get the focusPath signal
-  const focusPath = useFocusManager();
-  return ...
-}
-```
-
-The calculated focusPath is used for handling key events. When a key is pressed, the `Config.keyMap` looks for the keyName and corresponding value to call `on${key}` then `onKeyPress` on each element until one handles the event.
-
-```jsx
-import { Config } from '@lightningjs/solid';
-Config.keyMap.m = 'Menu';
-Config.keyMap.t = 'Text';
-Config.keyMap.b = 'Buttons';
-
-<View
-  onText={() => navigate('/text')}
-  onButtons={() => navigate('/buttons')}
-  onMenu={() => navigate('/')}
-/>;
-```
-
-When keys m, t, b are pressed - onMenu, onText, onButtons will be called respectively.
 
 ## Styling / Properties
 
@@ -204,44 +158,13 @@ You can have as many stops or colors as you like.
 When a child element changes size onLayout will be called. You'll be notified with
 `(node, { width, height})` of the element. You can use this callback to resize the parent node. If you do, call `parent.updateLayout`.
 
-### withPadding
-
-`withPadding` is a [directive](https://www.solidjs.com/docs/latest/api#use___) to set padding when a child text node loads. It follows css by taking a single padding value or Array [top, bottom | left, right ] or [top | right, left | bottom ] or [top | right | bottom | left]
-
-```jsx
-import { View, Text, withPadding } from '@lightningjs/solid';
-
-const Badge = (props) => {
-  return (
-    <node
-      use:withPadding={[10, 15]}
-      {...props}
-      style={{
-        color: '#00000099',
-        borderRadius: 8,
-        border: { width: 2, color: '#ffffff' },
-      }}
-    >
-      <Text
-        style={{
-          fontSize: 20,
-          lineHeight: 20,
-        }}
-      >
-        {props.children}
-      </Text>
-    </node>
-  );
-};
-<Badge>HD</Badge>;
-```
-
 ### Flex
 
 At the moment there is a very barebone flex implementation (`display: flex`) made for one level of children. It only supports `flexDirection`, `justifyContent` and `gap` at the moment. But very useful for laying out rows and columns.
 
 ```jsx
-import { Column, Row, View, Text } from '@lightningjs/solid';
+import { View, Text } from '@lightningjs/solid';
+import { Column, Row } from '@lightningjs/solid-primitives';
 const RowStyles = {
   display: 'flex',
   justifyContent: 'flexStart',
@@ -341,7 +264,7 @@ const Button = {
 };
 ```
 
-When Button is focused, the focus styles will be applied. And when focus is removed, the original styles on the element will be set, meaning you need defaults on the original style to fallback to.
+When Button is focused the focus styles will be applied. And when focus is removed, the original styles on the element will be set, meaning you need defaults on the original style to fallback to.
 
 To apply a state to a component:
 
@@ -374,7 +297,7 @@ createEffect(() => {
 <View ref={myButton} style={Button} />
 ```
 
-The `focus` state is automatically added and removed with the `useFocusManager` primitive. Also note if elements are animating and another state is applied during the animation which uses the animated value (say alpha or color) - when that state is removed it will return to some value during the animation. Be careful not to set state with styles that are also being animated.
+The `focus` state is added and removed by the [useFocusManager](https://github.com/lightning-js/solid-primitives) primitive. Also note if elements are animating and another state is applied during the animation which uses the animated value (say alpha or color) - when that state is removed it will return to some value during the animation. Be careful not to set state with styles that are also being animated.
 
 ### forwardStates
 
@@ -454,9 +377,4 @@ Config.debug = false;
 Config.fontSettings.fontFamily = 'Ubuntu';
 Config.fontSettings.color = 0xffffffff;
 Config.fontSettings.fontSize = 100;
-
-// Set key handling map for on{Name}
-Config.keyMap.m = 'Menu';
-Config.keyMap.t = 'Text';
-Config.keyMap.b = 'Buttons';
 ```

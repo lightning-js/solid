@@ -52,5 +52,3 @@ export const Canvas = (props) => {
     </canvas>
   )
 };
-
-export default Canvas;
