@@ -82,6 +82,7 @@ const LightningRendererNumberProps = [
   'x',
   'y',
   'zIndex',
+  'zIndexLocked',
 ];
 
 const LightningRendererColorProps = [
@@ -97,12 +98,13 @@ const LightningRendererColorProps = [
 ];
 
 const LightningRendererNonAnimatingProps = [
-  'text',
-  'texture',
-  'src',
-  'fontFamily',
+  'clipping',
   'contain',
+  'fontFamily',
+  'src',
+  'text',
   'textAlign',
+  'texture',
 ];
 
 export default class Node extends Object {
@@ -449,9 +451,17 @@ export default class Node extends Object {
       }
     } else {
       if (isNaN(props.width) || isNaN(props.height)) {
-        console.warn(
-          `${node.name} may not be rendered - missing width and height`,
-        );
+        // Set width and height to parent less offset
+        props.width = parent.width - props.x;
+        props.height = parent.height - props.y;
+        node._width = props.width;
+        node._height = props.height;
+      }
+
+      if (!props.color && !props.src) {
+        //Default color to transparent - If you later set a src, you'll need
+        // to set color '#ffffffff'
+        node._color = props.color = 0x00000000;
       }
 
       log('Rendering: ', node.name, props);
