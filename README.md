@@ -41,7 +41,7 @@ The <Canvas> element boots up the Lightning Renderer. This should be the first c
 
 ### View and Text
 
-Everything is built with two primitive components: <View> and <Text>. Think of <View> like div tag for HTML, all encompassing. Whenever you want to display text, wrap it in a <Text> tag like so `<Text>Hello World</Text>`
+Everything is built with two primitive components: `<View>` and `<Text>`. Think of `<View>` like div tag for HTML, all encompassing. Whenever you want to display text, wrap it in a `<Text>` tag like so `<Text>Hello World</Text>`
 
 ```jsx
 import { View, Text } from '@lightningjs/solid';
