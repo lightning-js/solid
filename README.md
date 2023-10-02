@@ -41,7 +41,7 @@ The <Canvas> element boots up the Lightning Renderer. This should be the first c
 
 ### View and Text
 
-Everything is built with two primitive components: <View> and <Text>. Think of <View> like div tag for HTML, all encompassing. Whenever you want to display text, wrap it in a <Text> tag like so `<Text>Hello World</Text>`
+Everything is built with two primitive components: `<View>` and `<Text>`. Think of `<View>` like div tag for HTML, all encompassing. Whenever you want to display text, wrap it in a `<Text>` tag like so `<Text>Hello World</Text>`
 
 ```jsx
 import { View, Text } from '@lightningjs/solid';
@@ -107,15 +107,15 @@ const [alpha, setAlpha] = createSignal(1);
 </View>;
 ```
 
-The style attribute takes an object of properties and passes them to the Lightning Renderer on initial creation of the component. The style object will not be reapplied if it is changed after creation. This keeps the style object as Read Only in the templating system allowing you to use it for multiple components. Additionally, when the style object is applied any properties on the JSX will have greater precedent so you can override styles on individual componets. After the component is created, you can further change props via signals or imperatively with the ref to the component.
+The style attribute takes an object of properties and passes them to the Lightning Renderer on initial creation of the component. The style object will not be reapplied if it is changed after creation. This keeps the style object as Read Only in the templating system allowing you to use it for multiple components. Additionally, when the style object is applied any properties on the JSX will have greater precedent so you can override styles on individual components. After the component is created, you can further change props via signals or imperatively with the ref to the component.
 
-### Required Props
+### Prop Defaults
 
-<View> components require a width and height value. X and y will default to 0, 0 if not specified but are required by the renderer. <Text> component does not require any properties.
+`<View>` components without a width and height value will inherit their parents width and height minus there x and y values. X and y will default to 0, 0 if not specified. `<Text>` component does not require any properties. If `<Text>` component is loaded in a flex container, it will update it's width and height when it loads.
 
 ### Color
 
-Can be HEX string ('#rrggbb') or ('#rrggbbaa') or RGBA number 0x00000000 or string 'RRGGBBAA'. I recommend installing [VS Code color picker](https://marketplace.visualstudio.com/items?itemName=AntiAntiSepticeye.vscode-color-picker) and using hex format to see the colors in VS Code.
+Can be HEX string ('#rrggbb') or ('#rrggbbaa') or RGBA number 0x00000000 or string 'RRGGBBAA'. By default, every node without a src attribute will have their color set to `0x00000000` making it transparent. If you have an element which sets it's src attribute after creation, you need to update color to `0xffffffff` so it's not transparent. I recommend installing [VS Code color picker](https://marketplace.visualstudio.com/items?itemName=AntiAntiSepticeye.vscode-color-picker) and using hex format to see the colors in VS Code.
 
 ### Border and borderRadius
 
