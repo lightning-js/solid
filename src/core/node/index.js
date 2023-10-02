@@ -450,11 +450,14 @@ export default class Node extends Object {
         });
       }
     } else {
-      if (isNaN(props.width) || isNaN(props.height)) {
-        // Set width and height to parent less offset
+      // Set width and height to parent less offset
+      if (isNaN(props.width)) {
         props.width = parent.width - props.x;
-        props.height = parent.height - props.y;
         node._width = props.width;
+      }
+
+      if (isNaN(props.height)) {
+        props.height = parent.height - props.y;
         node._height = props.height;
       }
 
