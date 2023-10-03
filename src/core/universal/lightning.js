@@ -34,7 +34,9 @@ export default {
   replaceText(node, value) {
     log('Replace ', value);
     node.text = value;
-    node.parent.text = value;
+    const parent = node.parent;
+    parent._autosized && parent._resizeOnTextLoad();
+    parent.text = parent.getText();
   },
   setProperty(node, name, value = true) {
     log('Set ', name, value);
@@ -50,7 +52,9 @@ export default {
 
       if (node.name === 'TextNode') {
         if (!parent.isTextNode()) {
-          console.error('Inserting text outside of a <Text> node is not allowed');
+          console.error(
+            'Inserting text outside of a <Text> node is not allowed',
+          );
         }
         parent.text = parent.getText();
       }

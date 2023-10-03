@@ -274,6 +274,14 @@ export default class Node extends Object {
     return this.name === 'text';
   }
 
+  _resizeOnTextLoad() {
+    this.lng.once('textLoaded', (elm, size) => {
+      this.width = size.width;
+      this.height = size.height;
+      this.parent.updateLayout(this, size);
+    });
+  }
+
   getText() {
     return this.children.map((c) => c.text).join('');
   }
@@ -443,11 +451,8 @@ export default class Node extends Object {
       }
 
       if (!node.width || !node.height) {
-        node.lng.once('textLoaded', (elm, size) => {
-          node.width = size.width;
-          node.height = size.height;
-          node.parent.updateLayout(node, size);
-        });
+        node._autosized = true;
+        node._resizeOnTextLoad();
       }
     } else {
       // Set width and height to parent less offset
