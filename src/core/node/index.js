@@ -455,21 +455,24 @@ export default class Node extends Object {
         node._resizeOnTextLoad();
       }
     } else {
-      // Set width and height to parent less offset
-      if (isNaN(props.width)) {
-        props.width = parent.width - props.x;
-        node._width = props.width;
-      }
+      // If its not an image or texture apply some defaults
+      if (!(props.src || props.texture)) {
+        // Set width and height to parent less offset
+        if (isNaN(props.width)) {
+          props.width = parent.width - props.x;
+          node._width = props.width;
+        }
 
-      if (isNaN(props.height)) {
-        props.height = parent.height - props.y;
-        node._height = props.height;
-      }
+        if (isNaN(props.height)) {
+          props.height = parent.height - props.y;
+          node._height = props.height;
+        }
 
-      if (!props.color && !(props.src || props.texture)) {
-        //Default color to transparent - If you later set a src, you'll need
-        // to set color '#ffffffff'
-        node._color = props.color = 0x00000000;
+        if (!props.color) {
+          //Default color to transparent - If you later set a src, you'll need
+          // to set color '#ffffffff'
+          node._color = props.color = 0x00000000;
+        }
       }
 
       log('Rendering: ', this, props);
