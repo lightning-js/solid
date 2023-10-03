@@ -443,7 +443,7 @@ export default class Node extends Object {
         ...props,
         text: node.getText(),
       };
-      log('Rendering: ', node.name, props);
+      log('Rendering: ', this, props);
       node.lng = renderer.createTextNode(props);
 
       if (isFunc(node.onLoad)) {
@@ -466,13 +466,13 @@ export default class Node extends Object {
         node._height = props.height;
       }
 
-      if (!props.color && !props.src) {
+      if (!props.color && !(props.src || props.texture)) {
         //Default color to transparent - If you later set a src, you'll need
         // to set color '#ffffffff'
         node._color = props.color = 0x00000000;
       }
 
-      log('Rendering: ', node.name, props);
+      log('Rendering: ', this, props);
       node.hasChildren && node._applyZIndexToChildren();
       node.lng = renderer.createNode(props);
 

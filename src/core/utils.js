@@ -36,9 +36,11 @@ export function normalizeColor(color = '') {
   }
 }
 const isDev = import.meta.env.MODE === 'development';
-export function log(...args) {
-  if (isDev && config.debug) {
-    console.log(...args);
+export function log(msg, node, ...args) {
+  if (isDev) {
+    if (config.debug || (isObject(node) && node.debug)) {
+      console.log(msg, node, ...args);
+    }
   }
 }
 

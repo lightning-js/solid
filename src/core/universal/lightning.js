@@ -22,7 +22,6 @@ import Node from '../node';
 
 export default {
   createElement(name) {
-    log('Creating: ', name);
     const node = new Node(name);
     renderer.root && createEffect(() => node.render());
     return node;
@@ -32,14 +31,13 @@ export default {
     return { name: 'TextNode', text };
   },
   replaceText(node, value) {
-    log('Replace ', value);
+    log('Replace Text: ', node, value);
     node.text = value;
     const parent = node.parent;
     parent._autosized && parent._resizeOnTextLoad();
     parent.text = parent.getText();
   },
   setProperty(node, name, value = true) {
-    log('Set ', name, value);
     if (name === 'animate') {
       return (node._animate = value);
     }
@@ -56,6 +54,7 @@ export default {
             'Inserting text outside of a <Text> node is not allowed',
           );
         }
+        parent._autosized && parent._resizeOnTextLoad();
         parent.text = parent.getText();
       }
     }
@@ -64,7 +63,7 @@ export default {
     return node.isTextNode();
   },
   removeNode(parent, node) {
-    log('REMOVING: ', parent, node);
+    log('REMOVE: ', parent, node);
     parent.children.remove(node);
     node.destroy && node.destroy();
   },
