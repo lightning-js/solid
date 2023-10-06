@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { renderer, makeShader } from '../../';
+import { renderer, createShader } from '../../';
 import Children from './children';
 import States from './states';
 import calculateFlex from '../flex';
@@ -41,7 +41,7 @@ function convertEffectsToShader(styleEffects) {
     }
     effects.push({ type, props });
   }
-  return makeShader('DynamicShader', { effects });
+  return createShader('DynamicShader', { effects });
 }
 
 function borderAccessor(direction = '') {
@@ -223,7 +223,7 @@ export default class Node extends Object {
 
   set shader(v) {
     if (isArray(v)) {
-      this._shader = makeShader(...v);
+      this._shader = createShader(...v);
     } else {
       this._shader = v;
     }

@@ -19,7 +19,7 @@ import { createEffect } from "solid-js";
 import startLightningRenderer from '../core/renderer';
 
 export let renderer;
-export let makeShader;
+export let createShader;
 
 function renderTopDown(node) {
   if (node.name === 'TextNode') {
@@ -36,7 +36,7 @@ export const Canvas = (props) => {
     height: 1080,
     ...options,
   });
-  makeShader = renderer.makeShader;
+  createShader = renderer.createShader;
   const init = renderer.init();
   let root;
 
