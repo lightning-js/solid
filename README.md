@@ -4,7 +4,7 @@
 
 # solid-lightning
 
-Solid-Lightning is a UI framework for [Lightning Renderer](https://lightningjs.io/) built with [SolidJS](https://www.solidjs.com/) Universal Renderer. It allows you to declaratively construct lightning nodes with reactive primitives, just as you would construct a DOM tree in SolidJS.
+Solid-Lightning is a UI framework for [Lightning Renderer](https://lightningjs.io/) built with [SolidJS](https://www.solidjs.com/) Universal Renderer. It allows you to declaratively construct lightning nodes with reactive primitives, just as you would construct a DOM tree in SolidJS. Also check out [Solid Lightning Primitives](https://github.com/lightning-js/solid-primitives) for additional primitives to speed up your development.
 
 ## Quick Start
 
@@ -41,25 +41,13 @@ The <Canvas> element boots up the Lightning Renderer. This should be the first c
 
 ### View and Text
 
-Everything is built with two primitive components: <View> and <Text>. Think of <View> like div tag for HTML, all encompassing. Whenever you want to display text, wrap it in a <Text> tag like so `<Text>Hello World</Text>`
+Everything is built with two primitive components: `<View>` and `<Text>`. Think of `<View>` like div tag for HTML, all encompassing. Whenever you want to display text, wrap it in a `<Text>` tag like so `<Text>Hello World</Text>`
 
 ```jsx
 import { View, Text } from '@lightningjs/solid';
 <View style={OverviewContainer}>
   <Text style={Title}>Hello World!</Text>
 </View>;
-```
-
-Also included is a Row and Column component which handles key navigation between children by automatically calling setFocus on selected child.
-
-```jsx
-import { Column, Row, View, Text } from '@lightningjs/solid';
-<Row y={400} style={styles.Row} gap={12} justifyContent="flexStart">
-  <Button autofocus>TV Shows</Button>
-  <Button>Movies</Button>
-  <Button>Sports</Button>
-  <Button>News</Button>
-</Row>;
 ```
 
 ## Focus / activeElement
@@ -87,38 +75,6 @@ onMount(() => {
 })
 <Button ref={myButton}>Sports</Button>
 ```
-
-### useFocusManager
-
-`useFocusManager` adds key handling, focusPath tracking, and focus and blur events on components. You can do this once in your App component. It returns a signal, focusPath which is an array of elements that currently have focus. When `activeElement` changes, the focusPath will be recalculated. During which all elements in focus will have a `focus` state added and onFocus(currentFocusedElm, prevFocusedElm) event called. Elements losing focus will have `focus` state removed and onBlur(currentFocusedElm, prevFocusedElm) called.
-
-```jsx
-import { useFocusManager } from "@lightningjs/solid";
-
-const App = () => {
-  // Only need to do this once in Application, but you can call it anywhere
-  // if you need to get the focusPath signal
-  const focusPath = useFocusManager();
-  return ...
-}
-```
-
-The calculated focusPath is used for handling key events. When a key is pressed, the `Config.keyMap` looks for the keyName and corresponding value to call `on${key}` then `onKeyPress` on each element until one handles the event.
-
-```jsx
-import { Config } from '@lightningjs/solid';
-Config.keyMap.m = 'Menu';
-Config.keyMap.t = 'Text';
-Config.keyMap.b = 'Buttons';
-
-<View
-  onText={() => navigate('/text')}
-  onButtons={() => navigate('/buttons')}
-  onMenu={() => navigate('/')}
-/>;
-```
-
-When keys m, t, b are pressed - onMenu, onText, onButtons will be called respectively.
 
 ## Styling / Properties
 
@@ -151,15 +107,15 @@ const [alpha, setAlpha] = createSignal(1);
 </View>;
 ```
 
-The style attribute takes an object of properties and passes them to the Lightning Renderer on initial creation of the component. The style object will not be reapplied if it is changed after creation. This keeps the style object as Read Only in the templating system allowing you to use it for multiple components. Additionally, when the style object is applied any properties on the JSX will have greater precedent so you can override styles on individual componets. After the component is created, you can further change props via signals or imperatively with the ref to the component.
+The style attribute takes an object of properties and passes them to the Lightning Renderer on initial creation of the component. The style object will not be reapplied if it is changed after creation. This keeps the style object as Read Only in the templating system allowing you to use it for multiple components. Additionally, when the style object is applied any properties on the JSX will have greater precedent so you can override styles on individual components. After the component is created, you can further change props via signals or imperatively with the ref to the component.
 
-### Required Props
+### Prop Defaults
 
-<View> components require a width and height value. X and y will default to 0, 0 if not specified but are required by the renderer. <Text> component does not require any properties.
+`<View>` components without a width and height value will inherit their parents width and height minus there x and y values. X and y will default to 0, 0 if not specified. `<Text>` component does not require any properties. If `<Text>` component is loaded in a flex container, it will update it's width and height when it loads.
 
 ### Color
 
-Can be HEX string ('#ffffff') or RGBA number 0x00000000 or string 'RRGGBBAA'
+Can be HEX string ('#rrggbb') or ('#rrggbbaa') or RGBA number 0x00000000 or string 'RRGGBBAA'. By default, every node without a src attribute will have their color set to `0x00000000` making it transparent. If you have an element which sets it's src attribute after creation, you need to update color to `0xffffffff` so it's not transparent. I recommend installing [VS Code color picker](https://marketplace.visualstudio.com/items?itemName=AntiAntiSepticeye.vscode-color-picker) and using hex format to see the colors in VS Code.
 
 ### Border and borderRadius
 
@@ -180,12 +136,35 @@ const style = {
 
 ```
 
-## Flex
+### linearGradient
+
+`linearGradient` is another special effect that can be used like a style with following syntax.
+
+```
+linearGradient:
+    {
+      angle: 225,
+      stops: [0.1, 0.5],
+      colors: [
+        0xff0000ff, 0x00000000,
+      ],
+    },
+```
+
+You can have as many stops or colors as you like.
+
+## Layout
+
+When a child element changes size onLayout will be called. You'll be notified with
+`(node, { width, height})` of the element. You can use this callback to resize the parent node. If you do, call `parent.updateLayout`.
+
+### Flex
 
 At the moment there is a very barebone flex implementation (`display: flex`) made for one level of children. It only supports `flexDirection`, `justifyContent` and `gap` at the moment. But very useful for laying out rows and columns.
 
 ```jsx
-import { Column, Row, View, Text } from '@lightningjs/solid';
+import { View, Text } from '@lightningjs/solid';
+import { Column, Row } from '@lightningjs/solid-primitives';
 const RowStyles = {
   display: 'flex',
   justifyContent: 'flexStart',
@@ -285,7 +264,7 @@ const Button = {
 };
 ```
 
-When Button is focused, the focus styles will be applied. And when focus is removed, the original styles on the element will be set, meaning you need defaults on the original style to fallback to.
+When Button is focused the focus styles will be applied. And when focus is removed, the original styles on the element will be set, meaning you need defaults on the original style to fallback to.
 
 To apply a state to a component:
 
@@ -318,7 +297,7 @@ createEffect(() => {
 <View ref={myButton} style={Button} />
 ```
 
-The `focus` state is automatically added and removed with the `useFocusManager` primitive. Also note if elements are animating and another state is applied during the animation which uses the animated value (say alpha or color) - when that state is removed it will return to some value during the animation. Be careful not to set state with styles that are also being animated.
+The `focus` state is added and removed by the [useFocusManager](https://github.com/lightning-js/solid-primitives) primitive. Also note if elements are animating and another state is applied during the animation which uses the animated value (say alpha or color) - when that state is removed it will return to some value during the animation. Be careful not to set state with styles that are also being animated.
 
 ### forwardStates
 
@@ -398,9 +377,4 @@ Config.debug = false;
 Config.fontSettings.fontFamily = 'Ubuntu';
 Config.fontSettings.color = 0xffffffff;
 Config.fontSettings.fontSize = 100;
-
-// Set key handling map for on{Name}
-Config.keyMap.m = 'Menu';
-Config.keyMap.t = 'Text';
-Config.keyMap.b = 'Buttons';
 ```

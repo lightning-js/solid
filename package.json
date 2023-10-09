@@ -1,6 +1,6 @@
 {
   "name": "@lightningjs/solid",
-  "version": "0.3.1",
+  "version": "0.5.4",
   "description": "Lightning renderer for solid universal",
   "type": "module",
   "types": "./dist/src/index.d.ts",
@@ -60,10 +60,9 @@
     "*.{js,cjs,md}": "prettier --write"
   },
   "dependencies": {
-    "@lightningjs/renderer": "^0.3.0",
-    "@solid-primitives/keyboard": "^1.2.5",
-    "@solid-primitives/rootless": "^1.4.2",
-    "@solid-primitives/scheduled": "^1.4.1",
+    "@lightningjs/renderer": "^0.3.6"
+  },
+  "peerDependencies": {
     "solid-js": "^1.7.12"
   },
   "files": [

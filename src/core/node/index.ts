@@ -15,23 +15,29 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { renderer, makeShader } from '../../index.js';
+import { renderer, createShader } from '../../index.js';
 import Children from './children.js';
 import States from './states.js';
 import calculateFlex from '../flex.js';
-import { normalizeColor, log, isArray, isNumber, keyExists } from '../utils.js';
+import {
+  normalizeColor,
+  log,
+  isArray,
+  isNumber,
+  isFunc,
+  keyExists,
+} from '../utils.js';
 import { config } from '../../config.js';
 import { setActiveElement } from '../activeElement.js';
-import type { INode, INodeAnimatableProps, INodeWritableProps, ShaderDesc } from '@lightningjs/renderer';
+import type {
+  INode,
+  INodeAnimatableProps,
+  INodeWritableProps,
+  ShaderRef,
+} from '@lightningjs/renderer';
 import { assertTruthy } from '@lightningjs/renderer/utils';
 
 const { animationSettings: defaultAnimationSettings } = config;
-
-function convertColor(key: string, value: number | string) {
-  return {
-    [key]: key.startsWith('color') ? normalizeColor(value) : value,
-  };
-}
 
 function convertEffectsToShader(styleEffects: any) {
   const effects = [];
@@ -42,10 +48,12 @@ function convertEffectsToShader(styleEffects: any) {
     }
     effects.push({ type, props });
   }
-  return makeShader('DynamicShader', { effects });
+  return createShader('DynamicShader', { effects });
 }
 
-function borderAccessor(direction: '' | 'Top' | 'Right' | 'Bottom' | 'Left' = '') {
+function borderAccessor(
+  direction: '' | 'Top' | 'Right' | 'Bottom' | 'Left' = '',
+) {
   return {
     effects: any,
     _border: any,
@@ -89,6 +97,7 @@ const LightningRendererNumberProps = [
   'x',
   'y',
   'zIndex',
+  'zIndexLocked',
 ];
 
 const LightningRendererColorProps = [
@@ -104,12 +113,13 @@ const LightningRendererColorProps = [
 ];
 
 const LightningRendererNonAnimatingProps = [
-  'text',
-  'texture',
-  'src',
-  'fontFamily',
+  'clipping',
   'contain',
+  'fontFamily',
+  'src',
+  'text',
   'textAlign',
+  'texture',
 ];
 
 export default class SolidNode extends Object {
@@ -122,7 +132,7 @@ export default class SolidNode extends Object {
   private _renderProps: any;
   private _effects: any;
   private _parent?: SolidNode;
-  private _shader?: ShaderDesc;
+  private _shader?: ShaderRef;
   private _animate?: any;
   private _style?: any;
   private _states?: States;
@@ -130,7 +140,6 @@ export default class SolidNode extends Object {
   private _updateLayoutOn?: any;
   public _isDirty?: boolean; // Public but uses _ prefix
   children: Children;
-
 
   constructor(name: string) {
     super();
@@ -159,7 +168,9 @@ export default class SolidNode extends Object {
         },
         set(v) {
           this[`_${key}`] = v;
-          if (!isArray(v)) {
+          if (isArray(v)) {
+            v[0] = normalizeColor(v[0]);
+          } else {
             v = normalizeColor(v);
           }
           this._sendToLightningAnimatable(key, v);
@@ -199,6 +210,24 @@ export default class SolidNode extends Object {
       borderTop: borderAccessor('Top'),
       borderBottom: borderAccessor('Bottom'),
     });
+
+    Object.defineProperties(this, {
+      linearGradient: {
+        set(props = {}) {
+          this._linearGradient = props;
+          if (props.colors) {
+            props.colors = props.colors.map((c) => normalizeColor(c));
+          }
+          this.effects = {
+            ...(this.effects || {}),
+            ...{ linearGradient: props },
+          };
+        },
+        get() {
+          return this._linearGradient;
+        },
+      },
+    });
   }
 
   get effects() {
@@ -221,24 +250,26 @@ export default class SolidNode extends Object {
     }
   }
 
-  get shader(): ShaderDesc | undefined {
+  get shader(): ShaderRef | undefined {
     return this._shader;
   }
 
-  set shader(v: Parameters<typeof makeShader> | ShaderDesc | undefined) {
+  set shader(v: Parameters<typeof createShader> | ShaderRef | undefined) {
     if (isArray(v)) {
-      this._shader = makeShader(...v);
+      this._shader = createShader(...v);
     } else {
       this._shader = v;
     }
     this._sendToLightning('shader', this._shader);
   }
 
-  _sendToLightningAnimatable(name: string, value: [value: number | string, settings: any] | number) {
+  _sendToLightningAnimatable(
+    name: string,
+    value: [value: number | string, settings: any] | number,
+  ) {
     if (this.rendered && this.lng) {
       if (isArray(value)) {
-        const prop = convertColor(name, value[0]);
-        return this.animate(prop, value[1]).start();
+        return this.animate({ [name]: value[0] }, value[1]).start();
       }
 
       if (this._animate) {
@@ -247,6 +278,10 @@ export default class SolidNode extends Object {
 
       (this.lng[name as keyof INode] as number) = value;
     } else {
+      // Need to render before animating
+      if (isArray(value)) {
+        value = value[0];
+      }
       this._renderProps[name] = value;
     }
   }
@@ -274,6 +309,14 @@ export default class SolidNode extends Object {
 
   isTextNode() {
     return this.name === 'text';
+  }
+
+  _resizeOnTextLoad() {
+    this.lng.once('textLoaded', (elm, size) => {
+      this.width = size.width;
+      this.height = size.height;
+      this.parent.updateLayout(this, size);
+    });
   }
 
   getText() {
@@ -348,11 +391,13 @@ export default class SolidNode extends Object {
     });
   }
 
-  updateLayout() {
+  updateLayout(...args) {
     if (this.display === 'flex' && this.hasChildren) {
       log('Layout: ', this);
       calculateFlex(this);
     }
+
+    isFunc(this.onLayout) && this.onLayout(...args);
   }
 
   _stateChanged() {
@@ -436,28 +481,39 @@ export default class SolidNode extends Object {
         ...props,
         text: node.getText(),
       };
-      log('Rendering: ', node.name, props);
+      log('Rendering: ', this, props);
       node.lng = renderer.createTextNode(props);
 
-      if (node.onLoad) {
+      if (isFunc(node.onLoad)) {
         node.lng.once('textLoaded', node.onLoad);
       }
 
       if (!node.width || !node.height) {
-        node.lng.once('textLoaded', (elm, { width, height }) => {
-          node.width = width;
-          node.height = height;
-          node.parent.updateLayout();
-        });
+        node._autosized = true;
+        node._resizeOnTextLoad();
       }
     } else {
-      if (isNaN(props.width) || isNaN(props.height)) {
-        console.warn(
-          `${node.name} may not be rendered - missing width and height`,
-        );
+      // If its not an image or texture apply some defaults
+      if (!(props.src || props.texture)) {
+        // Set width and height to parent less offset
+        if (isNaN(props.width)) {
+          props.width = parent.width - props.x;
+          node._width = props.width;
+        }
+
+        if (isNaN(props.height)) {
+          props.height = parent.height - props.y;
+          node._height = props.height;
+        }
+
+        if (!props.color) {
+          //Default color to transparent - If you later set a src, you'll need
+          // to set color '#ffffffff'
+          node._color = props.color = 0x00000000;
+        }
       }
 
-      log('Rendering: ', node.name, props);
+      log('Rendering: ', this, props);
       node.hasChildren && node._applyZIndexToChildren();
       node.lng = renderer.createNode(props);
 

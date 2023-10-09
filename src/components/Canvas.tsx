@@ -17,10 +17,10 @@
 
 import { createEffect } from "solid-js";
 import { startLightningRenderer, type SolidRendererOptions } from '../core/renderer/index.js';
-import type { INode, RendererMain } from "@lightningjs/renderer";
+import type { RendererMain } from "@lightningjs/renderer";
 
 export let renderer: RendererMain;
-export let makeShader: RendererMain['makeShader'];
+export let createShader: RendererMain['createShader'];
 
 function renderTopDown(node) {
   if (node.name === 'TextNode') {
@@ -43,7 +43,7 @@ export interface CanvasProps {
 export const Canvas = (props: CanvasProps) => {
   const options = props.options || {};
   renderer = startLightningRenderer(options);
-  makeShader = renderer.makeShader.bind(renderer);
+  createShader = renderer.createShader.bind(renderer);
   const init = renderer.init();
   let root;
 
@@ -59,5 +59,3 @@ export const Canvas = (props: CanvasProps) => {
     </canvas>
   )
 };
-
-export default Canvas;

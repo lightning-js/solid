@@ -28,9 +28,4 @@ export {
 export * from './core/activeElement.js';
 export * from './components/index.js';
 export * from './core/render.js';
-export * from './primitives/useFocusManager.js';
-export * from './primitives/Announcer/index.js';
-export * from './primitives/Row.jsx';
-export * from './primitives/Column.jsx';
-export * from './primitives/createSpriteMap.js';
 export { config as Config } from './config.js';

@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-import type { KeyMap } from "./intrinsicTypes.js";
+import type { KeyMap } from './intrinsicTypes.js';
 
 interface Config {
   debug: boolean;
@@ -29,7 +29,7 @@ interface Config {
     fontFamily: string;
     fontSize: number;
   };
-  keyMap: KeyMap
+  keyMap: KeyMap;
 }
 
 export const config: Config = {
@@ -41,13 +41,5 @@ export const config: Config = {
   fontSettings: {
     fontFamily: 'Ubuntu',
     fontSize: 100,
-  },
-  keyMap: {
-    ArrowLeft: 'Left',
-    ArrowRight: 'Right',
-    ArrowUp: 'Up',
-    ArrowDown: 'Down',
-    Enter: 'Enter',
-    l: 'Last',
   },
 };
