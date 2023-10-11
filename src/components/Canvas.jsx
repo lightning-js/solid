@@ -30,12 +30,7 @@ function renderTopDown(node) {
 }
 
 export const Canvas = (props) => {
-  const options = props.options || {};
-  renderer = startLightningRenderer({
-    width: 1920,
-    height: 1080,
-    ...options,
-  });
+  renderer = startLightningRenderer(props.options);
   createShader = renderer.createShader;
   const init = renderer.init();
   let root;
