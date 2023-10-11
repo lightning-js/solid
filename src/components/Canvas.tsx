@@ -44,8 +44,7 @@ export interface CanvasProps {
 }
 
 export const Canvas = (props: CanvasProps) => {
-  const options = props.options || {};
-  renderer = startLightningRenderer(options);
+  renderer = startLightningRenderer(props.options);
   createShader = renderer.createShader.bind(renderer);
   const init = renderer.init();
   let root: ElementNode | undefined;

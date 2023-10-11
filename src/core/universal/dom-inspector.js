@@ -17,6 +17,7 @@
 
 import { createEffect } from 'solid-js';
 import universalLightning from './lightning';
+import { renderer } from '@lightningjs/solid';
 
 const injectCSS = (css) => {
   const el = document.createElement('style');
@@ -24,12 +25,12 @@ const injectCSS = (css) => {
   document.head.appendChild(el);
 };
 
-const updateRootStyleFromCanvas = function (bcr) {
-  //const p = self.stage.getRenderPrecision() / self.stage.getOption('devicePixelRatio');
-  const p = 0.6666667;
-  const root = document.getElementById('inspector');
-  root.style.left = '0px';
-  root.style.top = '0px';
+const updateRootStyleFromCanvas = function (canvas) {
+  const bcr = canvas.getBoundingClientRect();
+  const p = renderer.settings.deviceLogicalPixelRatio || 1; //0.6666667;
+  const root = document.getElementById('linspector');
+  root.style.left = canvas.offsetLeft + 'px';
+  root.style.top = canvas.offsetTop + 'px';
   root.style.width = Math.ceil(bcr.width / p) + 'px';
   root.style.height = Math.ceil(bcr.height / p) + 'px';
   root.style.transformOrigin = '0 0 0';
@@ -38,7 +39,7 @@ const updateRootStyleFromCanvas = function (bcr) {
 
 export function attachInspector() {
   injectCSS(`
-    #inspector {
+    #linspector {
       position: absolute;
       top: 0;
       left: 0;
@@ -47,41 +48,40 @@ export function attachInspector() {
       zIndex: 5;
       overflow: hidden;
     }
-    div {
+    div.lnode {
       position: absolute;
       display: inline-block;
     }
-    .text {
+    .ltext {
       visibility: hidden;
     }
   `);
 
-  const dom = document.createElement('div');
-  dom.id = 'inspector';
-  document.body.appendChild(dom);
-
   setTimeout(function () {
-    const c = document.getElementsByTagName('canvas')[0];
-    updateRootStyleFromCanvas(c.getBoundingClientRect());
+    updateRootStyleFromCanvas(renderer.canvas);
   }, 1000);
 }
 
 export default {
   ...universalLightning,
   createElement(name) {
-    let dom;
+    const dom = document.createElement('div');
+
     if (name === 'canvas') {
-      dom = document.getElementById('inspector');
+      dom.id = 'linspector';
+      renderer.canvas.parentNode.appendChild(dom);
     } else {
-      dom = document.createElement('div');
+      dom.classList.add('lnode');
     }
 
     if (name === 'text') {
-      dom.classList.add('text');
+      dom.classList.add('ltext');
     }
     const node = universalLightning.createElement(name);
-    createEffect(() => {
-      setTimeout(() => {
+    if (name !== 'canvas') {
+      const origRender = node.render;
+      node.render = () => {
+        origRender.call(node);
         if (node.id) {
           dom.id = node.id;
         }
@@ -93,8 +93,8 @@ export default {
         dom.style.top = node.y + 'px';
         dom.style.left = node.x + 'px';
         dom.style.zIndex = node.zIndex;
-      }, 10);
-    });
+      };
+    }
     node._dom = dom;
     dom.solid = node;
     return node;
