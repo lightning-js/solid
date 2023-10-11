@@ -28,8 +28,8 @@ const updateRootStyleFromCanvas = function (bcr) {
   //const p = self.stage.getRenderPrecision() / self.stage.getOption('devicePixelRatio');
   const p = 0.6666667;
   const root = document.getElementById('inspector');
-  root.style.left = bcr.left + 'px';
-  root.style.top = bcr.top + 'px';
+  root.style.left = '0px';
+  root.style.top = '0px';
   root.style.width = Math.ceil(bcr.width / p) + 'px';
   root.style.height = Math.ceil(bcr.height / p) + 'px';
   root.style.transformOrigin = '0 0 0';
@@ -81,18 +81,37 @@ export default {
     }
     const node = universalLightning.createElement(name);
     createEffect(() => {
-      if (node.id) {
-        dom.id = node.id;
-      }
-      dom.style.width = node.width + 'px';
-      dom.style.height = node.height + 'px';
-      dom.style.top = node.y + 'px';
-      dom.style.left = node.x + 'px';
-      dom.style.zIndex = node.zIndex;
+      setTimeout(() => {
+        if (node.id) {
+          dom.id = node.id;
+        }
+        if (node.clipping) {
+          dom.style.overflow = 'hidden';
+        }
+        dom.style.width = node.width + 'px';
+        dom.style.height = node.height + 'px';
+        dom.style.top = node.y + 'px';
+        dom.style.left = node.x + 'px';
+        dom.style.zIndex = node.zIndex;
+      }, 10);
     });
     node._dom = dom;
     dom.solid = node;
     return node;
+  },
+  setProperty(node, name, value) {
+    if (name === 'width') {
+      node._dom.style.width = value + 'px';
+    } else if (name === 'height') {
+      node._dom.style.height = value + 'px';
+    } else if (name === 'y') {
+      node._dom.style.top = value + 'px';
+    } else if (name === 'x') {
+      node._dom.style.left = value + 'px';
+    } else if (name === 'zIndex') {
+      node._dom.style.zIndex = value;
+    }
+    universalLightning.setProperty(node, name, value);
   },
   createTextNode(text) {
     const dom = document.createTextNode(text);
@@ -106,7 +125,7 @@ export default {
   },
   insertNode(parent, node, anchor) {
     if (parent) {
-      if (anchor) {
+      if (anchor && parent._dom === anchor._dom.parentNode) {
         parent._dom.insertBefore(node._dom, anchor._dom);
       } else {
         parent._dom.appendChild(node._dom);
