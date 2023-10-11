@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 /*
  * Copyright 2023 Comcast Cable Communications Management, LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +17,17 @@
  */
 
 import { createRenderer } from 'solid-js/universal';
-import universalLightning from './universal/lightning';
-import universalInspector, { attachInspector } from './universal/dom-inspector';
+import universalLightning from './universal/lightning.js';
+import universalInspector, {
+  attachInspector,
+} from './universal/dom-inspector.js';
+import type { SolidNode } from './node/index.js';
 
 const loadInspector = import.meta.env.MODE === 'development';
 if (loadInspector) {
   attachInspector();
 }
-const solidRenderer = createRenderer(
+const solidRenderer = createRenderer<SolidNode>(
   loadInspector ? universalInspector : universalLightning,
 );
 export const {

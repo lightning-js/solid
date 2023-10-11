@@ -30,6 +30,13 @@ const config = {
     '@typescript-eslint/no-unsafe-call': 'warn',
     '@typescript-eslint/no-unsafe-member-access': 'warn',
     '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      },
+    ],
   },
   // Temporarily we also ignore all JavaScript files since they will be ultimately converted to TS.
   // TODO: Remove this once we have converted all of the JavaScript files to TypeScript

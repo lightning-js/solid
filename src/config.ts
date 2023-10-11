@@ -17,8 +17,6 @@
  * limitations under the License.
  */
 
-import type { KeyMap } from './intrinsicTypes.js';
-
 interface Config {
   debug: boolean;
   animationSettings: {
@@ -29,7 +27,6 @@ interface Config {
     fontFamily: string;
     fontSize: number;
   };
-  keyMap: KeyMap;
 }
 
 export const config: Config = {

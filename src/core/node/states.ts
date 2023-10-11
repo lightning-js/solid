@@ -16,19 +16,22 @@
  */
 
 import { isArray, isString } from '../utils.js';
-import type SolidNode from './index.js';
+import type { ElementNode } from './index.js';
 export default class States extends Array {
-  private _node: SolidNode;
+  private _node: ElementNode;
 
-  constructor(node: SolidNode, initialState: string[] | string | Record<string, unknown> = []) {
+  constructor(
+    node: ElementNode,
+    initialState: string[] | string | Record<string, unknown> = [],
+  ) {
     if (isArray(initialState)) {
-      super(...initialState as any);
+      super(...(initialState as any));
     } else if (isString(initialState)) {
       super(initialState as any);
     } else {
       super(
         ...(Object.entries(initialState)
-          .filter(([key, value]) => value)
+          .filter(([_key, value]) => value)
           .map(([key]) => key) as any),
       );
     }

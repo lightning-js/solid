@@ -17,7 +17,7 @@
  */
 
 import { config } from '../config.js';
-import type SolidNode from './node/index.js';
+import type { SolidNode } from './node/index.js';
 
 export function normalizeColor(color: string | number = '') {
   if (isInteger(color)) {

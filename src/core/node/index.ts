@@ -34,6 +34,7 @@ import type {
   INodeAnimatableProps,
   INodeWritableProps,
   ShaderRef,
+  Dimensions,
 } from '@lightningjs/renderer';
 import { assertTruthy } from '@lightningjs/renderer/utils';
 
@@ -42,26 +43,22 @@ const { animationSettings: defaultAnimationSettings } = config;
 function convertEffectsToShader(styleEffects: any) {
   const effects = [];
 
-  for (const [type, props] of Object.entries(styleEffects)) {
+  for (const [type, props] of Object.entries<Record<string, any>>(
+    styleEffects,
+  )) {
     if (props.color) {
       props.color = normalizeColor(props.color);
     }
     effects.push({ type, props });
   }
-  return createShader('DynamicShader', { effects });
+  return createShader('DynamicShader', { effects: effects as any });
 }
 
 function borderAccessor(
   direction: '' | 'Top' | 'Right' | 'Bottom' | 'Left' = '',
 ) {
   return {
-    effects: any,
-    _border: any,
-    _borderLeft: any,
-    _borderRight: any,
-    _borderTop: any,
-    _borderBottom: any,
-    set(props: any) {
+    set(this: ElementNode, props: any) {
       // Format: width || { width, color }
       if (isNumber(props)) {
         props = { width: props, color: '#000000' };
@@ -72,7 +69,7 @@ function borderAccessor(
       };
       this[`_border${direction}`] = props;
     },
-    get() {
+    get(this: ElementNode) {
       return this[`_border${direction}`];
     },
   };
@@ -122,22 +119,74 @@ const LightningRendererNonAnimatingProps = [
   'texture',
 ];
 
-export default class SolidNode extends Object {
+export interface TextNode {
+  name: 'TextNode';
+  text: string;
+  parent?: ElementNode;
+
+  // These don't seem to be needed by a TextNode but are potentially assigned anyway
+  // in various places
+  zIndex?: undefined;
+  states?: States;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  marginLeft?: number;
+  marginRight?: number;
+  marginTop?: number;
+  marginBottom?: number;
+}
+
+export type SolidNode = ElementNode | TextNode;
+
+export class ElementNode extends Object {
   name: string;
-  lng?: INode;
+  lng: INode | null = null;
   rendered: boolean;
   autofocus: boolean;
   zIndex?: number;
   selected?: number;
+  flexDirection?: 'row' | 'column';
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  gap?: number;
+  justifyContent?:
+    | 'flexStart'
+    | 'flexEnd'
+    | 'center'
+    | 'spaceBetween'
+    | 'spaceEvenly';
+  marginLeft?: number;
+  marginRight?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  text?: string;
+  display?: 'flex';
+  forwardStates?: boolean;
+  onLoad?: (target: INode, dimensions: Dimensions) => void;
+  onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
+  private _undoStates?: Record<string, any>;
   private _renderProps: any;
   private _effects: any;
-  private _parent?: SolidNode;
+  private _parent?: ElementNode;
   private _shader?: ShaderRef;
-  private _animate?: any;
   private _style?: any;
   private _states?: States;
   private _animationSettings?: any;
   private _updateLayoutOn?: any;
+  private _width?: number;
+  private _height?: number;
+  private _color?: number;
+  private _border?: number;
+  private _borderLeft?: number;
+  private _borderRight?: number;
+  private _borderTop?: number;
+  private _borderBottom?: number;
+  public _animate?: boolean; // Public but uses _ prefix
+  public _autosized?: boolean; // Public but uses _ prefix
   public _isDirty?: boolean; // Public but uses _ prefix
   children: Children;
 
@@ -216,7 +265,9 @@ export default class SolidNode extends Object {
         set(props = {}) {
           this._linearGradient = props;
           if (props.colors) {
-            props.colors = props.colors.map((c) => normalizeColor(c));
+            props.colors = props.colors.map((c: string | number) =>
+              normalizeColor(c),
+            );
           }
           this.effects = {
             ...(this.effects || {}),
@@ -256,7 +307,7 @@ export default class SolidNode extends Object {
 
   set shader(v: Parameters<typeof createShader> | ShaderRef | undefined) {
     if (isArray(v)) {
-      this._shader = createShader(...v);
+      this._shader = createShader(...v) as ShaderRef;
     } else {
       this._shader = v;
     }
@@ -265,7 +316,7 @@ export default class SolidNode extends Object {
 
   _sendToLightningAnimatable(
     name: string,
-    value: [value: number | string, settings: any] | number,
+    value: [value: number | string, settings: any] | number | string,
   ) {
     if (this.rendered && this.lng) {
       if (isArray(value)) {
@@ -276,7 +327,7 @@ export default class SolidNode extends Object {
         return this.animate({ [name]: value }).start();
       }
 
-      (this.lng[name as keyof INode] as number) = value;
+      (this.lng[name as keyof INode] as number | string) = value;
     } else {
       // Need to render before animating
       if (isArray(value)) {
@@ -301,7 +352,7 @@ export default class SolidNode extends Object {
 
   setFocus() {
     if (this.rendered) {
-      setActiveElement<SolidNode>(this);
+      setActiveElement<ElementNode>(this);
     } else {
       this.autofocus = true;
     }
@@ -312,9 +363,11 @@ export default class SolidNode extends Object {
   }
 
   _resizeOnTextLoad() {
-    this.lng.once('textLoaded', (elm, size) => {
+    assertTruthy(this.lng);
+    this.lng.once('textLoaded', (_node, size: Dimensions) => {
       this.width = size.width;
       this.height = size.height;
+      assertTruthy(this.parent);
       this.parent.updateLayout(this, size);
     });
   }
@@ -335,7 +388,7 @@ export default class SolidNode extends Object {
       }
 
       if (!this[key as keyof this]) {
-        this[key as keyof this] = value[key as keyof SolidNode];
+        this[key as keyof this] = value[key as keyof ElementNode];
       }
     }
 
@@ -381,7 +434,8 @@ export default class SolidNode extends Object {
 
   _applyZIndexToChildren() {
     const zIndex = this.zIndex;
-    const zIndexIsInteger = zIndex >= 1 && parseInt(zIndex) === zIndex;
+    assertTruthy(zIndex);
+    const zIndexIsInteger = zIndex >= 1 && parseInt('' + zIndex) === zIndex;
     const decimalSeparator = zIndexIsInteger ? '.' : '';
 
     this.children.forEach((c, i) => {
@@ -391,13 +445,13 @@ export default class SolidNode extends Object {
     });
   }
 
-  updateLayout(...args) {
+  updateLayout(child?: ElementNode, dimensions?: Dimensions) {
     if (this.display === 'flex' && this.hasChildren) {
       log('Layout: ', this);
       calculateFlex(this);
     }
 
-    isFunc(this.onLayout) && this.onLayout(...args);
+    isFunc(this.onLayout) && this.onLayout(child, dimensions);
   }
 
   _stateChanged() {
@@ -405,7 +459,7 @@ export default class SolidNode extends Object {
 
     if (this.forwardStates) {
       // apply states to children first
-      const states = this.states.slice();
+      const states = this.states.slice() as States;
       this.children.forEach((c) => (c.states = states));
     }
 
@@ -435,10 +489,11 @@ export default class SolidNode extends Object {
           };
 
           // get current values to undo state
-          if (!this._undoStates[state]) {
+          if (this._undoStates && !this._undoStates[state]) {
             this._undoStates[state] = {};
             Object.keys(styles).forEach((key) => {
-              this._undoStates[state][key] = this[key];
+              assertTruthy(this._undoStates);
+              this._undoStates[state][key] = this[key as keyof this];
             });
           }
         }
@@ -495,14 +550,15 @@ export default class SolidNode extends Object {
     } else {
       // If its not an image or texture apply some defaults
       if (!(props.src || props.texture)) {
+        assertTruthy(parent);
         // Set width and height to parent less offset
         if (isNaN(props.width)) {
-          props.width = parent.width - props.x;
+          props.width = (parent.width || 0) - props.x;
           node._width = props.width;
         }
 
         if (isNaN(props.height)) {
-          props.height = parent.height - props.y;
+          props.height = (parent.height || 0) - props.y;
           node._height = props.height;
         }
 

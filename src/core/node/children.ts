@@ -15,15 +15,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type SolidNode from "./index.js";
+import type { ElementNode, SolidNode } from './index.js';
 
 /**
  * Children class
  */
 export default class Children extends Array<SolidNode> {
-  _parent: SolidNode;
+  _parent: ElementNode;
 
-  constructor(node: SolidNode) {
+  constructor(node: ElementNode) {
     super();
     this._parent = node;
   }

@@ -28,7 +28,8 @@
     "watch": "tsc -w",
     "dev": "concurrently -c \"auto\" \"npm:watch\" \"npm:vite\"",
     "vite": "vite --open \"/test/index.html\" --host",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prepack": "npm run build"
   },
   "keywords": [
     "lightning",
@@ -48,6 +49,7 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "prettier": "^3.0.1",
+    "solid-js": "^1.8.1",
     "typescript": "^5.2.2",
     "vite": "^4.4.9",
     "vite-tsconfig-paths": "^4.2.0"
@@ -63,7 +65,7 @@
     "@lightningjs/renderer": "^0.3.6"
   },
   "peerDependencies": {
-    "solid-js": "^1.7.12"
+    "solid-js": "^1.8.1"
   },
   "files": [
     "dist",

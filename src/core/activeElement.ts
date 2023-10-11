@@ -16,5 +16,7 @@
  */
 
 import { createSignal } from 'solid-js';
-import type SolidNode from './node/index.js';
-export const [activeElement, setActiveElement] = createSignal<SolidNode | null>(null);
+import type { SolidNode } from './node/index.js';
+export const [activeElement, setActiveElement] = createSignal<SolidNode | null>(
+  null,
+);
