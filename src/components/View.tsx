@@ -15,5 +15,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createSignal } from 'solid-js';
-export const [activeElement, setActiveElement] = createSignal(null);
+import { type IntrinsicNodeProps } from "../intrinsicTypes.js";
+
+export function View(props: IntrinsicNodeProps) {
+  return <node {...props}></node>
+}

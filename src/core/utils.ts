@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  * Copyright 2023 Comcast Cable Communications Management, LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +16,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { config } from '../config';
+import { config } from '../config.js';
+import type { SolidNode } from './node/index.js';
 
-export function normalizeColor(color = '') {
-  if (Number.isInteger(color)) {
+export function normalizeColor(color: string | number = '') {
+  if (isInteger(color)) {
     return color;
   }
 
@@ -31,12 +33,11 @@ export function normalizeColor(color = '') {
     if (color.startsWith('0x')) {
       return color;
     }
-
     return '0x' + (color.length === 6 ? color + 'ff' : color);
   }
 }
 const isDev = import.meta.env.MODE === 'development';
-export function log(msg, node, ...args) {
+export function log(msg: string, node: SolidNode, ...args: any[]) {
   if (isDev) {
     if (config.debug || (isObject(node) && node.debug)) {
       console.log(msg, node, ...args);
@@ -44,27 +45,36 @@ export function log(msg, node, ...args) {
   }
 }
 
-export function isFunc(item) {
+export function isFunc(item: unknown): item is (...args: unknown[]) => unknown {
   return typeof item === 'function';
 }
 
-export function isObject(item) {
+export function isObject(
+  item: unknown,
+): item is Record<string | number | symbol, unknown> {
   return typeof item === 'object';
 }
 
-export function isArray(item) {
+export function isArray(item: unknown): item is any[] {
   return Array.isArray(item);
 }
 
-export function isString(item) {
+export function isString(item: unknown): item is string {
   return typeof item === 'string';
 }
 
-export function isNumber(item) {
+export function isNumber(item: unknown): item is number {
   return typeof item === 'number';
 }
 
-export function keyExists(obj, keys) {
+export function isInteger(item: unknown): item is number {
+  return Number.isInteger(item);
+}
+
+export function keyExists(
+  obj: Record<string | number | symbol, unknown>,
+  keys: (string | number | symbol)[],
+) {
   for (const key of keys) {
     if (key in obj) {
       return true;

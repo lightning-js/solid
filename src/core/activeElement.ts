@@ -15,6 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export * from './Text';
-export * from './View';
-export * from './Canvas';
+import { createSignal } from 'solid-js';
+import type { ElementNode } from './node/index.js';
+export const [activeElement, setActiveElement] =
+  createSignal<ElementNode | null>(null);

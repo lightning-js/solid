@@ -16,30 +16,45 @@
  */
 
 import { createEffect } from "solid-js";
-import startLightningRenderer from '../core/renderer';
+import { startLightningRenderer, type SolidRendererOptions } from '../core/renderer/index.js';
+import type { RendererMain } from "@lightningjs/renderer";
+import { assertTruthy } from "@lightningjs/renderer/utils";
+import { ElementNode, type SolidNode } from "../core/node/index.js";
 
-export let renderer;
-export let createShader;
+export let renderer: RendererMain;
+export let createShader: RendererMain['createShader'];
 
-function renderTopDown(node) {
+function renderTopDown(node: SolidNode) {
   if (node.name === 'TextNode') {
     return;
   }
+  assertTruthy(node instanceof ElementNode);
   node.render();
   node.children.forEach(c => renderTopDown(c))
 }
 
-export const Canvas = (props) => {
+export interface CanvasOptions {
+  coreExtensionModule?: string,
+  threadXCoreWorkerUrl?: string,
+}
+
+export interface CanvasProps {
+  options?: SolidRendererOptions;
+  children?: any;
+}
+
+export const Canvas = (props: CanvasProps) => {
   renderer = startLightningRenderer(props.options);
-  createShader = renderer.createShader;
+  createShader = renderer.createShader.bind(renderer);
   const init = renderer.init();
-  let root;
+  let root: ElementNode | undefined;
 
   createEffect(() => {
     init.then(() => {
+      assertTruthy(root);
       root.lng = renderer.root;
       root.children.forEach(renderTopDown)
-    });
+    }).catch(console.error);
   })
   return (
     <canvas ref={root} zIndex={0.1}>

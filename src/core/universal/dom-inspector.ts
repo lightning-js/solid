@@ -15,20 +15,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createEffect } from 'solid-js';
-import universalLightning from './lightning';
+import universalLightning from './lightning.js';
 import { renderer } from '@lightningjs/solid';
+import type { ElementNode, SolidNode, TextNode } from '../node/index.js';
 
-const injectCSS = (css) => {
+const injectCSS = (css: string) => {
   const el = document.createElement('style');
   el.innerText = css;
   document.head.appendChild(el);
 };
 
-const updateRootStyleFromCanvas = function (canvas) {
+const updateRootStyleFromCanvas = function (canvas: HTMLCanvasElement) {
   const bcr = canvas.getBoundingClientRect();
   const p = renderer.settings.deviceLogicalPixelRatio || 1; //0.6666667;
-  const root = document.getElementById('linspector');
+  const root = document.getElementById('linspector') as HTMLDivElement;
   root.style.left = canvas.offsetLeft + 'px';
   root.style.top = canvas.offsetTop + 'px';
   root.style.width = Math.ceil(bcr.width / p) + 'px';
@@ -58,17 +58,19 @@ export function attachInspector() {
   `);
 
   setTimeout(function () {
+    // @ts-expect-error Remove when Renderer publicizes `canvas`
     updateRootStyleFromCanvas(renderer.canvas);
   }, 1000);
 }
 
 export default {
   ...universalLightning,
-  createElement(name) {
+  createElement(name: string) {
     const dom = document.createElement('div');
 
     if (name === 'canvas') {
       dom.id = 'linspector';
+      // @ts-expect-error Remove when Renderer publicizes `canvas`
       renderer.canvas.parentNode.appendChild(dom);
     } else {
       dom.classList.add('lnode');
@@ -79,6 +81,7 @@ export default {
     }
     const node = universalLightning.createElement(name);
     if (name !== 'canvas') {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       const origRender = node.render;
       node.render = () => {
         origRender.call(node);
@@ -92,49 +95,50 @@ export default {
         dom.style.height = node.height + 'px';
         dom.style.top = node.y + 'px';
         dom.style.left = node.x + 'px';
-        dom.style.zIndex = node.zIndex;
+        dom.style.zIndex = `${node.zIndex}`;
       };
     }
     node._dom = dom;
-    dom.solid = node;
+    // TODO: WeakMap might be a good idea instead augmenting properties onto HTMLDivElement
+    (dom as any).solid = node;
     return node;
   },
-  setProperty(node, name, value) {
+  setProperty(node: ElementNode, name: string, value: any = true): void {
     if (name === 'width') {
-      node._dom.style.width = value + 'px';
+      node._dom!.style.width = value + 'px';
     } else if (name === 'height') {
-      node._dom.style.height = value + 'px';
+      node._dom!.style.height = value + 'px';
     } else if (name === 'y') {
-      node._dom.style.top = value + 'px';
+      node._dom!.style.top = value + 'px';
     } else if (name === 'x') {
-      node._dom.style.left = value + 'px';
+      node._dom!.style.left = value + 'px';
     } else if (name === 'zIndex') {
-      node._dom.style.zIndex = value;
+      node._dom!.style.zIndex = value;
     }
     universalLightning.setProperty(node, name, value);
   },
-  createTextNode(text) {
+  createTextNode(text: string): TextNode {
     const dom = document.createTextNode(text);
     const node = universalLightning.createTextNode(text);
     node._dom = dom;
     return node;
   },
-  replaceText(textNode, value) {
+  replaceText(textNode: TextNode, value: string): void {
     universalLightning.replaceText(textNode, value);
-    textNode._dom.data = value;
+    textNode._dom!.data = value;
   },
-  insertNode(parent, node, anchor) {
+  insertNode(parent: ElementNode, node: SolidNode, anchor: SolidNode): void {
     if (parent) {
-      if (anchor && parent._dom === anchor._dom.parentNode) {
-        parent._dom.insertBefore(node._dom, anchor._dom);
+      if (anchor && parent._dom === anchor._dom!.parentNode) {
+        parent._dom.insertBefore(node._dom!, anchor._dom!);
       } else {
-        parent._dom.appendChild(node._dom);
+        parent._dom!.appendChild(node._dom!);
       }
       universalLightning.insertNode(parent, node, anchor);
     }
   },
-  removeNode(parent, node) {
-    parent._dom.removeChild(node._dom);
+  removeNode(parent: ElementNode, node: SolidNode): void {
+    parent._dom!.removeChild(node._dom!);
     universalLightning.removeNode(parent, node);
   },
 };

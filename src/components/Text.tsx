@@ -15,17 +15,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export {
-  For,
-  Show,
-  Suspense,
-  SuspenseList,
-  Switch,
-  Match,
-  Index,
-  ErrorBoundary,
-} from 'solid-js';
-export * from './core/activeElement';
-export * from './components';
-export * from './core/render';
-export { config as Config } from './config';
+import type { IntrinsicTextProps } from "../intrinsicTypes.js";
+
+export function Text(props: IntrinsicTextProps) {
+  return <text {...props}></text>
+}

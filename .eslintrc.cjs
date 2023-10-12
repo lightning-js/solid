@@ -14,7 +14,7 @@ const config = {
     'prettier',
   ],
   parserOptions: {
-    project: ['./tsconfig.json', './tsconfig.cfg.json', './test/tsconfig.json'],
+    project: ['./tsconfig.json', './tsconfig.cfg.json'],
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     tsconfigRootDir: __dirname,
   },
@@ -29,6 +29,14 @@ const config = {
     '@typescript-eslint/no-unsafe-return': 'warn',
     '@typescript-eslint/no-unsafe-call': 'warn',
     '@typescript-eslint/no-unsafe-member-access': 'warn',
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      },
+    ],
   },
   // Temporarily we also ignore all JavaScript files since they will be ultimately converted to TS.
   // TODO: Remove this once we have converted all of the JavaScript files to TypeScript

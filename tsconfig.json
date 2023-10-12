@@ -1,14 +1,29 @@
 {
   "compilerOptions": {
+    "rootDir": ".",
+    "lib": ["ES2022", "DOM"],
+    "outDir": "dist",
+    "allowJs": true,
+    "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "sourceMap": true,
+    "declaration": true,
+    // Temporarily disable this until `solid-js` is released with this PR:
+    // https://github.com/solidjs/solid/pull/1913
+    "skipLibCheck": true,
+
+    // Type Checking / Syntax Rules
     "strict": true,
-    "target": "ESNext",
-    "module": "ESNext",
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "composite": true,
+
+    // jsx
     "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "types": ["vite/client"],
-    "noEmit": true,
-    "isolatedModules": true
-  }
+  },
+  "include": ["src/**/*", "jsx-runtime.d.ts"]
 }

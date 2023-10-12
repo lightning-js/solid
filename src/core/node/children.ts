@@ -15,11 +15,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { ElementNode, SolidNode } from './index.js';
+
 /**
  * Children class
  */
-export default class Children extends Array {
-  constructor(node) {
+export default class Children extends Array<SolidNode> {
+  _parent: ElementNode;
+
+  constructor(node: ElementNode) {
     super();
     this._parent = node;
   }
@@ -32,32 +36,33 @@ export default class Children extends Array {
     return this[0];
   }
 
-  get previousSibling() {
-    if (this._parent) {
-      let children = this._parent.children;
-      let index = children.indexOf(this) - 1;
-      if (index >= 0) {
-        return children[index];
-      }
-    }
+  // Commented out because it's not used anywhere and implementation seems wrong
+  // get previousSibling() {
+  //   if (this._parent) {
+  //     const children = this._parent.children;
+  //     const index = children.indexOf(this) - 1;
+  //     if (index >= 0) {
+  //       return children[index];
+  //     }
+  //   }
 
-    return null;
-  }
+  //   return null;
+  // }
 
-  get nextSibling() {
-    if (this._parent) {
-      let children = this._parent.children;
-      let index = children.indexOf(this) + 1;
-      if (index < children.length) {
-        return children[index];
-      }
-    }
-    return null;
-  }
+  // get nextSibling() {
+  //   if (this._parent) {
+  //     const children = this._parent.children;
+  //     const index = children.indexOf(this) + 1;
+  //     if (index < children.length) {
+  //       return children[index];
+  //     }
+  //   }
+  //   return null;
+  // }
 
-  insert(node, beforeNode) {
+  insert(node: SolidNode, beforeNode: SolidNode) {
     if (beforeNode) {
-      let index = this.indexOf(beforeNode);
+      const index = this.indexOf(beforeNode);
       this.splice(index, 0, node);
     } else {
       this.push(node);
@@ -67,7 +72,7 @@ export default class Children extends Array {
     this._parent._isDirty = true;
   }
 
-  remove(node) {
+  remove(node: SolidNode) {
     const nodeIndexToRemove = this.indexOf(node);
     if (nodeIndexToRemove >= 0) {
       this.splice(nodeIndexToRemove, 1);

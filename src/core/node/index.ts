@@ -15,10 +15,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { renderer, createShader } from '../../';
-import Children from './children';
-import States from './states';
-import calculateFlex from '../flex';
+import { renderer, createShader } from '../../index.js';
+import Children from './children.js';
+import States from './states.js';
+import calculateFlex from '../flex.js';
 import {
   normalizeColor,
   log,
@@ -26,27 +26,39 @@ import {
   isNumber,
   isFunc,
   keyExists,
-} from '../utils';
-import { config } from '../../config';
-import { setActiveElement } from '../activeElement';
+} from '../utils.js';
+import { config } from '../../config.js';
+import { setActiveElement } from '../activeElement.js';
+import type {
+  INode,
+  INodeAnimatableProps,
+  INodeWritableProps,
+  ShaderRef,
+  Dimensions,
+} from '@lightningjs/renderer';
+import { assertTruthy } from '@lightningjs/renderer/utils';
 
 const { animationSettings: defaultAnimationSettings } = config;
 
-function convertEffectsToShader(styleEffects) {
+function convertEffectsToShader(styleEffects: any) {
   const effects = [];
 
-  for (const [type, props] of Object.entries(styleEffects)) {
+  for (const [type, props] of Object.entries<Record<string, any>>(
+    styleEffects,
+  )) {
     if (props.color) {
       props.color = normalizeColor(props.color);
     }
     effects.push({ type, props });
   }
-  return createShader('DynamicShader', { effects });
+  return createShader('DynamicShader', { effects: effects as any });
 }
 
-function borderAccessor(direction = '') {
+function borderAccessor(
+  direction: '' | 'Top' | 'Right' | 'Bottom' | 'Left' = '',
+) {
   return {
-    set(props) {
+    set(this: ElementNode, props: any) {
       // Format: width || { width, color }
       if (isNumber(props)) {
         props = { width: props, color: '#000000' };
@@ -57,7 +69,7 @@ function borderAccessor(direction = '') {
       };
       this[`_border${direction}`] = props;
     },
-    get() {
+    get(this: ElementNode) {
       return this[`_border${direction}`];
     },
   };
@@ -107,12 +119,92 @@ const LightningRendererNonAnimatingProps = [
   'texture',
 ];
 
-export default class Node extends Object {
-  constructor(name) {
+export interface TextNode {
+  name: 'TextNode';
+  text: string;
+  parent?: ElementNode;
+
+  // These don't seem to be needed by a TextNode but are potentially assigned anyway
+  // in various places
+  zIndex?: undefined;
+  states?: States;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  marginLeft?: number;
+  marginRight?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  /**
+   * Managed by dom-inspector
+   */
+  _dom?: Text; // Public but uses _ prefix
+}
+
+export type SolidNode = ElementNode | TextNode;
+
+export class ElementNode extends Object {
+  name: string;
+  lng: INode | null = null;
+  rendered: boolean;
+  autofocus: boolean;
+  id?: string;
+  clipping?: boolean;
+  zIndex?: number;
+  selected?: number;
+  flexDirection?: 'row' | 'column';
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  gap?: number;
+  justifyContent?:
+    | 'flexStart'
+    | 'flexEnd'
+    | 'center'
+    | 'spaceBetween'
+    | 'spaceEvenly';
+  marginLeft?: number;
+  marginRight?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  text?: string;
+  display?: 'flex';
+  forwardStates?: boolean;
+  onLoad?: (target: INode, dimensions: Dimensions) => void;
+  onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
+  private _undoStates?: Record<string, any>;
+  private _renderProps: any;
+  private _effects: any;
+  private _parent?: ElementNode;
+  private _shader?: ShaderRef;
+  private _style?: any;
+  private _states?: States;
+  private _animationSettings?: any;
+  private _updateLayoutOn?: any;
+  private _width?: number;
+  private _height?: number;
+  private _color?: number;
+  private _border?: number;
+  private _borderLeft?: number;
+  private _borderRight?: number;
+  private _borderTop?: number;
+  private _borderBottom?: number;
+  public _animate?: boolean; // Public but uses _ prefix
+  public _autosized?: boolean; // Public but uses _ prefix
+  public _isDirty?: boolean; // Public but uses _ prefix
+  /**
+   * Managed by dom-inspector
+   */
+  public _dom?: HTMLDivElement; // Public but uses _ prefix
+  children: Children;
+
+  constructor(name: string) {
     super();
     this.name = name;
-    this.lng;
     this.rendered = false;
+    this.autofocus = false;
     this._renderProps = {};
     this.children = new Children(this);
 
@@ -183,7 +275,9 @@ export default class Node extends Object {
         set(props = {}) {
           this._linearGradient = props;
           if (props.colors) {
-            props.colors = props.colors.map((c) => normalizeColor(c));
+            props.colors = props.colors.map((c: string | number) =>
+              normalizeColor(c),
+            );
           }
           this.effects = {
             ...(this.effects || {}),
@@ -212,26 +306,29 @@ export default class Node extends Object {
 
   set parent(p) {
     this._parent = p;
-    if (this.rendered) {
-      this.lng.parent = p.lng;
+    if (this.rendered && this.lng) {
+      this.lng.parent = p?.lng ?? null;
     }
   }
 
-  get shader() {
+  get shader(): ShaderRef | undefined {
     return this._shader;
   }
 
-  set shader(v) {
+  set shader(v: Parameters<typeof createShader> | ShaderRef | undefined) {
     if (isArray(v)) {
-      this._shader = createShader(...v);
+      this._shader = createShader(...v) as ShaderRef;
     } else {
       this._shader = v;
     }
     this._sendToLightning('shader', this._shader);
   }
 
-  _sendToLightningAnimatable(name, value) {
-    if (this.rendered) {
+  _sendToLightningAnimatable(
+    name: string,
+    value: [value: number | string, settings: any] | number | string,
+  ) {
+    if (this.rendered && this.lng) {
       if (isArray(value)) {
         return this.animate({ [name]: value[0] }, value[1]).start();
       }
@@ -240,7 +337,7 @@ export default class Node extends Object {
         return this.animate({ [name]: value }).start();
       }
 
-      this.lng[name] = value;
+      (this.lng[name as keyof INode] as number | string) = value;
     } else {
       // Need to render before animating
       if (isArray(value)) {
@@ -250,21 +347,22 @@ export default class Node extends Object {
     }
   }
 
-  _sendToLightning(name, value) {
-    if (this.rendered) {
-      this.lng[name] = value;
+  _sendToLightning(name: string, value: unknown) {
+    if (this.rendered && this.lng) {
+      (this.lng[name as keyof INodeWritableProps] as unknown) = value;
     } else {
       this._renderProps[name] = value;
     }
   }
 
-  animate(props, animationSettings) {
+  animate(props: Partial<INodeAnimatableProps>, animationSettings?: any) {
+    assertTruthy(this.lng, 'Node must be rendered before animating');
     return this.lng.animate(props, animationSettings || this.animationSettings);
   }
 
   setFocus() {
     if (this.rendered) {
-      setActiveElement(this);
+      setActiveElement<ElementNode>(this);
     } else {
       this.autofocus = true;
     }
@@ -275,9 +373,11 @@ export default class Node extends Object {
   }
 
   _resizeOnTextLoad() {
-    this.lng.once('textLoaded', (elm, size) => {
+    assertTruthy(this.lng);
+    this.lng.once('textLoaded', (_node, size: Dimensions) => {
       this.width = size.width;
       this.height = size.height;
+      assertTruthy(this.parent);
       this.parent.updateLayout(this, size);
     });
   }
@@ -290,15 +390,15 @@ export default class Node extends Object {
     this.lng && renderer.destroyNode(this.lng);
   }
 
-  set style(value) {
+  set style(value: any) {
     // Keys set in JSX are more important
     for (let key in value) {
       if (key === 'animate') {
         key = '_animate';
       }
 
-      if (!this[key]) {
-        this[key] = value[key];
+      if (!this[key as keyof this]) {
+        this[key as keyof this] = value[key as keyof ElementNode];
       }
     }
 
@@ -344,7 +444,8 @@ export default class Node extends Object {
 
   _applyZIndexToChildren() {
     const zIndex = this.zIndex;
-    const zIndexIsInteger = zIndex >= 1 && parseInt(zIndex) === zIndex;
+    assertTruthy(zIndex);
+    const zIndexIsInteger = zIndex >= 1 && parseInt('' + zIndex) === zIndex;
     const decimalSeparator = zIndexIsInteger ? '.' : '';
 
     this.children.forEach((c, i) => {
@@ -354,13 +455,13 @@ export default class Node extends Object {
     });
   }
 
-  updateLayout(...args) {
+  updateLayout(child?: ElementNode, dimensions?: Dimensions) {
     if (this.display === 'flex' && this.hasChildren) {
       log('Layout: ', this);
       calculateFlex(this);
     }
 
-    isFunc(this.onLayout) && this.onLayout(...args);
+    isFunc(this.onLayout) && this.onLayout(child, dimensions);
   }
 
   _stateChanged() {
@@ -368,7 +469,7 @@ export default class Node extends Object {
 
     if (this.forwardStates) {
       // apply states to children first
-      const states = this.states.slice();
+      const states = this.states.slice() as States;
       this.children.forEach((c) => (c.states = states));
     }
 
@@ -398,10 +499,11 @@ export default class Node extends Object {
           };
 
           // get current values to undo state
-          if (!this._undoStates[state]) {
+          if (this._undoStates && !this._undoStates[state]) {
             this._undoStates[state] = {};
             Object.keys(styles).forEach((key) => {
-              this._undoStates[state][key] = this[key];
+              assertTruthy(this._undoStates);
+              this._undoStates[state][key] = this[key as keyof this];
             });
           }
         }
@@ -413,14 +515,15 @@ export default class Node extends Object {
   }
 
   render() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const node = this;
     const parent = this.parent;
     node.x = node.x || 0;
     node.y = node.y || 0;
 
     // Parent is dirty whenever a node is inserted after initial render
-    if (parent._isDirty) {
-      node.parent.updateLayout();
+    if (parent?._isDirty) {
+      parent.updateLayout();
       parent._applyZIndexToChildren();
       parent._isDirty = false;
     }
@@ -433,7 +536,7 @@ export default class Node extends Object {
 
     let props = node._renderProps;
 
-    if (parent.lng) {
+    if (parent?.lng) {
       props.parent = parent.lng;
     }
 
@@ -457,14 +560,15 @@ export default class Node extends Object {
     } else {
       // If its not an image or texture apply some defaults
       if (!(props.src || props.texture)) {
+        assertTruthy(parent);
         // Set width and height to parent less offset
         if (isNaN(props.width)) {
-          props.width = parent.width - props.x;
+          props.width = (parent.width || 0) - props.x;
           node._width = props.width;
         }
 
         if (isNaN(props.height)) {
-          props.height = parent.height - props.y;
+          props.height = (parent.height || 0) - props.y;
           node._height = props.height;
         }
 

@@ -14,36 +14,39 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-
-import { renderer } from '../../';
+import { assertTruthy } from '@lightningjs/renderer/utils';
+import { renderer } from '../../index.js';
 import { createEffect } from 'solid-js';
-import { log } from '../utils';
-import Node from '../node';
+import { log } from '../utils.js';
+import { ElementNode, type SolidNode, type TextNode } from '../node/index.js';
 
 export default {
-  createElement(name) {
-    const node = new Node(name);
+  createElement(name: string): ElementNode {
+    const node = new ElementNode(name);
     renderer.root && createEffect(() => node.render());
     return node;
   },
-  createTextNode(text) {
+  createTextNode(text: string): TextNode {
     // A text node is just a string - not the <text> node
     return { name: 'TextNode', text };
   },
-  replaceText(node, value) {
+  replaceText(node: TextNode, value: string): void {
     log('Replace Text: ', node, value);
     node.text = value;
     const parent = node.parent;
+    assertTruthy(parent);
     parent._autosized && parent._resizeOnTextLoad();
     parent.text = parent.getText();
   },
-  setProperty(node, name, value = true) {
+  setProperty(node: ElementNode, name: string, value: any = true): void {
     if (name === 'animate') {
-      return (node._animate = value);
+      node._animate = value as boolean;
+      return;
     }
+    // @ts-expect-error Assignment type is difficult to do here. Fix later.
     node[name] = value;
   },
-  insertNode(parent, node, anchor) {
+  insertNode(parent: ElementNode, node: SolidNode, anchor: SolidNode): void {
     log('INSERT: ', parent, node, anchor);
     if (parent) {
       parent.children.insert(node, anchor);
@@ -59,28 +62,30 @@ export default {
       }
     }
   },
-  isTextNode(node) {
+  isTextNode(node: ElementNode): boolean {
     return node.isTextNode();
   },
-  removeNode(parent, node) {
+  removeNode(parent: ElementNode, node: SolidNode): void {
     log('REMOVE: ', parent, node);
     parent.children.remove(node);
-    node.destroy && node.destroy();
+    if (node instanceof ElementNode) {
+      node.destroy();
+    }
   },
-  getParentNode(node) {
+  getParentNode(node: SolidNode): ElementNode | undefined {
     return node.parent;
   },
-  getFirstChild(node) {
+  getFirstChild(node: ElementNode): SolidNode | undefined {
     return node.children[0];
   },
-  getNextSibling(node) {
+  getNextSibling(node: SolidNode): SolidNode | undefined {
     if (node.parent) {
-      let children = node.parent.children || [];
-      let index = children.indexOf(node) + 1;
+      const children = node.parent.children || [];
+      const index = children.indexOf(node) + 1;
       if (index < children.length) {
         return children[index];
       }
     }
-    return null;
+    return undefined;
   },
 };

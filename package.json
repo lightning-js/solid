@@ -3,7 +3,17 @@
   "version": "0.5.6",
   "description": "Lightning renderer for solid universal",
   "type": "module",
-  "main": "./src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "main": "./dist/src/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    },
+    "./jsx-runtime": {
+      "types": "./jsx-runtime.d.ts"
+    }
+  },
   "sideEffects": false,
   "scripts": {
     "start": "npm run dev",
@@ -18,7 +28,8 @@
     "watch": "tsc -w",
     "dev": "concurrently -c \"auto\" \"npm:watch\" \"npm:vite\"",
     "vite": "vite --open \"/test/index.html\" --host",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prepack": "npm run build"
   },
   "keywords": [
     "lightning",
@@ -38,7 +49,8 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "prettier": "^3.0.1",
-    "typescript": "^5.1.6",
+    "solid-js": "^1.8.1",
+    "typescript": "^5.2.2",
     "vite": "^4.4.9",
     "vite-tsconfig-paths": "^4.2.0"
   },
@@ -53,10 +65,12 @@
     "@lightningjs/renderer": "^0.3.6"
   },
   "peerDependencies": {
-    "solid-js": "^1.7.12"
+    "solid-js": "^1.8.1"
   },
   "files": [
+    "dist",
     "src",
+    "jsx-runtime.d.ts",
     "LICENSE",
     "NOTICE",
     "README.md"

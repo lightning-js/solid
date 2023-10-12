@@ -15,6 +15,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export function View(props) {
-  return <node {...props}></node>
-}
+export {
+  For,
+  Show,
+  Suspense,
+  SuspenseList,
+  Switch,
+  Match,
+  Index,
+  ErrorBoundary,
+} from 'solid-js';
+export * from './core/activeElement.js';
+export * from './components/index.js';
+export * from './core/render.js';
+export { config as Config } from './config.js';
