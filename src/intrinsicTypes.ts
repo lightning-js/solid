@@ -17,4 +17,6 @@ export interface IntrinsicTextProps
 
 export interface IntrinsicNodeProps
   extends Partial<INodeWritableProps>,
-    IntrinsicCommonProps {}
+    IntrinsicCommonProps {
+  style: any;
+}

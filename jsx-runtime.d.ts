@@ -1,4 +1,7 @@
-import { IntrinsicNodeProps, type IntrinsicTextProps } from './src/intrinsicTypes.js';
+import {
+  IntrinsicNodeProps,
+  type IntrinsicTextProps,
+} from './src/intrinsicTypes.js';
 
 declare global {
   namespace JSX {
@@ -7,8 +10,5 @@ declare global {
       text: Partial<IntrinsicTextProps>;
       canvas: Partial<IntrinsicNodeProps>;
     }
-
-    type Element = unknown;
   }
 }
-

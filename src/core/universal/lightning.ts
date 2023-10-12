@@ -41,6 +41,7 @@ export default {
   setProperty(node: ElementNode, name: string, value: any = true): void {
     if (name === 'animate') {
       node._animate = value as boolean;
+      return;
     }
     // @ts-expect-error Assignment type is difficult to do here. Fix later.
     node[name] = value;
@@ -64,7 +65,7 @@ export default {
   isTextNode(node: ElementNode): boolean {
     return node.isTextNode();
   },
-  removeNode(parent: ElementNode, node: SolidNode) {
+  removeNode(parent: ElementNode, node: SolidNode): void {
     log('REMOVE: ', parent, node);
     parent.children.remove(node);
     if (node instanceof ElementNode) {
@@ -77,7 +78,7 @@ export default {
   getFirstChild(node: ElementNode): SolidNode | undefined {
     return node.children[0];
   },
-  getNextSibling(node: SolidNode): SolidNode | undefined | null {
+  getNextSibling(node: SolidNode): SolidNode | undefined {
     if (node.parent) {
       const children = node.parent.children || [];
       const index = children.indexOf(node) + 1;
@@ -85,6 +86,6 @@ export default {
         return children[index];
       }
     }
-    return null;
+    return undefined;
   },
 };

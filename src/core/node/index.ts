@@ -136,6 +136,10 @@ export interface TextNode {
   marginRight?: number;
   marginTop?: number;
   marginBottom?: number;
+  /**
+   * Managed by dom-inspector
+   */
+  _dom?: Text; // Public but uses _ prefix
 }
 
 export type SolidNode = ElementNode | TextNode;
@@ -145,6 +149,8 @@ export class ElementNode extends Object {
   lng: INode | null = null;
   rendered: boolean;
   autofocus: boolean;
+  id?: string;
+  clipping?: boolean;
   zIndex?: number;
   selected?: number;
   flexDirection?: 'row' | 'column';
@@ -188,6 +194,10 @@ export class ElementNode extends Object {
   public _animate?: boolean; // Public but uses _ prefix
   public _autosized?: boolean; // Public but uses _ prefix
   public _isDirty?: boolean; // Public but uses _ prefix
+  /**
+   * Managed by dom-inspector
+   */
+  public _dom?: HTMLDivElement; // Public but uses _ prefix
   children: Children;
 
   constructor(name: string) {
