@@ -35,7 +35,7 @@ export default function (node: ElementNode) {
     children.forEach((c) => {
       c[prop] = start + (c[marginOne] || 0);
       start +=
-        c[dimension] || 0 + gap + (c[marginOne] || 0) + (c[marginTwo] || 0);
+        (c[dimension] || 0) + gap + (c[marginOne] || 0) + (c[marginTwo] || 0);
     });
   }
   if (justify === 'flexEnd') {
@@ -45,7 +45,7 @@ export default function (node: ElementNode) {
       assertTruthy(c);
       c[prop] = start - (c[dimension] || 0) - (c[marginTwo] || 0);
       start -=
-        c[dimension] || 0 + gap + (c[marginOne] || 0) + (c[marginTwo] || 0);
+        (c[dimension] || 0) + gap + (c[marginOne] || 0) + (c[marginTwo] || 0);
     }
   }
   if (justify === 'center') {
