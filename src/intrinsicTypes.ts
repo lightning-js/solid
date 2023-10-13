@@ -6,9 +6,16 @@ import {
 interface IntrinsicCommonProps {
   onFocus?: () => void;
   onBlur?: () => void;
-  selected?: number;
-  children?: any;
+  onLoad?: () => void;
+  style?: any;
+  autofocus?: boolean;
+  id?: string;
   ref?: any;
+  marginLeft?: number;
+  marginRight?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  states?: Array<string>;
 }
 
 export interface IntrinsicTextProps
@@ -18,5 +25,8 @@ export interface IntrinsicTextProps
 export interface IntrinsicNodeProps
   extends Partial<INodeWritableProps>,
     IntrinsicCommonProps {
-  style: any;
+  selected?: number;
+  children?: any;
+  effects?: any;
+  animate?: boolean;
 }

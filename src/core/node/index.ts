@@ -148,7 +148,7 @@ export class ElementNode extends Object {
   name: string;
   lng: INode | null = null;
   rendered: boolean;
-  autofocus: boolean;
+  autofocus?: boolean;
   id?: string;
   clipping?: boolean;
   zIndex?: number;
@@ -205,7 +205,7 @@ export class ElementNode extends Object {
     this.name = name;
     this.rendered = false;
     this.autofocus = false;
-    this._renderProps = {};
+    this._renderProps = { x: 0, y: 0 };
     this.children = new Children(this);
 
     for (const key of LightningRendererNumberProps) {
@@ -518,8 +518,6 @@ export class ElementNode extends Object {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const node = this;
     const parent = this.parent;
-    node.x = node.x || 0;
-    node.y = node.y || 0;
 
     // Parent is dirty whenever a node is inserted after initial render
     if (parent?._isDirty) {
