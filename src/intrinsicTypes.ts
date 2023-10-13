@@ -2,31 +2,23 @@ import {
   type INodeWritableProps,
   type ITextNodeWritableProps,
 } from '@lightningjs/renderer';
+import { type ElementNode, type TextNode } from './core/node/index.js';
 
 interface IntrinsicCommonProps {
   onFocus?: () => void;
   onBlur?: () => void;
-  onLoad?: () => void;
-  style?: any;
-  autofocus?: boolean;
-  id?: string;
   ref?: any;
-  marginLeft?: number;
-  marginRight?: number;
-  marginTop?: number;
-  marginBottom?: number;
-  states?: Array<string>;
+  children?: any;
 }
 
 export interface IntrinsicTextProps
-  extends Partial<ITextNodeWritableProps>,
+  extends Partial<Omit<ITextNodeWritableProps, 'text' | 'parent'>>,
+    TextNode,
     IntrinsicCommonProps {}
 
 export interface IntrinsicNodeProps
-  extends Partial<INodeWritableProps>,
+  extends Partial<Omit<INodeWritableProps, 'animate' | 'parent' | 'shader'>>,
+    Partial<Omit<ElementNode, 'children' | 'animate'>>,
     IntrinsicCommonProps {
-  selected?: number;
-  children?: any;
-  effects?: any;
   animate?: boolean;
 }

@@ -123,10 +123,7 @@ export interface TextNode {
   name: 'TextNode';
   text: string;
   parent?: ElementNode;
-
-  // These don't seem to be needed by a TextNode but are potentially assigned anyway
-  // in various places
-  zIndex?: undefined;
+  zIndex?: number;
   states?: States;
   x?: number;
   y?: number;
