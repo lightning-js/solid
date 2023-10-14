@@ -67,6 +67,10 @@
   "peerDependencies": {
     "solid-js": "^1.8.1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lightning-js/solid.git"
+  },
   "files": [
     "dist",
     "src",
