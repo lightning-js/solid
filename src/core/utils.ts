@@ -36,7 +36,7 @@ export function normalizeColor(color: string | number = '') {
     return '0x' + (color.length === 6 ? color + 'ff' : color);
   }
 }
-const isDev = import.meta.env.MODE === 'development';
+const isDev = import.meta?.env?.MODE === 'development';
 export function log(msg: string, node: SolidNode, ...args: any[]) {
   if (isDev) {
     if (config.debug || (isObject(node) && node.debug)) {

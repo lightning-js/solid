@@ -23,7 +23,7 @@ import universalInspector, {
 } from './universal/dom-inspector.js';
 import type { SolidNode } from './node/index.js';
 
-const loadInspector = import.meta.env.MODE === 'development';
+const loadInspector = import.meta?.env?.MODE === 'development';
 if (loadInspector) {
   attachInspector();
 }
