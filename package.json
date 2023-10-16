@@ -4,7 +4,7 @@
   "description": "Lightning renderer for solid universal",
   "type": "module",
   "source": "src/index.ts",
-  "main": "./dist/source/index.js",
+  "main": "./dist/esm/index.js",
   "module": "./dist/source/index.js",
   "browser": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
