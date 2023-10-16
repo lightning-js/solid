@@ -8,11 +8,11 @@ dependencies:
   '@lightningjs/renderer':
     specifier: ^0.3.6
     version: 0.3.6
-
-devDependencies:
   '@lightningjs/solid':
     specifier: file:./
-    version: 'link:'
+    version: file:(solid-js@1.8.1)
+
+devDependencies:
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.3.0
     version: 6.7.2(@typescript-eslint/parser@6.7.2)(eslint@8.49.0)(typescript@5.2.2)
@@ -2199,7 +2199,6 @@ packages:
 
   /csstype@3.1.2:
     resolution: {integrity: sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==}
-    dev: true
 
   /debug@4.3.4:
     resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
@@ -3361,7 +3360,6 @@ packages:
   /seroval@0.10.4:
     resolution: {integrity: sha512-TdaE9JkoATjKu+vjwllieX8zWyBTUVxbgWDnOsDJFfmKbM7vLSukuCXuD3pO3kkCtX4daywOW8ps2VCdPhS8/w==}
     engines: {node: '>=10'}
-    dev: true
 
   /shebang-command@2.0.0:
     resolution: {integrity: sha512-kHxr2zZpYtdmrN1qDjrrX/Z1rR1kG8Dx+gkpK1G4eXmvXswmcE1hTWBWYUzlraYw1/yZp6YuDY77YtvbN0dmDA==}
@@ -3397,7 +3395,6 @@ packages:
     dependencies:
       csstype: 3.1.2
       seroval: 0.10.4
-    dev: true
 
   /source-map-js@1.0.2:
     resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==}
@@ -3685,3 +3682,14 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  file:(solid-js@1.8.1):
+    resolution: {directory: '', type: directory}
+    id: 'file:'
+    name: '@lightningjs/solid'
+    peerDependencies:
+      solid-js: '*'
+    dependencies:
+      '@lightningjs/renderer': 0.3.6
+      solid-js: 1.8.1
+    dev: false
