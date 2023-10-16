@@ -3,12 +3,17 @@
   "version": "0.6.4",
   "description": "Lightning renderer for solid universal",
   "type": "module",
-  "types": "./dist/src/index.d.ts",
-  "main": "./dist/src/index.js",
+  "source": "src/index.ts",
+  "main": "./dist/source/index.js",
+  "module": "./dist/source/index.js",
+  "browser": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts",
-      "import": "./dist/src/index.js"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/source/index.js",
+      "solid": "./dist/source/index.jsx",
+      "browser": "./dist/esm/index.js"
     },
     "./jsx-runtime": {
       "types": "./jsx-runtime.d.ts"
@@ -24,7 +29,7 @@
     "lint:fix:prettier": "prettier --write \"**/*.{ts,js,cjs,md}\"",
     "lint:eslint": "eslint .",
     "lint:fix:eslint": "eslint --fix .",
-    "build": "tsc",
+    "build": "rollup -c",
     "watch": "tsc -w",
     "dev": "concurrently -c \"auto\" \"npm:watch\" \"npm:vite\"",
     "vite": "vite --open \"/test/index.html\" --host",
@@ -41,7 +46,6 @@
   "author": "Chris Lorenzo",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@lightningjs/solid": "file:./",
     "@typescript-eslint/eslint-plugin": "^6.3.0",
     "@typescript-eslint/parser": "^6.3.0",
     "eslint": "^8.46.0",
@@ -49,6 +53,8 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "prettier": "^3.0.1",
+    "rollup": "^4.1.4",
+    "rollup-preset-solid": "^2.0.1",
     "solid-js": "^1.8.1",
     "typescript": "^5.2.2",
     "vite": "^4.4.9",
