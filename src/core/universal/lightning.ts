@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { assertTruthy } from '@lightningjs/renderer/utils';
-import { renderer } from '../../index.js';
+import { renderer } from '../renderer/index.js';
 import { createEffect } from 'solid-js';
 import { log } from '../utils.js';
 import { ElementNode, type SolidNode, type TextNode } from '../node/index.js';

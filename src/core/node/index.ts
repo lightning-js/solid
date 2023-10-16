@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { renderer, createShader } from '../../index.js';
+import { renderer, createShader } from '../renderer/index.js';
 import Children from './children.js';
 import States from './states.js';
 import calculateFlex from '../flex.js';

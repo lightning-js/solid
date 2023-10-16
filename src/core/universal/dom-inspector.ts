@@ -16,7 +16,7 @@
  */
 
 import universalLightning from './lightning.js';
-import { renderer } from '@lightningjs/solid';
+import { renderer } from '../renderer/index.js';
 import type { ElementNode, SolidNode, TextNode } from '../node/index.js';
 
 const injectCSS = (css: string) => {

@@ -19,12 +19,15 @@ import {
   MainRenderDriver,
   RendererMain,
   ThreadXRenderDriver,
-  type RendererMainSettings
+  type RendererMainSettings,
 } from '@lightningjs/renderer';
+
+export let renderer: RendererMain;
+export let createShader: RendererMain['createShader'];
 
 export interface SolidRendererOptions extends RendererMainSettings {
   threadXCoreWorkerUrl?: string;
-  rootId: string
+  rootId: string;
 }
 
 const defaultOptions: SolidRendererOptions = {
@@ -36,7 +39,9 @@ const defaultOptions: SolidRendererOptions = {
   threadXCoreWorkerUrl: undefined,
 };
 
-export function startLightningRenderer(options: Partial<SolidRendererOptions> = {}): RendererMain {
+export function startLightningRenderer(
+  options: Partial<SolidRendererOptions> = {},
+): RendererMain {
   let driver;
   const resolvedOptions: SolidRendererOptions = {
     ...defaultOptions,
@@ -51,12 +56,19 @@ export function startLightningRenderer(options: Partial<SolidRendererOptions> = 
     });
   }
 
-  return new RendererMain({
-    appWidth: resolvedOptions.appWidth,
-    appHeight: resolvedOptions.appHeight,
-    deviceLogicalPixelRatio: resolvedOptions.deviceLogicalPixelRatio,
-    devicePhysicalPixelRatio: resolvedOptions.devicePhysicalPixelRatio,
-    clearColor: resolvedOptions.clearColor,
-    coreExtensionModule: resolvedOptions.coreExtensionModule,
-  }, resolvedOptions.rootId, driver);
-};
+  renderer = new RendererMain(
+    {
+      appWidth: resolvedOptions.appWidth,
+      appHeight: resolvedOptions.appHeight,
+      deviceLogicalPixelRatio: resolvedOptions.deviceLogicalPixelRatio,
+      devicePhysicalPixelRatio: resolvedOptions.devicePhysicalPixelRatio,
+      clearColor: resolvedOptions.clearColor,
+      coreExtensionModule: resolvedOptions.coreExtensionModule,
+    },
+    resolvedOptions.rootId,
+    driver,
+  );
+
+  createShader = renderer.createShader.bind(renderer);
+  return renderer;
+}
