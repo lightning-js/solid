@@ -3,7 +3,7 @@ import {
   type IntrinsicTextProps,
 } from './src/intrinsicTypes.js';
 
-declare global {
+declare module 'solid-js' {
   namespace JSX {
     interface IntrinsicElements {
       node: Partial<IntrinsicNodeProps>;
