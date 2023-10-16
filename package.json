@@ -5,14 +5,13 @@
   "type": "module",
   "source": "src/index.ts",
   "main": "./dist/esm/index.js",
-  "module": "./dist/source/index.js",
   "browser": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
+      "solid": "./dist/source/index.js",
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/source/index.js",
-      "solid": "./dist/source/index.jsx",
+      "import": "./dist/esm/index.js",
       "browser": "./dist/esm/index.js"
     },
     "./jsx-runtime": {
