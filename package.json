@@ -13,9 +13,6 @@
       "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js",
       "browser": "./dist/esm/index.js"
-    },
-    "./jsx-runtime": {
-      "types": "./jsx-runtime.d.ts"
     }
   },
   "sideEffects": false,
@@ -29,6 +26,7 @@
     "lint:eslint": "eslint .",
     "lint:fix:eslint": "eslint --fix .",
     "build": "rollup -c",
+    "tsc": "tsc",
     "watch": "tsc -w",
     "dev": "concurrently -c \"auto\" \"npm:watch\" \"npm:vite\"",
     "vite": "vite --open \"/test/index.html\" --host",

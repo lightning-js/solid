@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import universalLightning from './lightning.js';
+import universalLightning, { type SolidRendererOptions } from './lightning.js';
 import { renderer } from '../renderer/index.js';
 import type { ElementNode, SolidNode, TextNode } from '../node/index.js';
 
@@ -141,4 +141,4 @@ export default {
     parent._dom!.removeChild(node._dom!);
     universalLightning.removeNode(parent, node);
   },
-};
+} satisfies SolidRendererOptions;
