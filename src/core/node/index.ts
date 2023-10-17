@@ -16,6 +16,7 @@
  */
 
 import { renderer, createShader } from '../renderer/index.js';
+import { type IntrinsicTextProps } from '../../index.js';
 import Children from './children.js';
 import States from './states.js';
 import calculateFlex from '../flex.js';
@@ -120,9 +121,9 @@ const LightningRendererNonAnimatingProps = [
 ];
 
 export interface TextNode {
-  name: 'TextNode';
+  name: string;
   text: string;
-  parent?: ElementNode;
+  parent: ElementNode | null;
   zIndex?: number;
   states?: States;
   x?: number;
@@ -141,40 +142,20 @@ export interface TextNode {
 
 export type SolidNode = ElementNode | TextNode;
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export interface ElementNode extends IntrinsicTextProps {}
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ElementNode extends Object {
   name: string;
   lng: INode | null = null;
+  selected: number | null = null;
   rendered: boolean;
-  autofocus?: boolean;
-  id?: string;
-  clipping?: boolean;
-  zIndex?: number;
-  selected?: number;
-  flexDirection?: 'row' | 'column';
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  gap?: number;
-  justifyContent?:
-    | 'flexStart'
-    | 'flexEnd'
-    | 'center'
-    | 'spaceBetween'
-    | 'spaceEvenly';
-  marginLeft?: number;
-  marginRight?: number;
-  marginTop?: number;
-  marginBottom?: number;
-  text?: string;
-  display?: 'flex';
-  forwardStates?: boolean;
-  onLoad?: (target: INode, dimensions: Dimensions) => void;
-  onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
+
   private _undoStates?: Record<string, any>;
   private _renderProps: any;
   private _effects: any;
-  private _parent?: ElementNode;
+  private _parent: ElementNode | null = null;
   private _shader?: ShaderRef;
   private _style?: any;
   private _states?: States;
@@ -327,11 +308,11 @@ export class ElementNode extends Object {
   ) {
     if (this.rendered && this.lng) {
       if (isArray(value)) {
-        return this.animate({ [name]: value[0] }, value[1]).start();
+        return this.createAnimation({ [name]: value[0] }, value[1]).start();
       }
 
       if (this._animate) {
-        return this.animate({ [name]: value }).start();
+        return this.createAnimation({ [name]: value }).start();
       }
 
       (this.lng[name as keyof INode] as number | string) = value;
@@ -352,7 +333,10 @@ export class ElementNode extends Object {
     }
   }
 
-  animate(props: Partial<INodeAnimatableProps>, animationSettings?: any) {
+  createAnimation(
+    props: Partial<INodeAnimatableProps>,
+    animationSettings?: any,
+  ) {
     assertTruthy(this.lng, 'Node must be rendered before animating');
     return this.lng.animate(props, animationSettings || this.animationSettings);
   }

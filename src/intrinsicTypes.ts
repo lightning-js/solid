@@ -1,24 +1,44 @@
 import {
+  type Dimensions,
+  type INode,
   type INodeWritableProps,
   type ITextNodeWritableProps,
 } from '@lightningjs/renderer';
 import { type ElementNode, type TextNode } from './core/node/index.js';
 
-interface IntrinsicCommonProps {
-  onFocus?: () => void;
-  onBlur?: () => void;
+export interface IntrinsicCommonProps {
   ref?: any;
   children?: any;
+  animate?: boolean;
+  gap?: number;
+  justifyContent?:
+    | 'flexStart'
+    | 'flexEnd'
+    | 'center'
+    | 'spaceBetween'
+    | 'spaceEvenly';
+  marginLeft?: number;
+  marginRight?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  display?: 'flex';
+  forwardStates?: boolean;
+  onLoad?: (target: INode, dimensions: Dimensions) => void;
+  onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
+  autofocus?: boolean;
+  id?: string;
+  flexDirection?: 'row' | 'column';
+  selected?: number | null;
 }
 
 export interface IntrinsicTextProps
-  extends Partial<Omit<ITextNodeWritableProps, 'text' | 'parent'>>,
-    TextNode,
-    IntrinsicCommonProps {}
+  extends Partial<Omit<ITextNodeWritableProps, 'parent' | 'shader'>>,
+    IntrinsicCommonProps {
+  style?: Partial<Omit<ITextNodeWritableProps, 'parent' | 'shader'>>;
+}
 
 export interface IntrinsicNodeProps
-  extends Partial<Omit<INodeWritableProps, 'animate' | 'parent' | 'shader'>>,
-    Partial<Omit<ElementNode, 'children' | 'animate'>>,
+  extends Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>,
     IntrinsicCommonProps {
-  animate?: boolean;
+  style?: Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>;
 }

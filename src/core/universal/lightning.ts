@@ -19,6 +19,11 @@ import { renderer } from '../renderer/index.js';
 import { createEffect } from 'solid-js';
 import { log } from '../utils.js';
 import { ElementNode, type SolidNode, type TextNode } from '../node/index.js';
+import type { createRenderer } from 'solid-js/universal';
+
+export type SolidRendererOptions = Parameters<
+  typeof createRenderer<SolidNode>
+>[0];
 
 export default {
   createElement(name: string): ElementNode {
@@ -28,7 +33,7 @@ export default {
   },
   createTextNode(text: string): TextNode {
     // A text node is just a string - not the <text> node
-    return { name: 'TextNode', text };
+    return { name: 'TextNode', text, parent: null };
   },
   replaceText(node: TextNode, value: string): void {
     log('Replace Text: ', node, value);
@@ -73,7 +78,7 @@ export default {
     }
   },
   getParentNode(node: SolidNode): ElementNode | undefined {
-    return node.parent;
+    return node.parent ?? undefined;
   },
   getFirstChild(node: ElementNode): SolidNode | undefined {
     return node.children[0];
@@ -88,4 +93,4 @@ export default {
     }
     return undefined;
   },
-};
+} satisfies SolidRendererOptions;

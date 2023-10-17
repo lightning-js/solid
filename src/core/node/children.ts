@@ -28,8 +28,9 @@ export default class Children extends Array<SolidNode> {
     this._parent = node;
   }
 
-  get selected() {
-    return this[this._parent.selected || 0];
+  get selected(): ElementNode | undefined {
+    // For selected Elements should always be an ElementNode
+    return this[this._parent.selected || 0] as ElementNode | undefined;
   }
 
   get firstChild() {
