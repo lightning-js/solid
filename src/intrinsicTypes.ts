@@ -33,8 +33,12 @@ export interface IntrinsicCommonProps {
 
 export interface IntrinsicTextProps
   extends Partial<Omit<ITextNodeWritableProps, 'parent' | 'shader'>>,
-    IntrinsicCommonProps {}
+    IntrinsicCommonProps {
+  style?: Partial<Omit<ITextNodeWritableProps, 'parent' | 'shader'>>;
+}
 
 export interface IntrinsicNodeProps
   extends Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>,
-    IntrinsicCommonProps {}
+    IntrinsicCommonProps {
+  style?: Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>;
+}
