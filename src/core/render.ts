@@ -22,6 +22,7 @@ import universalInspector, {
   attachInspector,
 } from './universal/dom-inspector.js';
 import type { SolidNode } from './node/index.js';
+import type { JSX } from 'solid-js';
 
 const loadInspector = import.meta?.env?.MODE === 'development';
 if (loadInspector) {
@@ -30,8 +31,15 @@ if (loadInspector) {
 const solidRenderer = createRenderer<SolidNode>(
   loadInspector ? universalInspector : universalLightning,
 );
+
+// TODO: This is a hack to get the `render()` function to work as it is used now in the demo app
+// There's gotta be a better way to fix it
+export const render = solidRenderer.render as unknown as (
+  code: () => JSX.Element,
+  node?: SolidNode,
+) => () => void;
+
 export const {
-  render,
   effect,
   memo,
   createComponent,

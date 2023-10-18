@@ -1,7 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@lightningjs/renderer': ^0.3.6
+  '@lightningjs/renderer': ^0.4.0
   '@lightningjs/solid': file:./
   '@typescript-eslint/eslint-plugin': ^6.3.0
   '@typescript-eslint/parser': ^6.3.0
@@ -18,7 +18,7 @@ specifiers:
   vite-tsconfig-paths: ^4.2.0
 
 dependencies:
-  '@lightningjs/renderer': 0.3.6
+  '@lightningjs/renderer': 0.4.0
   '@lightningjs/solid': 'link:'
 
 devDependencies:
@@ -1565,8 +1565,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@lightningjs/renderer/0.3.6:
-    resolution: {integrity: sha512-cw+QrptWQ2Nj5QAc9vQGRu7jgjaiUXqxUuAcYiaAUM9sYJhpEpNzYkzaPMiQvv5Mo4hRRI1zgZdnmQ7qZgJq5A==}
+  /@lightningjs/renderer/0.4.0:
+    resolution: {integrity: sha512-95I9pQj9WtbpcDuTkfPAlIUwhF1k/Y8jWhn0qjDbAiv8uwWEL5kvSeItPGoKwd7BYqL1iqlfzsOrkeQd7V8JKQ==}
     dependencies:
       '@lightningjs/threadx': 0.3.3
       '@protobufjs/eventemitter': 1.1.0

@@ -19,23 +19,6 @@
 import { config } from '../config.js';
 import type { SolidNode } from './node/index.js';
 
-export function normalizeColor(color: string | number = '') {
-  if (isInteger(color)) {
-    return color;
-  }
-
-  if (typeof color === 'string') {
-    // Renderer expects RGBA values
-    if (color.startsWith('#')) {
-      return color.replace('#', '0x') + (color.length === 7 ? 'ff' : '');
-    }
-
-    if (color.startsWith('0x')) {
-      return color;
-    }
-    return '0x' + (color.length === 6 ? color + 'ff' : color);
-  }
-}
 const isDev = import.meta?.env?.MODE === 'development';
 export function log(msg: string, node: SolidNode, ...args: any[]) {
   if (isDev) {

@@ -17,16 +17,13 @@
  * limitations under the License.
  */
 
+import type { AnimationSettings } from '@lightningjs/renderer';
+import type { IntrinsicTextNodeStyleProps } from './intrinsicTypes.js';
+
 interface Config {
   debug: boolean;
-  animationSettings: {
-    duration: number;
-    easing: string;
-  };
-  fontSettings: {
-    fontFamily: string;
-    fontSize: number;
-  };
+  animationSettings: Partial<AnimationSettings>;
+  fontSettings: Partial<IntrinsicTextNodeStyleProps>;
 }
 
 export const config: Config = {

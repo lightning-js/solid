@@ -35,7 +35,7 @@ export interface CanvasOptions {
 }
 
 export interface CanvasProps {
-  options?: SolidRendererOptions;
+  options?: Partial<SolidRendererOptions>;
   children?: any;
 }
 
