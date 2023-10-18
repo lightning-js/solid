@@ -16,18 +16,14 @@
  */
 
 import { renderer, createShader } from '../renderer/index.js';
-import { type IntrinsicTextProps } from '../../index.js';
+import {
+  type BorderStyleObject,
+  type IntrinsicTextProps,
+} from '../../index.js';
 import Children from './children.js';
 import States from './states.js';
 import calculateFlex from '../flex.js';
-import {
-  normalizeColor,
-  log,
-  isArray,
-  isNumber,
-  isFunc,
-  keyExists,
-} from '../utils.js';
+import { log, isArray, isNumber, isFunc, keyExists } from '../utils.js';
 import { config } from '../../config.js';
 import { setActiveElement } from '../activeElement.js';
 import type {
@@ -36,6 +32,7 @@ import type {
   INodeWritableProps,
   ShaderRef,
   Dimensions,
+  AnimationSettings,
 } from '@lightningjs/renderer';
 import { assertTruthy } from '@lightningjs/renderer/utils';
 
@@ -47,9 +44,6 @@ function convertEffectsToShader(styleEffects: any) {
   for (const [type, props] of Object.entries<Record<string, any>>(
     styleEffects,
   )) {
-    if (props.color) {
-      props.color = normalizeColor(props.color);
-    }
     effects.push({ type, props });
   }
   return createShader('DynamicShader', { effects: effects as any });
@@ -59,16 +53,16 @@ function borderAccessor(
   direction: '' | 'Top' | 'Right' | 'Bottom' | 'Left' = '',
 ) {
   return {
-    set(this: ElementNode, props: any) {
+    set(this: ElementNode, value: number | { width: number; color: number }) {
       // Format: width || { width, color }
-      if (isNumber(props)) {
-        props = { width: props, color: '#000000' };
+      if (isNumber(value)) {
+        value = { width: value, color: 0x000000ff };
       }
       this.effects = {
         ...(this.effects || {}),
-        ...{ [`border${direction}`]: props },
+        ...{ [`border${direction}`]: value },
       };
-      this[`_border${direction}`] = props;
+      this[`_border${direction}`] = value;
     },
     get(this: ElementNode) {
       return this[`_border${direction}`];
@@ -78,6 +72,15 @@ function borderAccessor(
 
 const LightningRendererNumberProps = [
   'alpha',
+  'color',
+  'colorTop',
+  'colorRight',
+  'colorLeft',
+  'colorBottom',
+  'colorTl',
+  'colorTr',
+  'colorBl',
+  'colorBr',
   'height',
   'fontSize',
   'lineHeight',
@@ -96,18 +99,6 @@ const LightningRendererNumberProps = [
   'y',
   'zIndex',
   'zIndexLocked',
-];
-
-const LightningRendererColorProps = [
-  'color',
-  'colorTop',
-  'colorRight',
-  'colorLeft',
-  'colorBottom',
-  'colorTl',
-  'colorTr',
-  'colorBl',
-  'colorBr',
 ];
 
 const LightningRendererNonAnimatingProps = [
@@ -164,11 +155,12 @@ export class ElementNode extends Object {
   private _width?: number;
   private _height?: number;
   private _color?: number;
-  private _border?: number;
-  private _borderLeft?: number;
-  private _borderRight?: number;
-  private _borderTop?: number;
-  private _borderBottom?: number;
+  private _borderRadius?: number;
+  private _border?: BorderStyleObject;
+  private _borderLeft?: BorderStyleObject;
+  private _borderRight?: BorderStyleObject;
+  private _borderTop?: BorderStyleObject;
+  private _borderBottom?: BorderStyleObject;
   public _animate?: boolean; // Public but uses _ prefix
   public _autosized?: boolean; // Public but uses _ prefix
   public _isDirty?: boolean; // Public but uses _ prefix
@@ -191,25 +183,8 @@ export class ElementNode extends Object {
         get() {
           return this[`_${key}`] || (this.lng && this.lng[key]);
         },
-        set(v) {
+        set(v: number) {
           this[`_${key}`] = v;
-          this._sendToLightningAnimatable(key, v);
-        },
-      });
-    }
-
-    for (const key of LightningRendererColorProps) {
-      Object.defineProperty(this, key, {
-        get() {
-          return this[`_${key}`] || (this.lng && this.lng[key]);
-        },
-        set(v) {
-          this[`_${key}`] = v;
-          if (isArray(v)) {
-            v[0] = normalizeColor(v[0]);
-          } else {
-            v = normalizeColor(v);
-          }
           this._sendToLightningAnimatable(key, v);
         },
       });
@@ -230,14 +205,14 @@ export class ElementNode extends Object {
     // Add Border Helpers
     Object.defineProperties(this, {
       borderRadius: {
-        set(radius) {
+        set(this: ElementNode, radius) {
           this._borderRadius = radius;
           this.effects = {
             ...(this.effects || {}),
             ...{ radius: { radius } },
           };
         },
-        get() {
+        get(this: ElementNode) {
           return this._borderRadius;
         },
       },
@@ -252,11 +227,6 @@ export class ElementNode extends Object {
       linearGradient: {
         set(props = {}) {
           this._linearGradient = props;
-          if (props.colors) {
-            props.colors = props.colors.map((c: string | number) =>
-              normalizeColor(c),
-            );
-          }
           this.effects = {
             ...(this.effects || {}),
             ...{ linearGradient: props },
@@ -304,7 +274,10 @@ export class ElementNode extends Object {
 
   _sendToLightningAnimatable(
     name: string,
-    value: [value: number | string, settings: any] | number | string,
+    value:
+      | [value: number | string, settings: AnimationSettings]
+      | number
+      | string,
   ) {
     if (this.rendered && this.lng) {
       if (isArray(value)) {

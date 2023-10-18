@@ -18,6 +18,7 @@
 import universalLightning, { type SolidRendererOptions } from './lightning.js';
 import { renderer } from '../renderer/index.js';
 import type { ElementNode, SolidNode, TextNode } from '../node/index.js';
+import { assertTruthy } from '@lightningjs/renderer/utils';
 
 const injectCSS = (css: string) => {
   const el = document.createElement('style');
@@ -58,7 +59,6 @@ export function attachInspector() {
   `);
 
   setTimeout(function () {
-    // @ts-expect-error Remove when Renderer publicizes `canvas`
     updateRootStyleFromCanvas(renderer.canvas);
   }, 1000);
 }
@@ -70,7 +70,7 @@ export default {
 
     if (name === 'canvas') {
       dom.id = 'linspector';
-      // @ts-expect-error Remove when Renderer publicizes `canvas`
+      assertTruthy(renderer.canvas.parentNode);
       renderer.canvas.parentNode.appendChild(dom);
     } else {
       dom.classList.add('lnode');
