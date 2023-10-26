@@ -113,9 +113,9 @@ The style attribute takes an object of properties and passes them to the Lightni
 
 `<View>` components without a width and height value will inherit their parents width and height minus there x and y values. X and y will default to 0, 0 if not specified. `<Text>` component does not require any properties. If `<Text>` component is loaded in a flex container, it will update it's width and height when it loads.
 
-### Color
+### Colors
 
-Can be HEX string ('#rrggbb') or ('#rrggbbaa') or RGBA number 0x00000000 or string 'RRGGBBAA'. By default, every node without a src attribute will have their color set to `0x00000000` making it transparent. If you have an element which sets it's src attribute after creation, you need to update color to `0xffffffff` so it's not transparent. I recommend installing [VS Code color picker](https://marketplace.visualstudio.com/items?itemName=AntiAntiSepticeye.vscode-color-picker) and using hex format to see the colors in VS Code.
+RGBA number 0xRRGGBBAA. If you want to use hex, `import { hexColor } from '@lightningjs/solid'` and do `hexColor('#c0ffee')` to convert colors to RGBA. Please know all hex colors are #RRGGBB so they are easy to convert to 0xRRGGBBAA and usually AA is ff for full alpha. By default, every node without a src attribute will have their color set to `0x00000000` making it transparent. If you have an element which sets it's src attribute after creation, you need to update color to `0xffffffff` so it's not transparent.
 
 ### Border and borderRadius
 
@@ -124,14 +124,14 @@ Can be HEX string ('#rrggbb') or ('#rrggbbaa') or RGBA number 0x00000000 or stri
 ```
 const style = {
   borderRadius: 30,
-  border: { width: 10, color: '#000000' }
+  border: { width: 10, color: 0x000000ff }
 }
 
 // or
 
 const style = {
-  borderLeft: { width: 10, color: '#000000' },
-  borderRight: { width: 10, color: '#000000' }
+  borderLeft: { width: 10, color: 0x000000ff },
+  borderRight: { width: 10, color: 0x000000ff }
 }
 
 ```
@@ -250,16 +250,16 @@ The style object can also be used to style components based on their state. You 
 const Button = {
   width: 386,
   height: 136,
-  color: '#546160',
+  color: 0x546160ff,
   alpha: 0.5,
   scale: 1,
   focus: {
-    color: '#58807d',
+    color: 0x58807dff,
     scale: [1.1, { duration: 500 }],
     alpha: 1,
   },
   disabled: {
-    color: '#333333',
+    color: 0x333333ff,
   },
 };
 ```
@@ -308,11 +308,11 @@ function Button(props) {
   const ButtonContainer = {
     width: 386,
     height: 136,
-    color: '#000000',
+    color: 0x000000ff,
     alpha: 0.3,
     scale: 1,
     focus: {
-      color: ['#58807d', { duration: 2000 }],
+      color: [0x58807dff, { duration: 2000 }],
       scale: 1.2,
       alpha: [1, { duration: 1500, delay: 200, timing: 'easy-in' }],
     },
@@ -324,11 +324,11 @@ function Button(props) {
     contain: 'width',
     textAlign: 'center',
     mountY: -0.35,
-    color: '#F6F6F9',
+    color: 0xf6f6f9ff,
     height: Button.height,
     width: Button.width,
     focus: {
-      color: '#FFFFFF',
+      color: 0xffffffff,
     },
   };
 
@@ -361,6 +361,24 @@ function Button(props) {
   );
 }
 ```
+
+## use: (Directives) in Solid
+
+SolidJS has built in [Directives](https://www.solidjs.com/docs/latest/api#use___) support via `use:` property. These only work on root elements `node` and `text`. Meaning you can't use `View` or `Text` with directives so instead do:
+
+```
+<node
+  use:withPadding={[10, 15]}
+  {...props}
+  style={{
+    color: '#00000099',
+    borderRadius: 8,
+    border: { width: 2, color: '#ffffff' },
+  }}
+>
+```
+
+PS - there is currently a [bug](https://github.com/solidjs/solid/issues/1927) in SolidJS that you need to have the directive before spreading props.
 
 ## Config
 
