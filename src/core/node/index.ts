@@ -535,6 +535,10 @@ export class ElementNode extends Object {
       node.hasChildren && node._applyZIndexToChildren();
       node.lng = renderer.createNode(props);
 
+      if (node.onFail) {
+        node.lng.once('txFailed', node.onFail);
+      }
+
       if (node.onLoad) {
         node.lng.once('txLoaded', node.onLoad);
       }

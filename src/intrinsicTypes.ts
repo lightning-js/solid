@@ -49,6 +49,7 @@ export interface IntrinsicCommonProps {
   display?: 'flex';
   forwardStates?: boolean;
   onLoad?: (target: INode, dimensions: Dimensions) => void;
+  onFail?: (target: INode, error: Error) => void;
   onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
   autofocus?: boolean;
   id?: string;
