@@ -410,12 +410,16 @@ export class ElementNode extends Object {
   }
 
   updateLayout(child?: ElementNode, dimensions?: Dimensions) {
-    if (this.display === 'flex' && this.hasChildren) {
+    if (this.hasChildren) {
       log('Layout: ', this);
-      calculateFlex(this);
-    }
+      isFunc(this.onBeforeLayout) && this.onBeforeLayout(child, dimensions);
 
-    isFunc(this.onLayout) && this.onLayout(child, dimensions);
+      if (this.display === 'flex') {
+        calculateFlex(this);
+      }
+
+      isFunc(this.onLayout) && this.onLayout(child, dimensions);
+    }
   }
 
   _stateChanged() {

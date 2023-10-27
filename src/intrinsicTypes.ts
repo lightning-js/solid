@@ -50,6 +50,7 @@ export interface IntrinsicCommonProps {
   forwardStates?: boolean;
   onLoad?: (target: INode, dimensions: Dimensions) => void;
   onFail?: (target: INode, error: Error) => void;
+  onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
   onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
   autofocus?: boolean;
   id?: string;
