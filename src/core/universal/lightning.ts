@@ -57,13 +57,11 @@ export default {
       parent.children.insert(node, anchor);
 
       if (node.name === 'TextNode') {
-        if (!parent.isTextNode()) {
-          console.error(
-            'Inserting text outside of a <Text> node is not allowed',
-          );
+        // TextNodes can be placed outside of <text> nodes when <Show> is used as placeholder
+        if (parent.isTextNode()) {
+          parent._autosized && parent._resizeOnTextLoad();
+          parent.text = parent.getText();
         }
-        parent._autosized && parent._resizeOnTextLoad();
-        parent.text = parent.getText();
       }
     }
   },

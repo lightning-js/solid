@@ -18,7 +18,8 @@ import { assertTruthy } from '@lightningjs/renderer/utils';
 import type { ElementNode } from './node/index.js';
 
 export default function (node: ElementNode) {
-  const children = node.children;
+  // Filter empty text nodes which are place holders for <Show>
+  const children = node.children.filter((c) => c.name !== 'TextNode');
   const direction = node.flexDirection || 'row';
   const dimension = direction === 'row' ? 'width' : 'height';
   const marginOne = direction === 'row' ? 'marginLeft' : 'marginTop';
