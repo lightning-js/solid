@@ -19,6 +19,7 @@ import { createEffect } from "solid-js";
 import { startLightningRenderer, type SolidRendererOptions } from '../core/renderer/index.js';
 import { assertTruthy } from "@lightningjs/renderer/utils";
 import { ElementNode, type SolidNode } from "../core/node/index.js";
+import { isFunc } from "../core/utils.js";
 
 function renderTopDown(node: SolidNode) {
   if (node.name === 'TextNode') {
@@ -36,7 +37,9 @@ export interface CanvasOptions {
 
 export interface CanvasProps {
   options?: Partial<SolidRendererOptions>;
+  onFirstRender?: (callback: () => void) => void;
   children?: any;
+  ref?: (el: ElementNode) => void;
 }
 
 export const Canvas = (props: CanvasProps) => {
@@ -48,7 +51,8 @@ export const Canvas = (props: CanvasProps) => {
     init.then(() => {
       assertTruthy(root);
       root.lng = renderer.root;
-      root.children.forEach(renderTopDown)
+      root.children.forEach(renderTopDown);
+      isFunc(props.onFirstRender) && props.onFirstRender(root);
     }).catch(console.error);
   })
   return (

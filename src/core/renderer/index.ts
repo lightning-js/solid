@@ -27,7 +27,7 @@ export let createShader: RendererMain['createShader'];
 
 export interface SolidRendererOptions extends RendererMainSettings {
   threadXCoreWorkerUrl?: string;
-  rootId: string;
+  rootId: string | HTMLElement;
 }
 
 const defaultOptions: SolidRendererOptions = {
