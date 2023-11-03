@@ -15,21 +15,39 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { assertTruthy } from '@lightningjs/renderer/utils';
-import type { ElementNode } from './node/index.js';
+import type { ElementNode, SolidNode } from './node/index.js';
 
 export default function (node: ElementNode) {
   // Filter empty text nodes which are place holders for <Show>
   const children = node.children.filter((c) => c.name !== 'TextNode');
   const direction = node.flexDirection || 'row';
   const dimension = direction === 'row' ? 'width' : 'height';
+  const crossDimension = direction === 'row' ? 'height' : 'width';
   const marginOne = direction === 'row' ? 'marginLeft' : 'marginTop';
   const marginTwo = direction === 'row' ? 'marginRight' : 'marginBottom';
   const prop = direction === 'row' ? 'x' : 'y';
+  const crossProp = direction === 'row' ? 'y' : 'x';
   const containerSize = node[dimension] || 0;
+  const containerCrossSize = node[crossDimension] || 0;
   const itemSize = children.reduce((prev, c) => prev + (c[dimension] || 0), 0);
   const gap = node.gap || 0;
   const numChildren = children.length;
   const justify = node.justifyContent || 'flexStart';
+  const align = node.alignItems;
+
+  // Only align children if container has a cross size
+  const crossAlignChild =
+    containerCrossSize && align
+      ? (c: SolidNode) => {
+          if (align === 'flexStart') {
+            c[crossProp] = 0;
+          } else if (align === 'center') {
+            c[crossProp] = (containerCrossSize - (c[crossDimension] || 0)) / 2;
+          } else if (align === 'flexEnd') {
+            c[crossProp] = containerCrossSize - (c[crossDimension] || 0);
+          }
+        }
+      : (c: SolidNode) => c;
 
   if (justify === 'flexStart') {
     let start = 0;
@@ -37,6 +55,7 @@ export default function (node: ElementNode) {
       c[prop] = start + (c[marginOne] || 0);
       start +=
         (c[dimension] || 0) + gap + (c[marginOne] || 0) + (c[marginTwo] || 0);
+      crossAlignChild(c);
     });
   }
   if (justify === 'flexEnd') {
@@ -47,6 +66,7 @@ export default function (node: ElementNode) {
       c[prop] = start - (c[dimension] || 0) - (c[marginTwo] || 0);
       start -=
         (c[dimension] || 0) + gap + (c[marginOne] || 0) + (c[marginTwo] || 0);
+      crossAlignChild(c);
     }
   }
   if (justify === 'center') {
@@ -54,6 +74,7 @@ export default function (node: ElementNode) {
     children.forEach((c) => {
       c[prop] = start;
       start += (c[dimension] || 0) + gap;
+      crossAlignChild(c);
     });
   }
   if (justify === 'spaceBetween') {
@@ -62,6 +83,7 @@ export default function (node: ElementNode) {
     children.forEach((c) => {
       c[prop] = start;
       start += (c[dimension] || 0) + toPad;
+      crossAlignChild(c);
     });
   }
   if (justify === 'spaceEvenly') {
@@ -70,6 +92,7 @@ export default function (node: ElementNode) {
     children.forEach((c) => {
       c[prop] = start;
       start += (c[dimension] || 0) + toPad;
+      crossAlignChild(c);
     });
   }
 }

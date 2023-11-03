@@ -42,6 +42,7 @@ export interface IntrinsicCommonProps {
     | 'center'
     | 'spaceBetween'
     | 'spaceEvenly';
+  alignItems?: 'flexStart' | 'flexEnd' | 'center';
   marginLeft?: number;
   marginRight?: number;
   marginTop?: number;
