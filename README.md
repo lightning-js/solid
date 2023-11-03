@@ -155,12 +155,11 @@ You can have as many stops or colors as you like.
 
 ## Layout
 
-When a child element changes size onLayout will be called. You'll be notified with
-`(node, { width, height})` of the element. You can use this callback to resize the parent node. If you do, call `parent.updateLayout`.
+When a child element changes size updateLayout method on the node will be called. You can use `onBeforeLayout` and `onLayout` hooks to update the element with the following signature `(node, { width, height})`. You can use this callback to resize the parent node before flex is calculated using `onBeforeLayout` and after flex with `onLayout`. If you do, call `parent.updateLayout` for it to also resize.
 
 ### Flex
 
-At the moment there is a very barebone flex implementation (`display: flex`) made for one level of children. It only supports `flexDirection`, `justifyContent` and `gap` at the moment. But very useful for laying out rows and columns.
+At the moment there is a very barebone flex implementation (`display: flex`). It only supports `flexDirection`, `justifyContent`, `alignItems` and `gap` at the moment. But very useful for laying out rows and columns.
 
 ```jsx
 import { View, Text } from '@lightningjs/solid';
@@ -195,6 +194,8 @@ Additionally, flex will automatically layout Text nodes. Anytime a View with dis
   </View>
 </View>
 ```
+
+`alignItems` supports `flexStart`, `flexEnd`, and `center` but requires it's container to have a height / width set.
 
 ## Animations
 
