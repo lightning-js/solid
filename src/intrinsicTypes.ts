@@ -23,6 +23,7 @@ import {
   type ITextNodeWritableProps,
 } from '@lightningjs/renderer';
 import { type ElementNode, type TextNode } from './core/node/index.js';
+import type States from './core/node/states.js';
 
 export interface BorderStyleObject {
   width: number;
@@ -63,6 +64,7 @@ export interface IntrinsicCommonProps {
   borderRight?: BorderStyle;
   borderTop?: BorderStyle;
   borderBottom?: BorderStyle;
+  states?: States;
 }
 
 // TODO: Add this concept back in and come up with a way to properly type it so it works
