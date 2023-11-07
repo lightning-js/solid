@@ -33,37 +33,38 @@ export interface BorderStyleObject {
 export type BorderStyle = number | BorderStyleObject;
 
 export interface IntrinsicCommonProps {
-  ref?: any;
-  children?: any;
+  alignItems?: 'flexStart' | 'flexEnd' | 'center';
   animate?: boolean;
+  animationSettings?: AnimationSettings;
+  autofocus?: boolean;
+  border?: BorderStyle;
+  borderBottom?: BorderStyle;
+  borderLeft?: BorderStyle;
+  borderRadius?: number;
+  borderRight?: BorderStyle;
+  borderTop?: BorderStyle;
+  children?: any;
+  display?: 'flex';
+  flexDirection?: 'row' | 'column';
+  forwardStates?: boolean;
   gap?: number;
+  id?: string;
   justifyContent?:
     | 'flexStart'
     | 'flexEnd'
     | 'center'
     | 'spaceBetween'
     | 'spaceEvenly';
-  alignItems?: 'flexStart' | 'flexEnd' | 'center';
+  marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
   marginTop?: number;
-  marginBottom?: number;
-  display?: 'flex';
-  forwardStates?: boolean;
-  onLoad?: (target: INode, dimensions: Dimensions) => void;
-  onFail?: (target: INode, error: Error) => void;
   onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
+  onFail?: (target: INode, error: Error) => void;
   onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
-  autofocus?: boolean;
-  id?: string;
-  flexDirection?: 'row' | 'column';
+  onLoad?: (target: INode, dimensions: Dimensions) => void;
+  ref?: any;
   selected?: number | null;
-  borderRadius?: number;
-  border?: BorderStyle;
-  borderLeft?: BorderStyle;
-  borderRight?: BorderStyle;
-  borderTop?: BorderStyle;
-  borderBottom?: BorderStyle;
   states?: States;
 }
 
