@@ -16,27 +16,26 @@
  */
 
 import { isArray, isString } from '../utils.js';
-import type { ElementNode } from './index.js';
-export default class States extends Array {
-  private _node: ElementNode;
+export default class States extends Array<string> {
+  private onChange: () => void;
 
   constructor(
-    node: ElementNode,
-    initialState: string[] | string | Record<string, unknown> = [],
+    callback: () => void,
+    initialState: string[] | string | Record<string, boolean> = [],
   ) {
     if (isArray(initialState)) {
-      super(...(initialState as any));
+      super(...initialState);
     } else if (isString(initialState)) {
-      super(initialState as any);
+      super(initialState);
     } else {
       super(
-        ...(Object.entries(initialState)
+        ...Object.entries(initialState)
           .filter(([_key, value]) => value)
-          .map(([key]) => key) as any),
+          .map(([key]) => key),
       );
     }
 
-    this._node = node;
+    this.onChange = callback;
     return this;
   }
 
@@ -50,7 +49,7 @@ export default class States extends Array {
 
   add(state: string) {
     this.push(state);
-    this._node._stateChanged();
+    this.onChange();
   }
 
   toggle(state: string) {
@@ -65,7 +64,7 @@ export default class States extends Array {
     const stateIndexToRemove = this.indexOf(state);
     if (stateIndexToRemove >= 0) {
       this.splice(stateIndexToRemove, 1);
-      this._node._stateChanged();
+      this.onChange();
     }
   }
 }

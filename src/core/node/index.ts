@@ -368,14 +368,14 @@ export class ElementNode extends Object {
   }
 
   set states(v) {
-    this._states = new States(this, v);
+    this._states = new States(this._stateChanged.bind(this), v);
     if (this.rendered) {
       this._stateChanged();
     }
   }
 
   get states() {
-    this._states = this._states || new States(this);
+    this._states = this._states || new States(this._stateChanged.bind(this));
     return this._states;
   }
 
@@ -412,13 +412,14 @@ export class ElementNode extends Object {
   updateLayout(child?: ElementNode, dimensions?: Dimensions) {
     if (this.hasChildren) {
       log('Layout: ', this);
-      isFunc(this.onBeforeLayout) && this.onBeforeLayout(child, dimensions);
+      isFunc(this.onBeforeLayout) &&
+        this.onBeforeLayout.call(this, child, dimensions);
 
       if (this.display === 'flex') {
         calculateFlex(this);
       }
 
-      isFunc(this.onLayout) && this.onLayout(child, dimensions);
+      isFunc(this.onLayout) && this.onLayout.call(this, child, dimensions);
     }
   }
 
@@ -431,16 +432,15 @@ export class ElementNode extends Object {
       this.children.forEach((c) => (c.states = states));
     }
 
-    if (
-      this._undoStates ||
-      (this.style && keyExists(this.style, this.states))
-    ) {
+    const states = config.stateMapperHook?.(this, this.states) || this.states;
+
+    if (this._undoStates || (this.style && keyExists(this.style, states))) {
       this._undoStates = this._undoStates || {};
       let stylesToUndo = {};
 
       for (const [state, undoStyles] of Object.entries(this._undoStates)) {
         // if state is no longer in the states undo it
-        if (!this.states.includes(state)) {
+        if (!states.includes(state)) {
           stylesToUndo = {
             ...stylesToUndo,
             ...undoStyles,
@@ -448,7 +448,7 @@ export class ElementNode extends Object {
         }
       }
 
-      const newStyles = this.states.reduce((acc, state) => {
+      const newStyles = states.reduce((acc, state) => {
         const styles = this.style[state];
         if (styles) {
           acc = {
@@ -468,6 +468,7 @@ export class ElementNode extends Object {
         return acc;
       }, {});
 
+      // Apply the styles
       Object.assign(this, { ...stylesToUndo, ...newStyles });
     }
   }
