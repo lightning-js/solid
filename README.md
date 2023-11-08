@@ -300,6 +300,19 @@ createEffect(() => {
 
 The `focus` state is added and removed by the [useFocusManager](https://github.com/lightning-js/solid-primitives) primitive. Also note if elements are animating and another state is applied during the animation which uses the animated value (say alpha or color) - when that state is removed it will return to some value during the animation. Be careful not to set state with styles that are also being animated.
 
+#### stateMapperHook
+
+For further customization of styles using states, you can change the states before styles are applied globally using Config.stateMapperHook. For instance, if you wanted to change your styles based on another property like tone you could do:
+
+```js
+Config.stateMapperHook = (node, states) => {
+  const tone = node.tone || ''; // node.tone is 'brand'
+  return states.map((state) => state + tone);
+};
+```
+
+Then it would apply `focusbrand` from the styles object.
+
 ### forwardStates
 
 When you want the state to also be applied to children elements, you can add `forwardStates` attribute to the parent element. Any states set on the parent will be add / removed from the children as well. This is useful for functional components where you need to change styles of children as well.
