@@ -33,6 +33,7 @@ import type {
   ShaderRef,
   Dimensions,
   AnimationSettings,
+  NodeLoadedPayload,
 } from '@lightningjs/renderer';
 import { assertTruthy } from '@lightningjs/renderer/utils';
 
@@ -328,12 +329,19 @@ export class ElementNode extends Object {
 
   _resizeOnTextLoad() {
     assertTruthy(this.lng);
-    this.lng.once('loaded', (_node, size: Dimensions) => {
-      this.width = size.width;
-      this.height = size.height;
-      assertTruthy(this.parent);
-      this.parent.updateLayout(this, size);
-    });
+    this.lng.once(
+      'loaded',
+      (_node: INode, loadedPayload: NodeLoadedPayload) => {
+        if (loadedPayload.type === 'text') {
+          const { dimensions } = loadedPayload;
+
+          this.width = dimensions.width;
+          this.height = dimensions.height;
+          assertTruthy(this.parent);
+          this.parent.updateLayout(this, dimensions);
+        }
+      },
+    );
   }
 
   getText() {
