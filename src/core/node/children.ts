@@ -37,30 +37,6 @@ export default class Children extends Array<SolidNode> {
     return this[0];
   }
 
-  // Commented out because it's not used anywhere and implementation seems wrong
-  // get previousSibling() {
-  //   if (this._parent) {
-  //     const children = this._parent.children;
-  //     const index = children.indexOf(this) - 1;
-  //     if (index >= 0) {
-  //       return children[index];
-  //     }
-  //   }
-
-  //   return null;
-  // }
-
-  // get nextSibling() {
-  //   if (this._parent) {
-  //     const children = this._parent.children;
-  //     const index = children.indexOf(this) + 1;
-  //     if (index < children.length) {
-  //       return children[index];
-  //     }
-  //   }
-  //   return null;
-  // }
-
   insert(node: SolidNode, beforeNode: SolidNode) {
     if (beforeNode) {
       const index = this.indexOf(beforeNode);

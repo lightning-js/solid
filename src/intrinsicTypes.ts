@@ -22,7 +22,8 @@ import {
   type INodeWritableProps,
   type ITextNodeWritableProps,
 } from '@lightningjs/renderer';
-import { type ElementNode, type TextNode } from './core/node/index.js';
+import { type JSX } from 'solid-js';
+import { type ElementNode } from './core/node/index.js';
 import type States from './core/node/states.js';
 
 export interface BorderStyleObject {
@@ -43,7 +44,6 @@ export interface IntrinsicCommonProps {
   borderRadius?: number;
   borderRight?: BorderStyle;
   borderTop?: BorderStyle;
-  children?: any;
   display?: 'flex';
   flexDirection?: 'row' | 'column';
   forwardStates?: boolean;
@@ -66,6 +66,7 @@ export interface IntrinsicCommonProps {
   ref?: any;
   selected?: number | null;
   states?: States;
+  text?: string;
 }
 
 // TODO: Add this concept back in and come up with a way to properly type it so it works
@@ -86,8 +87,10 @@ export interface IntrinsicTextNodeStyleProps
 
 export interface IntrinsicNodeProps extends IntrinsicNodeStyleProps {
   style?: IntrinsicNodeStyleProps;
+  children?: JSX.Element;
 }
 
 export interface IntrinsicTextProps extends IntrinsicTextNodeStyleProps {
   style?: IntrinsicTextNodeStyleProps;
+  children: string;
 }

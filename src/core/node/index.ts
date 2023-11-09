@@ -18,7 +18,7 @@
 import { renderer, createShader } from '../renderer/index.js';
 import {
   type BorderStyleObject,
-  type IntrinsicTextProps,
+  type IntrinsicNodeProps,
 } from '../../index.js';
 import Children from './children.js';
 import States from './states.js';
@@ -134,7 +134,7 @@ export interface TextNode {
 export type SolidNode = ElementNode | TextNode;
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export interface ElementNode extends IntrinsicTextProps {}
+export interface ElementNode extends Omit<IntrinsicNodeProps, 'children'> {}
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ElementNode extends Object {
@@ -328,7 +328,7 @@ export class ElementNode extends Object {
 
   _resizeOnTextLoad() {
     assertTruthy(this.lng);
-    this.lng.once('textLoaded', (_node, size: Dimensions) => {
+    this.lng.once('loaded', (_node, size: Dimensions) => {
       this.width = size.width;
       this.height = size.height;
       assertTruthy(this.parent);
@@ -507,7 +507,7 @@ export class ElementNode extends Object {
       node.lng = renderer.createTextNode(props);
 
       if (isFunc(node.onLoad)) {
-        node.lng.once('textLoaded', node.onLoad);
+        node.lng.once('loaded', node.onLoad);
       }
 
       if (!node.width || !node.height) {
@@ -541,11 +541,11 @@ export class ElementNode extends Object {
       node.lng = renderer.createNode(props);
 
       if (node.onFail) {
-        node.lng.once('txFailed', node.onFail);
+        node.lng.once('failed', node.onFail);
       }
 
       if (node.onLoad) {
-        node.lng.once('txLoaded', node.onLoad);
+        node.lng.once('loaded', node.onLoad);
       }
     }
 

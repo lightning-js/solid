@@ -15,8 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { type Component } from "solid-js";
 import type { IntrinsicTextProps } from "../intrinsicTypes.js";
 
-export function Text(props: IntrinsicTextProps) {
-  return <text {...props}></text>
-}
+export const Text: Component<IntrinsicTextProps> = (props) => <text {...props}></text>

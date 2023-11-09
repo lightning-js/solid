@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createEffect } from "solid-js";
+import { createEffect, type JSX } from "solid-js";
 import { startLightningRenderer, type SolidRendererOptions } from '../core/renderer/index.js';
 import { assertTruthy } from "@lightningjs/renderer/utils";
 import { ElementNode, type SolidNode } from "../core/node/index.js";
@@ -38,7 +38,7 @@ export interface CanvasOptions {
 export interface CanvasProps {
   options?: Partial<SolidRendererOptions>;
   onFirstRender?: (callback: () => void) => void;
-  children?: any;
+  children?: JSX.Element;
   ref?: (el: ElementNode) => void;
 }
 
