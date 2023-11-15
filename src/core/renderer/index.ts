@@ -18,7 +18,6 @@
 import {
   MainRenderDriver,
   RendererMain,
-  ThreadXRenderDriver,
   type RendererMainSettings,
 } from '@lightningjs/renderer';
 
@@ -42,19 +41,11 @@ const defaultOptions: SolidRendererOptions = {
 export function startLightningRenderer(
   options: Partial<SolidRendererOptions> = {},
 ): RendererMain {
-  let driver;
+  const driver = new MainRenderDriver();
   const resolvedOptions: SolidRendererOptions = {
     ...defaultOptions,
     ...options,
   };
-
-  if (!resolvedOptions.threadXCoreWorkerUrl) {
-    driver = new MainRenderDriver();
-  } else {
-    driver = new ThreadXRenderDriver({
-      coreWorkerUrl: resolvedOptions.threadXCoreWorkerUrl,
-    });
-  }
 
   renderer = new RendererMain(
     {

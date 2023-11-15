@@ -15,8 +15,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { type Component } from "solid-js";
 import { type IntrinsicNodeProps } from "../intrinsicTypes.js";
 
-export function View(props: IntrinsicNodeProps) {
-  return <node {...props}></node>
-}
+export const View: Component<IntrinsicNodeProps> = (props) =>
+   <node {...props}></node>;
