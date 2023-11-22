@@ -199,7 +199,7 @@ Additionally, flex will automatically layout Text nodes. Anytime a View with dis
 
 ## Animations
 
-Adding an `animate` attribute to a <View> component will cause any property changes (after initial render) to be animated. This is useful for simple animations where you want to resize, move, or change alpha of a component. You can set `animationSettings` with an object to control the duration and timing function of property changes.
+Adding an `animate` attribute to a <View> component will cause any property changes (after initial render) to be animated. This is useful for simple animations where you want to resize, move, or change alpha of a component. You can set `animationSettings` with an object to control the duration and easing function of property changes.
 
 ```jsx
 createEffect(on(activeElement, (elm) => {
@@ -328,7 +328,7 @@ function Button(props) {
     focus: {
       color: [0x58807dff, { duration: 2000 }],
       scale: 1.2,
-      alpha: [1, { duration: 1500, delay: 200, timing: 'easy-in' }],
+      alpha: [1, { duration: 1500, delay: 200, easing: 'easy-in' }],
     },
   };
 
