@@ -141,7 +141,7 @@ export interface ElementNode extends Omit<IntrinsicNodeProps, 'children'> {}
 export class ElementNode extends Object {
   name: string;
   lng: INode | null = null;
-  selected: number | null = null;
+  selected?: number;
   rendered: boolean;
 
   private _undoStates?: Record<string, any>;

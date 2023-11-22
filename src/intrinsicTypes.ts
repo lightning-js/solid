@@ -63,8 +63,8 @@ export interface IntrinsicCommonProps {
   onFail?: (target: INode, error: Error) => void;
   onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
   onLoad?: (target: INode, dimensions: Dimensions) => void;
-  ref?: any;
-  selected?: number | null;
+  ref?: ElementNode | ((node: ElementNode | null) => void) | null;
+  selected?: number;
   states?: States;
   text?: string;
 }
@@ -94,3 +94,8 @@ export interface IntrinsicTextProps extends IntrinsicTextNodeStyleProps {
   style?: IntrinsicTextNodeStyleProps;
   children: string;
 }
+
+export type StyleSheet = IntrinsicNodeStyleProps;
+export type TextStyles = IntrinsicTextNodeStyleProps;
+export type NodeProps = IntrinsicNodeProps;
+export type TextProps = IntrinsicTextProps;

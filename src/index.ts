@@ -33,3 +33,4 @@ export { config as Config } from './config.js';
 export * from './core/node/index.js';
 export * from './intrinsicTypes.js';
 export * from './utils.js';
+export * as Types from './intrinsicTypes.js';
