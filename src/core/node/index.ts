@@ -21,7 +21,7 @@ import {
   type IntrinsicNodeProps,
 } from '../../index.js';
 import Children from './children.js';
-import States from './states.js';
+import States, { type NodeStates } from './states.js';
 import calculateFlex from '../flex.js';
 import { log, isArray, isNumber, isFunc, keyExists } from '../utils.js';
 import { config } from '../../config.js';
@@ -151,7 +151,7 @@ export class ElementNode extends Object {
   private _shader?: ShaderRef;
   private _style?: any;
   private _states?: States;
-  private _animationSettings?: any;
+  private _animationSettings?: Partial<AnimationSettings>;
   private _updateLayoutOn?: any;
   private _width?: number;
   private _height?: number;
@@ -375,24 +375,24 @@ export class ElementNode extends Object {
     return this.children.length > 0;
   }
 
-  set states(v) {
-    this._states = new States(this._stateChanged.bind(this), v);
+  set states(states: NodeStates) {
+    this._states = new States(this._stateChanged.bind(this), states);
     if (this.rendered) {
       this._stateChanged();
     }
   }
 
-  get states() {
+  get states(): States {
     this._states = this._states || new States(this._stateChanged.bind(this));
     return this._states;
   }
 
-  get animationSettings() {
+  get animationSettings(): Partial<AnimationSettings> {
     return this._animationSettings || defaultAnimationSettings;
   }
 
-  set animationSettings(v) {
-    this._animationSettings = v;
+  set animationSettings(animationSettings: Partial<AnimationSettings>) {
+    this._animationSettings = animationSettings;
   }
 
   get updateLayoutOn() {

@@ -16,13 +16,13 @@
  */
 
 import { isArray, isString } from '../utils.js';
+
+export type NodeStates = string[] | string | Record<string, boolean>;
+
 export default class States extends Array<string> {
   private onChange: () => void;
 
-  constructor(
-    callback: () => void,
-    initialState: string[] | string | Record<string, boolean> = [],
-  ) {
+  constructor(callback: () => void, initialState: NodeStates = {}) {
     if (isArray(initialState)) {
       super(...initialState);
     } else if (isString(initialState)) {
