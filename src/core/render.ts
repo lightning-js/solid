@@ -24,7 +24,7 @@ import universalInspector, {
 import type { SolidNode } from './node/index.js';
 import type { JSX } from 'solid-js';
 
-const loadInspector = import.meta?.env?.MODE === 'development';
+const loadInspector = import.meta.env.MODE === 'development';
 if (loadInspector) {
   attachInspector();
 }

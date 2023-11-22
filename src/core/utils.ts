@@ -19,7 +19,7 @@
 import { config } from '../config.js';
 import type { SolidNode } from './node/index.js';
 
-const isDev = import.meta?.env?.MODE === 'development';
+const isDev = import.meta.env.MODE === 'development';
 export function log(msg: string, node: SolidNode, ...args: any[]) {
   if (isDev) {
     if (config.debug || (isObject(node) && node.debug)) {

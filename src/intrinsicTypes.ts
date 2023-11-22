@@ -95,7 +95,7 @@ export interface IntrinsicTextProps extends IntrinsicTextNodeStyleProps {
   children: string;
 }
 
-export type StyleSheet = IntrinsicNodeStyleProps;
+export type NodeStyles = IntrinsicNodeStyleProps;
 export type TextStyles = IntrinsicTextNodeStyleProps;
 export type NodeProps = IntrinsicNodeProps;
 export type TextProps = IntrinsicTextProps;
