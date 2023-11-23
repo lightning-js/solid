@@ -17,13 +17,21 @@
 
 import { renderer, createShader } from '../renderer/index.js';
 import {
+  type AnimatableNumberProp,
   type BorderStyleObject,
   type IntrinsicNodeProps,
 } from '../../index.js';
 import Children from './children.js';
 import States, { type NodeStates } from './states.js';
 import calculateFlex from '../flex.js';
-import { log, isArray, isNumber, isFunc, keyExists } from '../utils.js';
+import {
+  log,
+  isArray,
+  isNumber,
+  isFunc,
+  keyExists,
+  getAnimatableValue,
+} from '../utils.js';
 import { config } from '../../config.js';
 import { setActiveElement } from '../activeElement.js';
 import type {
@@ -181,10 +189,10 @@ export class ElementNode extends Object {
 
     for (const key of LightningRendererNumberProps) {
       Object.defineProperty(this, key, {
-        get() {
+        get(): number | AnimatableNumberProp | undefined {
           return this[`_${key}`] || (this.lng && this.lng[key]);
         },
-        set(v: number) {
+        set(v: number | AnimatableNumberProp | undefined) {
           this[`_${key}`] = v;
           this._sendToLightningAnimatable(key, v);
         },
@@ -275,10 +283,7 @@ export class ElementNode extends Object {
 
   _sendToLightningAnimatable(
     name: string,
-    value:
-      | [value: number | string, settings: AnimationSettings]
-      | number
-      | string,
+    value: AnimatableNumberProp | number | string,
   ) {
     if (this.rendered && this.lng) {
       if (isArray(value)) {
@@ -309,7 +314,7 @@ export class ElementNode extends Object {
 
   createAnimation(
     props: Partial<INodeAnimatableProps>,
-    animationSettings?: any,
+    animationSettings?: Partial<AnimationSettings>,
   ) {
     assertTruthy(this.lng, 'Node must be rendered before animating');
     return this.lng.animate(props, animationSettings || this.animationSettings);
@@ -528,12 +533,12 @@ export class ElementNode extends Object {
         assertTruthy(parent);
         // Set width and height to parent less offset
         if (isNaN(props.width)) {
-          props.width = (parent.width || 0) - props.x;
+          props.width = (getAnimatableValue(parent.width) || 0) - props.x;
           node._width = props.width;
         }
 
         if (isNaN(props.height)) {
-          props.height = (parent.height || 0) - props.y;
+          props.height = (getAnimatableValue(parent.height) || 0) - props.y;
           node._height = props.height;
         }
 

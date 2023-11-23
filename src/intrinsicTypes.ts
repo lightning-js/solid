@@ -19,6 +19,7 @@ import {
   type AnimationSettings,
   type Dimensions,
   type INode,
+  type INodeAnimatableProps,
   type INodeWritableProps,
   type ITextNodeWritableProps,
 } from '@lightningjs/renderer';
@@ -69,23 +70,27 @@ export interface IntrinsicCommonProps {
   text?: string;
 }
 
-type TransformableFieldNames = 'alpha' | 'scale' | 'scaleX' | 'scaleY';
-
+export type AnimatableNumberProp = [
+  value: number,
+  settings: Partial<AnimationSettings>,
+];
 // TODO: Add this concept back in and come up with a way to properly type it so it works
 // internally and externally.
 //
 // Type that transforms all number typed properties to a tuple
 type TransformAnimatableNumberProps<T> = {
-  [K in keyof T]?: number extends T[K]
-    ? number | [value: number, settings: AnimationSettings]
-    : T[K];
+  [K in keyof T]?: number extends T[K] ? number | AnimatableNumberProp : T[K];
 };
 
-type TransformableNodeWritableProps = TransformAnimatableNumberProps<
-  Pick<INodeWritableProps, TransformableFieldNames>
+export type TransformableNodeWritableProps = TransformAnimatableNumberProps<
+  Omit<INodeAnimatableProps, 'zIndex' | 'zIndexLocked'>
 >;
+
 type INodeStyleProps = Partial<
-  Omit<INodeWritableProps, 'parent' | 'shader' | TransformableFieldNames>
+  Omit<
+    INodeWritableProps,
+    'parent' | 'shader' | keyof TransformableNodeWritableProps
+  >
 > &
   TransformableNodeWritableProps &
   IntrinsicCommonProps;

@@ -16,6 +16,7 @@
  */
 import { assertTruthy } from '@lightningjs/renderer/utils';
 import type { ElementNode, SolidNode } from './node/index.js';
+import { getAnimatableValue } from './utils.js';
 
 export default function (node: ElementNode) {
   // Filter empty text nodes which are place holders for <Show>
@@ -27,9 +28,12 @@ export default function (node: ElementNode) {
   const marginTwo = direction === 'row' ? 'marginRight' : 'marginBottom';
   const prop = direction === 'row' ? 'x' : 'y';
   const crossProp = direction === 'row' ? 'y' : 'x';
-  const containerSize = node[dimension] || 0;
-  const containerCrossSize = node[crossDimension] || 0;
-  const itemSize = children.reduce((prev, c) => prev + (c[dimension] || 0), 0);
+  const containerSize = getAnimatableValue(node[dimension]) || 0;
+  const containerCrossSize = getAnimatableValue(node[crossDimension]) || 0;
+  const itemSize = children.reduce(
+    (prev, c) => prev + (getAnimatableValue(c[dimension]) || 0),
+    0,
+  );
   const gap = node.gap || 0;
   const numChildren = children.length;
   const justify = node.justifyContent || 'flexStart';
@@ -42,9 +46,13 @@ export default function (node: ElementNode) {
           if (align === 'flexStart') {
             c[crossProp] = 0;
           } else if (align === 'center') {
-            c[crossProp] = (containerCrossSize - (c[crossDimension] || 0)) / 2;
+            c[crossProp] =
+              (containerCrossSize -
+                (getAnimatableValue(c[crossDimension]) || 0)) /
+              2;
           } else if (align === 'flexEnd') {
-            c[crossProp] = containerCrossSize - (c[crossDimension] || 0);
+            c[crossProp] =
+              containerCrossSize - (getAnimatableValue(c[crossDimension]) || 0);
           }
         }
       : (c: SolidNode) => c;
@@ -54,7 +62,10 @@ export default function (node: ElementNode) {
     children.forEach((c) => {
       c[prop] = start + (c[marginOne] || 0);
       start +=
-        (c[dimension] || 0) + gap + (c[marginOne] || 0) + (c[marginTwo] || 0);
+        (getAnimatableValue(c[dimension]) || 0) +
+        gap +
+        (c[marginOne] || 0) +
+        (c[marginTwo] || 0);
       crossAlignChild(c);
     });
   }
@@ -63,9 +74,13 @@ export default function (node: ElementNode) {
     for (let i = numChildren - 1; i >= 0; i--) {
       const c = children[i];
       assertTruthy(c);
-      c[prop] = start - (c[dimension] || 0) - (c[marginTwo] || 0);
+      c[prop] =
+        start - (getAnimatableValue(c[dimension]) || 0) - (c[marginTwo] || 0);
       start -=
-        (c[dimension] || 0) + gap + (c[marginOne] || 0) + (c[marginTwo] || 0);
+        (getAnimatableValue(c[dimension]) || 0) +
+        gap +
+        (c[marginOne] || 0) +
+        (c[marginTwo] || 0);
       crossAlignChild(c);
     }
   }
@@ -73,7 +88,7 @@ export default function (node: ElementNode) {
     let start = (containerSize - (itemSize + gap * (numChildren - 1))) / 2;
     children.forEach((c) => {
       c[prop] = start;
-      start += (c[dimension] || 0) + gap;
+      start += (getAnimatableValue(c[dimension]) || 0) + gap;
       crossAlignChild(c);
     });
   }
@@ -82,7 +97,7 @@ export default function (node: ElementNode) {
     let start = 0;
     children.forEach((c) => {
       c[prop] = start;
-      start += (c[dimension] || 0) + toPad;
+      start += (getAnimatableValue(c[dimension]) || 0) + toPad;
       crossAlignChild(c);
     });
   }
@@ -91,7 +106,7 @@ export default function (node: ElementNode) {
     let start = toPad;
     children.forEach((c) => {
       c[prop] = start;
-      start += (c[dimension] || 0) + toPad;
+      start += (getAnimatableValue(c[dimension]) || 0) + toPad;
       crossAlignChild(c);
     });
   }
