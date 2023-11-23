@@ -551,8 +551,6 @@ export class ElementNode extends Object {
           // to set color '#ffffffff'
           node._color = props.color = 0x00000000;
         }
-      } else {
-        // debugger;
       }
 
       log('Rendering: ', this, props);
