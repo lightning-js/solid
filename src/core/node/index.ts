@@ -19,7 +19,8 @@ import { renderer, createShader } from '../renderer/index.js';
 import {
   type AnimatableNumberProp,
   type BorderStyleObject,
-  type IntrinsicNodeProps,
+  type IntrinsicCommonProps,
+  type IntrinsicNodeStyleProps,
 } from '../../index.js';
 import Children from './children.js';
 import States, { type NodeStates } from './states.js';
@@ -143,7 +144,9 @@ export interface TextNode {
 export type SolidNode = ElementNode | TextNode;
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export interface ElementNode extends Omit<IntrinsicNodeProps, 'children'> {}
+export interface ElementNode
+  extends Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>,
+    IntrinsicCommonProps {}
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ElementNode extends Object {
@@ -151,6 +154,7 @@ export class ElementNode extends Object {
   lng: INode | null = null;
   selected?: number;
   rendered: boolean;
+  autofocus: boolean;
 
   private _undoStates?: Record<string, any>;
   private _renderProps: any;
@@ -189,11 +193,11 @@ export class ElementNode extends Object {
 
     for (const key of LightningRendererNumberProps) {
       Object.defineProperty(this, key, {
-        get(): number | AnimatableNumberProp | undefined {
+        get(): number {
           return this[`_${key}`] || (this.lng && this.lng[key]);
         },
-        set(v: number | AnimatableNumberProp | undefined) {
-          this[`_${key}`] = v;
+        set(v: number | AnimatableNumberProp) {
+          this[`_${key}`] = getAnimatableValue(v);
           this._sendToLightningAnimatable(key, v);
         },
       });
@@ -365,14 +369,14 @@ export class ElementNode extends Object {
       }
 
       if (!this[key as keyof this]) {
-        this[key as keyof this] = value[key as keyof ElementNode];
+        this[key as keyof this] = value[key as keyof IntrinsicNodeStyleProps];
       }
     }
 
     this._style = value;
   }
 
-  get style() {
+  get style(): any {
     return this._style;
   }
 
@@ -533,12 +537,12 @@ export class ElementNode extends Object {
         assertTruthy(parent);
         // Set width and height to parent less offset
         if (isNaN(props.width)) {
-          props.width = (getAnimatableValue(parent.width) || 0) - props.x;
+          props.width = (parent.width || 0) - props.x;
           node._width = props.width;
         }
 
         if (isNaN(props.height)) {
-          props.height = (getAnimatableValue(parent.height) || 0) - props.y;
+          props.height = (parent.height || 0) - props.y;
           node._height = props.height;
         }
 
@@ -547,6 +551,8 @@ export class ElementNode extends Object {
           // to set color '#ffffffff'
           node._color = props.color = 0x00000000;
         }
+      } else {
+        // debugger;
       }
 
       log('Rendering: ', this, props);
