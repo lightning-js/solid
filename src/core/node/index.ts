@@ -17,13 +17,22 @@
 
 import { renderer, createShader } from '../renderer/index.js';
 import {
+  type AnimatableNumberProp,
   type BorderStyleObject,
-  type IntrinsicNodeProps,
+  type IntrinsicCommonProps,
+  type IntrinsicNodeStyleProps,
 } from '../../index.js';
 import Children from './children.js';
-import States from './states.js';
+import States, { type NodeStates } from './states.js';
 import calculateFlex from '../flex.js';
-import { log, isArray, isNumber, isFunc, keyExists } from '../utils.js';
+import {
+  log,
+  isArray,
+  isNumber,
+  isFunc,
+  keyExists,
+  getAnimatableValue,
+} from '../utils.js';
 import { config } from '../../config.js';
 import { setActiveElement } from '../activeElement.js';
 import type {
@@ -135,7 +144,9 @@ export interface TextNode {
 export type SolidNode = ElementNode | TextNode;
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export interface ElementNode extends Omit<IntrinsicNodeProps, 'children'> {}
+export interface ElementNode
+  extends Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>,
+    IntrinsicCommonProps {}
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ElementNode extends Object {
@@ -143,6 +154,7 @@ export class ElementNode extends Object {
   lng: INode | null = null;
   selected?: number;
   rendered: boolean;
+  autofocus: boolean;
 
   private _undoStates?: Record<string, any>;
   private _renderProps: any;
@@ -151,7 +163,7 @@ export class ElementNode extends Object {
   private _shader?: ShaderRef;
   private _style?: any;
   private _states?: States;
-  private _animationSettings?: any;
+  private _animationSettings?: Partial<AnimationSettings>;
   private _updateLayoutOn?: any;
   private _width?: number;
   private _height?: number;
@@ -181,11 +193,11 @@ export class ElementNode extends Object {
 
     for (const key of LightningRendererNumberProps) {
       Object.defineProperty(this, key, {
-        get() {
+        get(): number {
           return this[`_${key}`] || (this.lng && this.lng[key]);
         },
-        set(v: number) {
-          this[`_${key}`] = v;
+        set(v: number | AnimatableNumberProp) {
+          this[`_${key}`] = getAnimatableValue(v);
           this._sendToLightningAnimatable(key, v);
         },
       });
@@ -275,10 +287,7 @@ export class ElementNode extends Object {
 
   _sendToLightningAnimatable(
     name: string,
-    value:
-      | [value: number | string, settings: AnimationSettings]
-      | number
-      | string,
+    value: AnimatableNumberProp | number | string,
   ) {
     if (this.rendered && this.lng) {
       if (isArray(value)) {
@@ -309,7 +318,7 @@ export class ElementNode extends Object {
 
   createAnimation(
     props: Partial<INodeAnimatableProps>,
-    animationSettings?: any,
+    animationSettings?: Partial<AnimationSettings>,
   ) {
     assertTruthy(this.lng, 'Node must be rendered before animating');
     return this.lng.animate(props, animationSettings || this.animationSettings);
@@ -360,14 +369,14 @@ export class ElementNode extends Object {
       }
 
       if (!this[key as keyof this]) {
-        this[key as keyof this] = value[key as keyof ElementNode];
+        this[key as keyof this] = value[key as keyof IntrinsicNodeStyleProps];
       }
     }
 
     this._style = value;
   }
 
-  get style() {
+  get style(): any {
     return this._style;
   }
 
@@ -375,24 +384,24 @@ export class ElementNode extends Object {
     return this.children.length > 0;
   }
 
-  set states(v) {
-    this._states = new States(this._stateChanged.bind(this), v);
+  set states(states: NodeStates) {
+    this._states = new States(this._stateChanged.bind(this), states);
     if (this.rendered) {
       this._stateChanged();
     }
   }
 
-  get states() {
+  get states(): States {
     this._states = this._states || new States(this._stateChanged.bind(this));
     return this._states;
   }
 
-  get animationSettings() {
+  get animationSettings(): Partial<AnimationSettings> {
     return this._animationSettings || defaultAnimationSettings;
   }
 
-  set animationSettings(v) {
-    this._animationSettings = v;
+  set animationSettings(animationSettings: Partial<AnimationSettings>) {
+    this._animationSettings = animationSettings;
   }
 
   get updateLayoutOn() {

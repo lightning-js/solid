@@ -19,12 +19,15 @@ import {
   type AnimationSettings,
   type Dimensions,
   type INode,
+  type INodeAnimatableProps,
   type INodeWritableProps,
   type ITextNodeWritableProps,
+  type NodeFailedPayload,
+  type NodeLoadedPayload,
 } from '@lightningjs/renderer';
 import { type JSX } from 'solid-js';
 import { type ElementNode } from './core/node/index.js';
-import type States from './core/node/states.js';
+import type { NodeStates } from './core/node/states.js';
 
 export interface BorderStyleObject {
   width: number;
@@ -36,7 +39,7 @@ export type BorderStyle = number | BorderStyleObject;
 export interface IntrinsicCommonProps {
   alignItems?: 'flexStart' | 'flexEnd' | 'center';
   animate?: boolean;
-  animationSettings?: AnimationSettings;
+  animationSettings?: Partial<AnimationSettings>;
   autofocus?: boolean;
   border?: BorderStyle;
   borderBottom?: BorderStyle;
@@ -60,26 +63,43 @@ export interface IntrinsicCommonProps {
   marginRight?: number;
   marginTop?: number;
   onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
-  onFail?: (target: INode, error: Error) => void;
   onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
-  onLoad?: (target: INode, dimensions: Dimensions) => void;
-  ref?: ElementNode | ((node: ElementNode | null) => void) | null;
+  onLoad?: (target: INode, nodeLoadedPayload: NodeLoadedPayload) => void;
+  onFail?: (target: INode, nodeFailedPayload: NodeFailedPayload) => void;
+  ref?: ElementNode | ((node: ElementNode | null) => void) | null | undefined;
   selected?: number;
-  states?: States;
+  states?: NodeStates;
   text?: string;
 }
 
+export type AnimatableNumberProp = [
+  value: number,
+  settings: Partial<AnimationSettings>,
+];
 // TODO: Add this concept back in and come up with a way to properly type it so it works
 // internally and externally.
 //
 // Type that transforms all number typed properties to a tuple
-// type TransformAnimatableNumberProps<T> = {
-//   [K in keyof T]: number extends T[K] ? (number | [value: number, settings: AnimationSettings]) : T[K];
-// };
+type TransformAnimatableNumberProps<T> = {
+  [K in keyof T]?: number extends T[K] ? number | AnimatableNumberProp : T[K];
+};
 
-export interface IntrinsicNodeStyleProps
-  extends Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>,
-    IntrinsicCommonProps {}
+export type TransformableNodeWritableProps = TransformAnimatableNumberProps<
+  Omit<INodeAnimatableProps, 'zIndex' | 'zIndexLocked'>
+>;
+
+type INodeStyleProps = Partial<
+  Omit<
+    INodeWritableProps,
+    'parent' | 'shader' | keyof TransformableNodeWritableProps
+  >
+> &
+  TransformableNodeWritableProps &
+  IntrinsicCommonProps;
+
+export interface IntrinsicNodeStyleProps extends INodeStyleProps {
+  effects?: any; // Should be EffectMap
+}
 
 export interface IntrinsicTextNodeStyleProps
   extends Partial<Omit<ITextNodeWritableProps, 'parent' | 'shader'>>,
@@ -92,7 +112,7 @@ export interface IntrinsicNodeProps extends IntrinsicNodeStyleProps {
 
 export interface IntrinsicTextProps extends IntrinsicTextNodeStyleProps {
   style?: IntrinsicTextNodeStyleProps;
-  children: string;
+  children: string | string[];
 }
 
 export type NodeStyles = IntrinsicNodeStyleProps;
