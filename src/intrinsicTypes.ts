@@ -22,6 +22,8 @@ import {
   type INodeAnimatableProps,
   type INodeWritableProps,
   type ITextNodeWritableProps,
+  type NodeFailedPayload,
+  type NodeLoadedPayload,
 } from '@lightningjs/renderer';
 import { type JSX } from 'solid-js';
 import { type ElementNode } from './core/node/index.js';
@@ -61,9 +63,9 @@ export interface IntrinsicCommonProps {
   marginRight?: number;
   marginTop?: number;
   onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
-  onFail?: (target: INode, error: Error) => void;
   onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
-  onLoad?: (target: INode, dimensions: Dimensions) => void;
+  onLoad?: (target: INode, nodeLoadedPayload: NodeLoadedPayload) => void;
+  onFail?: (target: INode, nodeFailedPayload: NodeFailedPayload) => void;
   ref?: ElementNode | ((node: ElementNode | null) => void) | null | undefined;
   selected?: number;
   states?: NodeStates;
