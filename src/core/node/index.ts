@@ -524,7 +524,7 @@ export class ElementNode extends Object {
       node.lng = renderer.createTextNode(props);
 
       if (isFunc(node.onLoad)) {
-        node.lng.once('loaded', node.onLoad);
+        node.lng.on('loaded', node.onLoad);
       }
 
       if (!node.width || !node.height) {
@@ -547,7 +547,7 @@ export class ElementNode extends Object {
         }
 
         if (!props.color) {
-          //Default color to transparent - If you later set a src, you'll need
+          // Default color to transparent - If you later set a src, you'll need
           // to set color '#ffffffff'
           node._color = props.color = 0x00000000;
         }
@@ -558,12 +558,14 @@ export class ElementNode extends Object {
       node.lng = renderer.createNode(props);
 
       if (node.onFail) {
-        node.lng.once('failed', node.onFail);
+        node.lng.on('failed', node.onFail);
       }
 
       if (node.onLoad) {
-        node.lng.once('loaded', node.onLoad);
+        node.lng.on('loaded', node.onLoad);
       }
+
+      isFunc(this.onCreate) && this.onCreate.call(this, node);
     }
 
     node.rendered = true;
