@@ -354,6 +354,18 @@ function Button(props) {
 }
 ```
 
+## Events
+
+`View` and `Text` provide a set of event handlers that can be used in various stages of a node creation process.
+
+```jsx
+  onCreate: (target: ElementNode)
+  onLoad: (target: INode, nodeLoadedPayload: NodeLoadedPayload)
+  onFail: (target: INode, nodeFailedPayload: NodeFailedPayload)
+  onBeforeLayout: (child: ElementNode, dimensions: Dimensions)
+  onLayout: (child: ElementNode, dimensions: Dimensions)
+```
+
 ## Shaders and Effects
 
 The shader prop allows you to specify a custom shader. Most of the common use ones have shortcuts like `borderRadius`, `border`.

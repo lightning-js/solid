@@ -29,6 +29,20 @@ import { type JSX } from 'solid-js';
 import { type ElementNode } from './core/node/index.js';
 import type { NodeStates } from './core/node/states.js';
 
+type AddUndefined<T> = {
+  [K in keyof T]: T[K] | undefined;
+};
+
+// Type that transforms all number typed properties to a tuple
+type TransformAnimatableNumberProps<T> = {
+  [K in keyof T]?: number extends T[K] ? number | AnimatableNumberProp : T[K];
+};
+
+export type AnimatableNumberProp = [
+  value: number,
+  settings: Partial<AnimationSettings>,
+];
+
 export interface BorderStyleObject {
   width: number;
   color: number;
@@ -36,11 +50,25 @@ export interface BorderStyleObject {
 
 export type BorderStyle = number | BorderStyleObject;
 
-export interface IntrinsicCommonProps {
-  alignItems?: 'flexStart' | 'flexEnd' | 'center';
+export interface IntrinsicNodeCommonProps {
   animate?: boolean;
   animationSettings?: Partial<AnimationSettings>;
   autofocus?: boolean;
+  forwardStates?: boolean;
+  id?: string;
+  onCreate?: (target: ElementNode) => void;
+  onLoad?: (target: INode, nodeLoadedPayload: NodeLoadedPayload) => void;
+  onFail?: (target: INode, nodeFailedPayload: NodeFailedPayload) => void;
+  onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
+  onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
+  ref?: ElementNode | ((node: ElementNode | null) => void) | null;
+  selected?: number;
+  states?: NodeStates;
+  text?: string;
+}
+
+export interface IntrinsicNodeStyleCommonProps {
+  alignItems?: 'flexStart' | 'flexEnd' | 'center';
   border?: BorderStyle;
   borderBottom?: BorderStyle;
   borderLeft?: BorderStyle;
@@ -48,69 +76,59 @@ export interface IntrinsicCommonProps {
   borderRight?: BorderStyle;
   borderTop?: BorderStyle;
   display?: 'flex';
+  effects?: any; // Should be EffectMap
   flexDirection?: 'row' | 'column';
-  forwardStates?: boolean;
   gap?: number;
-  id?: string;
   justifyContent?:
     | 'flexStart'
     | 'flexEnd'
     | 'center'
     | 'spaceBetween'
     | 'spaceEvenly';
+  linearGradient?: any; // Should be typeof LinearGradientEffect
   marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
   marginTop?: number;
-  onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
-  onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
-  onLoad?: (target: INode, nodeLoadedPayload: NodeLoadedPayload) => void;
-  onFail?: (target: INode, nodeFailedPayload: NodeFailedPayload) => void;
-  ref?: ElementNode | ((node: ElementNode | null) => void) | null | undefined;
-  selected?: number;
-  states?: NodeStates;
-  text?: string;
 }
 
-export type AnimatableNumberProp = [
-  value: number,
-  settings: Partial<AnimationSettings>,
-];
-// TODO: Add this concept back in and come up with a way to properly type it so it works
-// internally and externally.
-//
-// Type that transforms all number typed properties to a tuple
-type TransformAnimatableNumberProps<T> = {
-  [K in keyof T]?: number extends T[K] ? number | AnimatableNumberProp : T[K];
-};
+export interface IntrinsicTextStyleCommonProps {
+  marginLeft?: number;
+  marginRight?: number;
+  marginTop?: number;
+  marginBottom?: number;
+}
+
+export type IntrinsicCommonProps = IntrinsicNodeCommonProps &
+  IntrinsicNodeStyleCommonProps &
+  IntrinsicTextStyleCommonProps;
 
 export type TransformableNodeWritableProps = TransformAnimatableNumberProps<
   Omit<INodeAnimatableProps, 'zIndex' | 'zIndexLocked'>
 >;
 
-type INodeStyleProps = Partial<
-  Omit<
-    INodeWritableProps,
-    'parent' | 'shader' | keyof TransformableNodeWritableProps
-  >
-> &
-  TransformableNodeWritableProps &
-  IntrinsicCommonProps;
-
-export interface IntrinsicNodeStyleProps extends INodeStyleProps {
-  effects?: any; // Should be EffectMap
-}
+export interface IntrinsicNodeStyleProps
+  extends Partial<
+      Omit<
+        INodeWritableProps,
+        'parent' | 'shader' | keyof TransformableNodeWritableProps
+      >
+    >,
+    TransformableNodeWritableProps,
+    IntrinsicNodeStyleCommonProps {}
 
 export interface IntrinsicTextNodeStyleProps
   extends Partial<Omit<ITextNodeWritableProps, 'parent' | 'shader'>>,
-    IntrinsicCommonProps {}
+    IntrinsicTextStyleCommonProps {}
 
-export interface IntrinsicNodeProps extends IntrinsicNodeStyleProps {
+export interface IntrinsicNodeProps
+  extends AddUndefined<IntrinsicNodeCommonProps & IntrinsicNodeStyleProps> {
   style?: IntrinsicNodeStyleProps;
   children?: JSX.Element;
 }
 
-export interface IntrinsicTextProps extends IntrinsicTextNodeStyleProps {
+export interface IntrinsicTextProps
+  extends AddUndefined<IntrinsicNodeCommonProps & IntrinsicTextNodeStyleProps> {
   style?: IntrinsicTextNodeStyleProps;
   children: string | string[];
 }
