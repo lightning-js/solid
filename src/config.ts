@@ -28,6 +28,9 @@ interface Config {
   stateMapperHook?: (node: ElementNode, states: Array<string>) => Array<string>;
 }
 
+import.meta.env = import.meta.env || { MODE: 'development' };
+export const isDev = import.meta.env.MODE === 'development';
+
 export const config: Config = {
   debug: false,
   animationSettings: {

@@ -16,11 +16,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { config } from '../config.js';
+import { config, isDev } from '../config.js';
 import type { AnimatableNumberProp } from '../index.js';
 import type { SolidNode } from './node/index.js';
 
-const isDev = import.meta.env.MODE === 'development';
 export function log(msg: string, node: SolidNode, ...args: any[]) {
   if (isDev) {
     if (config.debug || (isObject(node) && node.debug)) {
