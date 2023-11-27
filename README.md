@@ -356,7 +356,7 @@ function Button(props) {
 
 ## Events
 
-`View` and `Text` provide a set of event handlers that can be utilized in various stages of a node creation process.
+`View` and `Text` provide a set of event handlers that can be used in various stages of a node creation process.
 
 ```jsx
   onCreate: (target: ElementNode)
