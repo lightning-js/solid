@@ -48,7 +48,7 @@ export interface IntrinsicNodeCommonProps {
   forwardStates?: boolean;
   id?: string;
   onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
-  onCreate?: (target: INode, nodeFailedPayload: NodeFailedPayload) => void;
+  onCreate?: (target: ElementNode) => void;
   onFail?: (target: INode, nodeFailedPayload: NodeFailedPayload) => void;
   onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
   onLoad?: (target: INode, nodeLoadedPayload: NodeLoadedPayload) => void;

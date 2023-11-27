@@ -523,6 +523,8 @@ export class ElementNode extends Object {
       log('Rendering: ', this, props);
       node.lng = renderer.createTextNode(props);
 
+      isFunc(this.onCreate) && this.onCreate.call(this, node);
+
       if (isFunc(node.onLoad)) {
         node.lng.on('loaded', node.onLoad);
       }
