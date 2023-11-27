@@ -29,6 +29,15 @@ import { type JSX } from 'solid-js';
 import { type ElementNode } from './core/node/index.js';
 import type { NodeStates } from './core/node/states.js';
 
+type AddUndefined<T> = {
+  [K in keyof T]: T[K] | undefined;
+};
+
+// Type that transforms all number typed properties to a tuple
+type TransformAnimatableNumberProps<T> = {
+  [K in keyof T]?: number extends T[K] ? number | AnimatableNumberProp : T[K];
+};
+
 export type AnimatableNumberProp = [
   value: number,
   settings: Partial<AnimationSettings>,
@@ -47,18 +56,18 @@ export interface IntrinsicNodeCommonProps {
   autofocus?: boolean;
   forwardStates?: boolean;
   id?: string;
-  onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
   onCreate?: (target: ElementNode) => void;
-  onFail?: (target: INode, nodeFailedPayload: NodeFailedPayload) => void;
-  onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
   onLoad?: (target: INode, nodeLoadedPayload: NodeLoadedPayload) => void;
+  onFail?: (target: INode, nodeFailedPayload: NodeFailedPayload) => void;
+  onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
+  onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
   ref?: ElementNode | ((node: ElementNode | null) => void) | null;
   selected?: number;
   states?: NodeStates;
   text?: string;
 }
 
-export interface IntrinsicStyleCommonProps {
+export interface IntrinsicNodeStyleCommonProps {
   alignItems?: 'flexStart' | 'flexEnd' | 'center';
   border?: BorderStyle;
   borderBottom?: BorderStyle;
@@ -83,21 +92,16 @@ export interface IntrinsicStyleCommonProps {
   marginTop?: number;
 }
 
-type AddUndefined<T> = {
-  [K in keyof T]: T[K] | undefined;
-};
+export interface IntrinsicTextStyleCommonProps {
+  marginLeft?: number;
+  marginRight?: number;
+  marginTop?: number;
+  marginBottom?: number;
+}
 
-export type IntrinsicCommonProps = AddUndefined<
-  IntrinsicNodeCommonProps & IntrinsicStyleCommonProps
->;
-
-// TODO: Add this concept back in and come up with a way to properly type it so it works
-// internally and externally.
-//
-// Type that transforms all number typed properties to a tuple
-type TransformAnimatableNumberProps<T> = {
-  [K in keyof T]?: number extends T[K] ? number | AnimatableNumberProp : T[K];
-};
+export type IntrinsicCommonProps = IntrinsicNodeCommonProps &
+  IntrinsicNodeStyleCommonProps &
+  IntrinsicTextStyleCommonProps;
 
 export type TransformableNodeWritableProps = TransformAnimatableNumberProps<
   Omit<INodeAnimatableProps, 'zIndex' | 'zIndexLocked'>
@@ -111,22 +115,20 @@ export interface IntrinsicNodeStyleProps
       >
     >,
     TransformableNodeWritableProps,
-    IntrinsicStyleCommonProps {}
+    IntrinsicNodeStyleCommonProps {}
 
 export interface IntrinsicTextNodeStyleProps
   extends Partial<Omit<ITextNodeWritableProps, 'parent' | 'shader'>>,
-    IntrinsicStyleCommonProps {}
+    IntrinsicTextStyleCommonProps {}
 
 export interface IntrinsicNodeProps
-  extends IntrinsicNodeStyleProps,
-    IntrinsicNodeCommonProps {
+  extends AddUndefined<IntrinsicNodeCommonProps & IntrinsicNodeStyleProps> {
   style?: IntrinsicNodeStyleProps;
   children?: JSX.Element;
 }
 
 export interface IntrinsicTextProps
-  extends IntrinsicTextNodeStyleProps,
-    IntrinsicNodeCommonProps {
+  extends AddUndefined<IntrinsicNodeCommonProps & IntrinsicTextNodeStyleProps> {
   style?: IntrinsicTextNodeStyleProps;
   children: string | string[];
 }
