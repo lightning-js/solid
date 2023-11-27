@@ -1,6 +1,6 @@
 {
   "name": "@lightningjs/solid",
-  "version": "0.8.5",
+  "version": "0.8.6",
   "description": "Lightning renderer for solid universal",
   "type": "module",
   "source": "src/index.ts",
