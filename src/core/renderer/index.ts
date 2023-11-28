@@ -29,36 +29,12 @@ export interface SolidRendererOptions extends RendererMainSettings {
   rootId: string | HTMLElement;
 }
 
-const defaultOptions: SolidRendererOptions = {
-  appWidth: 1920,
-  appHeight: 1080,
-  deviceLogicalPixelRatio: 0.6666667,
-  devicePhysicalPixelRatio: 1,
-  rootId: 'app',
-  threadXCoreWorkerUrl: undefined,
-};
-
 export function startLightningRenderer(
   options: Partial<SolidRendererOptions> = {},
 ): RendererMain {
   const driver = new MainRenderDriver();
-  const resolvedOptions: SolidRendererOptions = {
-    ...defaultOptions,
-    ...options,
-  };
 
-  renderer = new RendererMain(
-    {
-      appWidth: resolvedOptions.appWidth,
-      appHeight: resolvedOptions.appHeight,
-      deviceLogicalPixelRatio: resolvedOptions.deviceLogicalPixelRatio,
-      devicePhysicalPixelRatio: resolvedOptions.devicePhysicalPixelRatio,
-      clearColor: resolvedOptions.clearColor,
-      coreExtensionModule: resolvedOptions.coreExtensionModule,
-    },
-    resolvedOptions.rootId,
-    driver,
-  );
+  renderer = new RendererMain(options, options.rootId || 'app', driver);
 
   createShader = renderer.createShader.bind(renderer);
   return renderer;
