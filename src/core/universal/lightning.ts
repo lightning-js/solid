@@ -48,7 +48,7 @@ export default {
       node._animate = value as boolean;
       return;
     }
-    // @ts-expect-error Assignment type is difficult to do here. Fix later.
+
     node[name] = value;
   },
   insertNode(parent: ElementNode, node: SolidNode, anchor: SolidNode): void {

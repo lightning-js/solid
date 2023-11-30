@@ -55,7 +55,7 @@ export function isInteger(item: unknown): item is number {
 }
 
 export function keyExists(
-  obj: Record<string | number | symbol, unknown>,
+  obj: Record<string, unknown>,
   keys: (string | number | symbol)[],
 ) {
   for (const key of keys) {

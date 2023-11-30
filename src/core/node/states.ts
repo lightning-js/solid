@@ -17,7 +17,10 @@
 
 import { isArray, isString } from '../utils.js';
 
-export type NodeStates = string[] | string | Record<string, boolean>;
+export type NodeStates =
+  | string[]
+  | string
+  | Record<string, boolean | undefined>;
 
 export default class States extends Array<string> {
   private onChange: () => void;

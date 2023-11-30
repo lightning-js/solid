@@ -115,11 +115,15 @@ export interface IntrinsicNodeStyleProps
       >
     >,
     TransformableNodeWritableProps,
-    IntrinsicNodeStyleCommonProps {}
+    IntrinsicNodeStyleCommonProps {
+  [key: string]: unknown;
+}
 
 export interface IntrinsicTextNodeStyleProps
   extends Partial<Omit<ITextNodeWritableProps, 'parent' | 'shader'>>,
-    IntrinsicTextStyleCommonProps {}
+    IntrinsicTextStyleCommonProps {
+  [key: string]: unknown;
+}
 
 export interface IntrinsicNodeProps
   extends AddUndefined<IntrinsicNodeCommonProps & IntrinsicNodeStyleProps> {

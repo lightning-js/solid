@@ -20,7 +20,8 @@ import {
   type AnimatableNumberProp,
   type BorderStyleObject,
   type IntrinsicCommonProps,
-  type IntrinsicNodeStyleProps,
+  type NodeStyles,
+  type TextStyles,
 } from '../../index.js';
 import Children from './children.js';
 import States, { type NodeStates } from './states.js';
@@ -142,11 +143,14 @@ export interface TextNode {
 }
 
 export type SolidNode = ElementNode | TextNode;
+export type SolidStyles = NodeStyles | TextStyles;
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface ElementNode
   extends Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>,
-    IntrinsicCommonProps {}
+    IntrinsicCommonProps {
+  [key: string]: unknown;
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ElementNode extends Object {
@@ -161,10 +165,9 @@ export class ElementNode extends Object {
   private _effects: any;
   private _parent: ElementNode | null = null;
   private _shader?: ShaderRef;
-  private _style?: any;
+  private _style?: SolidStyles;
   private _states?: States;
   private _animationSettings?: Partial<AnimationSettings>;
-  private _updateLayoutOn?: any;
   private _width?: number;
   private _height?: number;
   private _color?: number;
@@ -337,8 +340,7 @@ export class ElementNode extends Object {
   }
 
   _resizeOnTextLoad() {
-    assertTruthy(this.lng);
-    this.lng.once(
+    this.lng!.once(
       'loaded',
       (_node: INode, loadedPayload: NodeLoadedPayload) => {
         if (loadedPayload.type === 'text') {
@@ -346,8 +348,7 @@ export class ElementNode extends Object {
 
           this.width = dimensions.width;
           this.height = dimensions.height;
-          assertTruthy(this.parent);
-          this.parent.updateLayout(this, dimensions);
+          this.parent!.updateLayout(this, dimensions);
         }
       },
     );
@@ -361,23 +362,23 @@ export class ElementNode extends Object {
     this.lng && renderer.destroyNode(this.lng);
   }
 
-  set style(value: any) {
+  set style(value: SolidStyles) {
     // Keys set in JSX are more important
     for (let key in value) {
       if (key === 'animate') {
         key = '_animate';
       }
 
-      if (!this[key as keyof this]) {
-        this[key as keyof this] = value[key as keyof IntrinsicNodeStyleProps];
+      if (!this[key as keyof SolidStyles]) {
+        this[key as keyof SolidStyles] = value[key as keyof SolidStyles];
       }
     }
 
     this._style = value;
   }
 
-  get style(): any {
-    return this._style;
+  get style(): SolidStyles {
+    return this._style!;
   }
 
   get hasChildren() {
@@ -404,18 +405,8 @@ export class ElementNode extends Object {
     this._animationSettings = animationSettings;
   }
 
-  get updateLayoutOn() {
-    return this._updateLayoutOn;
-  }
-
-  set updateLayoutOn(v) {
-    this._updateLayoutOn = v;
-    queueMicrotask(() => this.updateLayout());
-  }
-
   _applyZIndexToChildren() {
-    const zIndex = this.zIndex;
-    assertTruthy(zIndex);
+    const zIndex = this.zIndex!;
     const zIndexIsInteger = zIndex >= 1 && parseInt('' + zIndex) === zIndex;
     const decimalSeparator = zIndexIsInteger ? '.' : '';
 
@@ -477,8 +468,7 @@ export class ElementNode extends Object {
           if (this._undoStates && !this._undoStates[state]) {
             this._undoStates[state] = {};
             Object.keys(styles).forEach((key) => {
-              assertTruthy(this._undoStates);
-              this._undoStates[state][key] = this[key as keyof this];
+              this._undoStates![state][key] = this[key as keyof this];
             });
           }
         }
@@ -493,10 +483,10 @@ export class ElementNode extends Object {
   render() {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const node = this;
-    const parent = this.parent;
+    const parent = this.parent!;
 
     // Parent is dirty whenever a node is inserted after initial render
-    if (parent?._isDirty) {
+    if (parent._isDirty) {
       parent.updateLayout();
       parent._applyZIndexToChildren();
       parent._isDirty = false;
@@ -510,7 +500,7 @@ export class ElementNode extends Object {
 
     let props = node._renderProps;
 
-    if (parent?.lng) {
+    if (parent.lng) {
       props.parent = parent.lng;
     }
 
@@ -536,7 +526,6 @@ export class ElementNode extends Object {
     } else {
       // If its not an image or texture apply some defaults
       if (!(props.src || props.texture)) {
-        assertTruthy(parent);
         // Set width and height to parent less offset
         if (isNaN(props.width)) {
           props.width = (parent.width || 0) - props.x;
