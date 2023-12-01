@@ -18,8 +18,22 @@ import { assertTruthy } from '@lightningjs/renderer/utils';
 import type { ElementNode, SolidNode } from './node/index.js';
 
 export default function (node: ElementNode) {
-  // Filter empty text nodes which are place holders for <Show>
-  const children = node.children.filter((c) => c.name !== 'TextNode');
+  const children = [];
+  for (let i = 0; i < node.children.length; i++) {
+    const c = node.children[i]!;
+    // Filter empty text nodes which are place holders for <Show> and elements missing dimensions
+    if (c.name === 'TextNode') {
+      continue;
+    }
+    // text node hasnt loaded yet - skip layout
+    if (c.name === 'text' && !(c.width || c.height)) {
+      return;
+    }
+
+    children.push(c);
+  }
+
+  const numChildren = children.length;
   const direction = node.flexDirection || 'row';
   const dimension = direction === 'row' ? 'width' : 'height';
   const crossDimension = direction === 'row' ? 'height' : 'width';
@@ -31,7 +45,6 @@ export default function (node: ElementNode) {
   const containerCrossSize = node[crossDimension] || 0;
   const itemSize = children.reduce((prev, c) => prev + (c[dimension] || 0), 0);
   const gap = node.gap || 0;
-  const numChildren = children.length;
   const justify = node.justifyContent || 'flexStart';
   const align = node.alignItems;
 
