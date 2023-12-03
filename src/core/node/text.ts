@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { renderer, createShader } from '../renderer/index.js';
+import Base from './base.js';
 import {
   type AnimatableNumberProp,
   type BorderStyleObject,
@@ -120,12 +120,6 @@ const LightningRendererNonAnimatingProps = [
   'text',
   'textAlign',
   'texture',
-  'maxLines',
-  'maxLinesSuffix',
-  'textBaseline',
-  'textOverflow',
-  'verticalAlign',
-  'wordWrap',
 ];
 
 export interface TextNode {
@@ -162,47 +156,9 @@ export interface ElementNode
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export class ElementNode extends Object {
-  name: string;
-  lng: INode | null = null;
-  selected?: number;
-  rendered: boolean;
-  autofocus: boolean;
-
-  private _undoStates?: Record<string, any>;
-  private _renderProps: any;
-  private _effects: any;
-  private _parent: ElementNode | null = null;
-  private _shader?: ShaderRef;
-  private _style?: SolidStyles;
-  private _states?: States;
-  private _animationSettings?: Partial<AnimationSettings>;
-  private _width?: number;
-  private _height?: number;
-  private _color?: number;
-  private _maxLines?: number;
-  private _borderRadius?: number;
-  private _border?: BorderStyleObject;
-  private _borderLeft?: BorderStyleObject;
-  private _borderRight?: BorderStyleObject;
-  private _borderTop?: BorderStyleObject;
-  private _borderBottom?: BorderStyleObject;
-  public _animate?: boolean; // Public but uses _ prefix
-  public _autosized?: boolean; // Public but uses _ prefix
-  public _isDirty?: boolean; // Public but uses _ prefix
-  /**
-   * Managed by dom-inspector
-   */
-  public _dom?: HTMLDivElement; // Public but uses _ prefix
-  children: Children;
-
+export class TextNode extends Base {
   constructor(name: string) {
-    super();
-    this.name = name;
-    this.rendered = false;
-    this.autofocus = false;
-    this._renderProps = { x: 0, y: 0 };
-    this.children = new Children(this);
+    super(name);
 
     for (const key of LightningRendererNumberProps) {
       Object.defineProperty(this, key, {
@@ -272,17 +228,6 @@ export class ElementNode extends Object {
   set effects(v) {
     this._effects = v;
     this.shader = convertEffectsToShader(v);
-  }
-
-  get parent() {
-    return this._parent;
-  }
-
-  set parent(p) {
-    this._parent = p;
-    if (this.rendered && this.lng) {
-      this.lng.parent = p?.lng ?? null;
-    }
   }
 
   get shader(): ShaderRef | undefined {
@@ -415,6 +360,27 @@ export class ElementNode extends Object {
     this._animationSettings = animationSettings;
   }
 
+  set maxLines(maxLines: number) {
+    this._maxLines = maxLines;
+    this.height = maxLines * (this.lineHeight || this.fontSize || 0);
+  }
+
+  get maxLines(): number {
+    return this._maxLines || 0;
+  }
+
+  _applyZIndexToChildren() {
+    const zIndex = this.zIndex!;
+    const zIndexIsInteger = zIndex >= 1 && parseInt('' + zIndex) === zIndex;
+    const decimalSeparator = zIndexIsInteger ? '.' : '';
+
+    this.children.forEach((c, i) => {
+      if (!c.zIndex || c.zIndex < 1) {
+        c.zIndex = parseFloat(`${zIndex}${decimalSeparator}${i + 1}`);
+      }
+    });
+  }
+
   updateLayout(child?: ElementNode, dimensions?: Dimensions) {
     if (this.hasChildren) {
       log('Layout: ', this);
@@ -486,6 +452,7 @@ export class ElementNode extends Object {
     // Parent is dirty whenever a node is inserted after initial render
     if (parent._isDirty) {
       parent.updateLayout();
+      parent._applyZIndexToChildren();
       parent._isDirty = false;
     }
 
@@ -542,6 +509,7 @@ export class ElementNode extends Object {
       }
 
       log('Rendering: ', this, props);
+      node.hasChildren && node._applyZIndexToChildren();
       node.lng = renderer.createNode(props);
 
       if (node.onFail) {
