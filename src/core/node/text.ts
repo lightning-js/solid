@@ -15,16 +15,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import Base from './base.js';
+import BaseNode from './base.js';
 import {
-  type AnimatableNumberProp,
-  type BorderStyleObject,
   type IntrinsicCommonProps,
   type NodeStyles,
   type TextStyles,
 } from '../../index.js';
-import Children from './children.js';
-import States, { type NodeStates } from './states.js';
 import calculateFlex from '../flex.js';
 import {
   log,
@@ -46,40 +42,6 @@ import type {
   NodeLoadedPayload,
 } from '@lightningjs/renderer';
 import { assertTruthy } from '@lightningjs/renderer/utils';
-
-const { animationSettings: defaultAnimationSettings } = config;
-
-function convertEffectsToShader(styleEffects: any) {
-  const effects = [];
-
-  for (const [type, props] of Object.entries<Record<string, any>>(
-    styleEffects,
-  )) {
-    effects.push({ type, props });
-  }
-  return createShader('DynamicShader', { effects: effects as any });
-}
-
-function borderAccessor(
-  direction: '' | 'Top' | 'Right' | 'Bottom' | 'Left' = '',
-) {
-  return {
-    set(this: ElementNode, value: number | { width: number; color: number }) {
-      // Format: width || { width, color }
-      if (isNumber(value)) {
-        value = { width: value, color: 0x000000ff };
-      }
-      this.effects = {
-        ...(this.effects || {}),
-        ...{ [`border${direction}`]: value },
-      };
-      this[`_border${direction}`] = value;
-    },
-    get(this: ElementNode) {
-      return this[`_border${direction}`];
-    },
-  };
-}
 
 const LightningRendererNumberProps = [
   'alpha',
@@ -122,12 +84,11 @@ const LightningRendererNonAnimatingProps = [
   'texture',
 ];
 
-export interface TextNode {
+export interface TextNode extends BaseNode {
   name: string;
   text: string;
   parent: ElementNode | null;
   zIndex?: number;
-  states?: States;
   x?: number;
   y?: number;
   width?: number;
@@ -156,142 +117,9 @@ export interface ElementNode
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export class TextNode extends Base {
-  constructor(name: string) {
-    super(name);
-
-    for (const key of LightningRendererNumberProps) {
-      Object.defineProperty(this, key, {
-        get(): number {
-          return this[`_${key}`] || (this.lng && this.lng[key]);
-        },
-        set(v: number | AnimatableNumberProp) {
-          this[`_${key}`] = getAnimatableValue(v);
-          this._sendToLightningAnimatable(key, v);
-        },
-      });
-    }
-
-    for (const key of LightningRendererNonAnimatingProps) {
-      Object.defineProperty(this, key, {
-        get() {
-          return this[`_${key}`] || (this.lng && this.lng[key]);
-        },
-        set(v) {
-          this[`_${key}`] = v;
-          this._sendToLightning(key, v);
-        },
-      });
-    }
-
-    // Add Border Helpers
-    Object.defineProperties(this, {
-      borderRadius: {
-        set(this: ElementNode, radius) {
-          this._borderRadius = radius;
-          this.effects = {
-            ...(this.effects || {}),
-            ...{ radius: { radius } },
-          };
-        },
-        get(this: ElementNode) {
-          return this._borderRadius;
-        },
-      },
-      border: borderAccessor(),
-      borderLeft: borderAccessor('Left'),
-      borderRight: borderAccessor('Right'),
-      borderTop: borderAccessor('Top'),
-      borderBottom: borderAccessor('Bottom'),
-    });
-
-    Object.defineProperties(this, {
-      linearGradient: {
-        set(props = {}) {
-          this._linearGradient = props;
-          this.effects = {
-            ...(this.effects || {}),
-            ...{ linearGradient: props },
-          };
-        },
-        get() {
-          return this._linearGradient;
-        },
-      },
-    });
-  }
-
-  get effects() {
-    return this._effects;
-  }
-
-  set effects(v) {
-    this._effects = v;
-    this.shader = convertEffectsToShader(v);
-  }
-
-  get shader(): ShaderRef | undefined {
-    return this._shader;
-  }
-
-  set shader(v: Parameters<typeof createShader> | ShaderRef | undefined) {
-    if (isArray(v)) {
-      this._shader = createShader(...v) as ShaderRef;
-    } else {
-      this._shader = v;
-    }
-    this._sendToLightning('shader', this._shader);
-  }
-
-  _sendToLightningAnimatable(
-    name: string,
-    value: AnimatableNumberProp | number | string,
-  ) {
-    if (this.rendered && this.lng) {
-      if (isArray(value)) {
-        return this.createAnimation({ [name]: value[0] }, value[1]).start();
-      }
-
-      if (this._animate) {
-        return this.createAnimation({ [name]: value }).start();
-      }
-
-      (this.lng[name as keyof INode] as number | string) = value;
-    } else {
-      // Need to render before animating
-      if (isArray(value)) {
-        value = value[0];
-      }
-      this._renderProps[name] = value;
-    }
-  }
-
-  _sendToLightning(name: string, value: unknown) {
-    if (this.rendered && this.lng) {
-      (this.lng[name as keyof INodeWritableProps] as unknown) = value;
-    } else {
-      this._renderProps[name] = value;
-    }
-  }
-
-  createAnimation(
-    props: Partial<INodeAnimatableProps>,
-    animationSettings?: Partial<AnimationSettings>,
-  ) {
-    assertTruthy(this.lng, 'Node must be rendered before animating');
-    return this.lng.animate(props, animationSettings || this.animationSettings);
-  }
-
-  setFocus() {
-    if (this.rendered) {
-      setActiveElement<ElementNode>(this);
-    } else {
-      this.autofocus = true;
-    }
-  }
-
-  isTextNode() {
-    return this.name === 'text';
+export class TextNode extends BaseNode {
+  constructor() {
+    super('TextNode');
   }
 
   _resizeOnTextLoad() {
@@ -313,51 +141,21 @@ export class TextNode extends Base {
     return this.children.map((c) => c.text).join('');
   }
 
-  destroy() {
-    this.lng && renderer.destroyNode(this.lng);
-  }
 
-  set style(value: SolidStyles) {
+  set style(value: TextStyles) {
     // Keys set in JSX are more important
-    for (let key in value) {
-      if (key === 'animate') {
-        key = '_animate';
-      }
-
-      if (!this[key as keyof SolidStyles]) {
-        this[key as keyof SolidStyles] = value[key as keyof SolidStyles];
-      }
+    if (!this[key as keyof SolidStyles]) {
+      this[key as keyof SolidStyles] = value[key as keyof SolidStyles];
     }
-
     this._style = value;
   }
 
-  get style(): SolidStyles {
+  get style(): TextStyles {
     return this._style!;
   }
 
   get hasChildren() {
     return this.children.length > 0;
-  }
-
-  set states(states: NodeStates) {
-    this._states = new States(this._stateChanged.bind(this), states);
-    if (this.rendered) {
-      this._stateChanged();
-    }
-  }
-
-  get states(): States {
-    this._states = this._states || new States(this._stateChanged.bind(this));
-    return this._states;
-  }
-
-  get animationSettings(): Partial<AnimationSettings> {
-    return this._animationSettings || defaultAnimationSettings;
-  }
-
-  set animationSettings(animationSettings: Partial<AnimationSettings>) {
-    this._animationSettings = animationSettings;
   }
 
   set maxLines(maxLines: number) {
@@ -367,18 +165,6 @@ export class TextNode extends Base {
 
   get maxLines(): number {
     return this._maxLines || 0;
-  }
-
-  _applyZIndexToChildren() {
-    const zIndex = this.zIndex!;
-    const zIndexIsInteger = zIndex >= 1 && parseInt('' + zIndex) === zIndex;
-    const decimalSeparator = zIndexIsInteger ? '.' : '';
-
-    this.children.forEach((c, i) => {
-      if (!c.zIndex || c.zIndex < 1) {
-        c.zIndex = parseFloat(`${zIndex}${decimalSeparator}${i + 1}`);
-      }
-    });
   }
 
   updateLayout(child?: ElementNode, dimensions?: Dimensions) {
@@ -395,68 +181,11 @@ export class TextNode extends Base {
     }
   }
 
-  _stateChanged() {
-    log('State Changed: ', this, this.states);
-
-    if (this.forwardStates) {
-      // apply states to children first
-      const states = this.states.slice() as States;
-      this.children.forEach((c) => (c.states = states));
-    }
-
-    const states = config.stateMapperHook?.(this, this.states) || this.states;
-
-    if (this._undoStates || (this.style && keyExists(this.style, states))) {
-      this._undoStates = this._undoStates || {};
-      let stylesToUndo = {};
-
-      for (const [state, undoStyles] of Object.entries(this._undoStates)) {
-        // if state is no longer in the states undo it
-        if (!states.includes(state)) {
-          stylesToUndo = {
-            ...stylesToUndo,
-            ...undoStyles,
-          };
-        }
-      }
-
-      const newStyles = states.reduce((acc, state) => {
-        const styles = this.style[state];
-        if (styles) {
-          acc = {
-            ...acc,
-            ...styles,
-          };
-
-          // get current values to undo state
-          if (this._undoStates && !this._undoStates[state]) {
-            this._undoStates[state] = {};
-            Object.keys(styles).forEach((key) => {
-              this._undoStates![state][key] = this[key as keyof this];
-            });
-          }
-        }
-        return acc;
-      }, {});
-
-      // Apply the styles
-      Object.assign(this, { ...stylesToUndo, ...newStyles });
-    }
-  }
-
   render() {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const node = this;
     const parent = this.parent!;
 
-    // Parent is dirty whenever a node is inserted after initial render
-    if (parent._isDirty) {
-      parent.updateLayout();
-      parent._applyZIndexToChildren();
-      parent._isDirty = false;
-    }
-
-    node.updateLayout();
 
     if (this.states.length) {
       this._stateChanged();
@@ -468,59 +197,23 @@ export class TextNode extends Base {
       props.parent = parent.lng;
     }
 
-    if (node.isTextNode()) {
-      props = {
-        ...config.fontSettings,
-        ...props,
-        text: node.getText(),
-      };
-      log('Rendering: ', this, props);
-      node.lng = renderer.createTextNode(props);
+    props = {
+      ...config.fontSettings,
+      ...props,
+      text: node.getText(),
+    };
+    log('Rendering: ', this, props);
+    node.lng = renderer.createTextNode(props);
 
-      isFunc(this.onCreate) && this.onCreate.call(this, node);
+    isFunc(this.onCreate) && this.onCreate.call(this, node);
 
-      if (isFunc(node.onLoad)) {
-        node.lng.on('loaded', node.onLoad);
-      }
+    if (isFunc(node.onLoad)) {
+      node.lng.on('loaded', node.onLoad);
+    }
 
-      if (!node.width || !node.height) {
-        node._autosized = true;
-        node._resizeOnTextLoad();
-      }
-    } else {
-      // If its not an image or texture apply some defaults
-      if (!(props.src || props.texture)) {
-        // Set width and height to parent less offset
-        if (isNaN(props.width)) {
-          props.width = (parent.width || 0) - props.x;
-          node._width = props.width;
-        }
-
-        if (isNaN(props.height)) {
-          props.height = (parent.height || 0) - props.y;
-          node._height = props.height;
-        }
-
-        if (!props.color) {
-          // Default color to transparent - If you later set a src, you'll need
-          // to set color '#ffffffff'
-          node._color = props.color = 0x00000000;
-        }
-      }
-
-      log('Rendering: ', this, props);
-      node.hasChildren && node._applyZIndexToChildren();
-      node.lng = renderer.createNode(props);
-
-      if (node.onFail) {
-        node.lng.on('failed', node.onFail);
-      }
-
-      if (node.onLoad) {
-        node.lng.on('loaded', node.onLoad);
-      }
-
-      isFunc(this.onCreate) && this.onCreate.call(this, node);
+    if (!node.width || !node.height) {
+      node._autosized = true;
+      node._resizeOnTextLoad();
     }
 
     node.rendered = true;
