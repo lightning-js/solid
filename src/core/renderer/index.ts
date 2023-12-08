@@ -16,7 +16,7 @@
  */
 
 import {
-  MainRenderDriver,
+  MainCoreDriver,
   RendererMain,
   type RendererMainSettings,
 } from '@lightningjs/renderer';
@@ -32,7 +32,7 @@ export interface SolidRendererOptions extends RendererMainSettings {
 export function startLightningRenderer(
   options: Partial<SolidRendererOptions> = {},
 ): RendererMain {
-  const driver = new MainRenderDriver();
+  const driver = new MainCoreDriver();
 
   renderer = new RendererMain(options, options.rootId || 'app', driver);
 
