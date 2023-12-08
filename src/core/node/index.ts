@@ -120,6 +120,10 @@ const LightningRendererNonAnimatingProps = [
   'text',
   'textAlign',
   'texture',
+  'maxLines',
+  'maxLinesSuffix',
+  'textOverflow',
+  'wordWrap',
 ];
 
 export interface TextNode {
