@@ -56,7 +56,7 @@ export const Canvas = (props: CanvasProps) => {
     }).catch(console.error);
   })
   return (
-    <canvas ref={root} zIndex={0.1}>
+    <canvas ref={root}>
       {props.children}
     </canvas>
   )

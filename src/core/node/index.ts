@@ -409,18 +409,6 @@ export class ElementNode extends Object {
     this._animationSettings = animationSettings;
   }
 
-  _applyZIndexToChildren() {
-    const zIndex = this.zIndex!;
-    const zIndexIsInteger = zIndex >= 1 && parseInt('' + zIndex) === zIndex;
-    const decimalSeparator = zIndexIsInteger ? '.' : '';
-
-    this.children.forEach((c, i) => {
-      if (!c.zIndex || c.zIndex < 1) {
-        c.zIndex = parseFloat(`${zIndex}${decimalSeparator}${i + 1}`);
-      }
-    });
-  }
-
   updateLayout(child?: ElementNode, dimensions?: Dimensions) {
     if (this.hasChildren) {
       log('Layout: ', this);
@@ -492,7 +480,6 @@ export class ElementNode extends Object {
     // Parent is dirty whenever a node is inserted after initial render
     if (parent._isDirty) {
       parent.updateLayout();
-      parent._applyZIndexToChildren();
       parent._isDirty = false;
     }
 
@@ -549,7 +536,6 @@ export class ElementNode extends Object {
       }
 
       log('Rendering: ', this, props);
-      node.hasChildren && node._applyZIndexToChildren();
       node.lng = renderer.createNode(props);
 
       if (node.onFail) {
