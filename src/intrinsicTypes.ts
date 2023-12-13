@@ -61,7 +61,7 @@ export interface IntrinsicNodeCommonProps {
   onFail?: (target: INode, nodeFailedPayload: NodeFailedPayload) => void;
   onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
   onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
-  ref?: ElementNode | ((node: ElementNode | null) => void) | null;
+  ref?: ElementNode | ((node: ElementNode) => void) | null;
   selected?: number;
   states?: NodeStates;
   text?: string;

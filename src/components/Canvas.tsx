@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createEffect, type JSX } from "solid-js";
+import { type JSX } from "solid-js";
 import { startLightningRenderer, type SolidRendererOptions } from '../core/renderer/index.js';
 import { assertTruthy } from "@lightningjs/renderer/utils";
 import { ElementNode, type SolidNode } from "../core/node/index.js";
@@ -45,18 +45,17 @@ export interface CanvasProps {
 export const Canvas = (props: CanvasProps) => {
   const renderer = startLightningRenderer(props.options);
   const init = renderer.init();
-  let root: ElementNode | undefined;
 
-  createEffect(() => {
+  const rootRef = (root : ElementNode) => {
     init.then(() => {
-      assertTruthy(root);
       root.lng = renderer.root;
       root.children.forEach(renderTopDown);
       isFunc(props.onFirstRender) && props.onFirstRender(root);
     }).catch(console.error);
-  })
+  }
+
   return (
-    <canvas ref={root}>
+    <canvas ref={rootRef}>
       {props.children}
     </canvas>
   )
