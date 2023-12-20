@@ -6,6 +6,9 @@
 
 Solid-Lightning is a UI framework for [Lightning Renderer](https://lightningjs.io/) built with [SolidJS](https://www.solidjs.com/) Universal Renderer. It allows you to declaratively construct lightning nodes with reactive primitives, just as you would construct a DOM tree in SolidJS. Also check out [Solid Lightning Primitives](https://github.com/lightning-js/solid-primitives) for additional primitives to speed up your development.
 
+## Hello World
+
+  For a Hello World type guide go to this [Page](HelloWorld.md)
 ## Quick Start
 
 Clone starter template:
