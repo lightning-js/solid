@@ -26,7 +26,6 @@ import States, { type NodeStates } from './states.js';
 import calculateFlex from '../flex.js';
 import {
   log,
-  isArray,
   isFunc,
   keyExists,
 } from '../utils.js';
@@ -41,6 +40,7 @@ import type {
   AnimationSettings,
 } from '@lightningjs/renderer';
 import { assertTruthy } from '@lightningjs/renderer/utils';
+import type { NodeStates } from './states.js';
 
 export type SolidNode = ElementNode | TextNode;
 export type SolidStyles = NodeStyles | TextStyles;
@@ -52,41 +52,33 @@ export interface ElementNode
   [key: string]: unknown;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export default class BaseNode extends Object {
-  name: string;
   lng: INode | null = null;
-  selected?: number;
+  selected: number;
   rendered: boolean;
+  forwardStates?: boolean;
   autofocus: boolean;
-  zIndex?: number;
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  marginLeft?: number;
-  marginRight?: number;
-  marginTop?: number;
-  marginBottom?: number;
   children: Children;
-  _renderProps: SolidStyles;
+  style: SolidStyles;
+  _undoStates: SolidStyles;
   _parent?: ElementNode | null;
-  /**
-   * Managed by dom-inspector
-   */
-  _dom?: Text; // Public but uses _ prefix
-
+  onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
+  onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
+  _states?: NodeStates;
+  display?: string;
+  marginTop?: number;
+  marginRight?: number;
+  marginBottom?: number;
+  marginLeft?: number;
   /**
    * Managed by dom-inspector
    */
   public _dom?: HTMLDivElement; // Public but uses _ prefix
 
-  constructor(name: string) {
-    super();
-    this.name = name;
+  constructor() {
+    this.selected = 0;
     this.rendered = false;
     this.autofocus = false;
-    this._renderProps = { x: 0, y: 0 };
     this.children = new Children(this);
   }
 
@@ -107,6 +99,10 @@ export default class BaseNode extends Object {
     if (this.rendered && this.lng) {
       this.lng.parent = p?.lng ?? null;
     }
+  }
+
+  get hasChildren() {
+    return this.children.length > 0;
   }
 
   destroy() {
@@ -131,9 +127,7 @@ export default class BaseNode extends Object {
       isFunc(this.onBeforeLayout) &&
         this.onBeforeLayout.call(this, child, dimensions);
 
-      if (this.display === 'flex') {
-        calculateFlex(this);
-      }
+      calculateFlex(this);
 
       isFunc(this.onLayout) && this.onLayout.call(this, child, dimensions);
     }
@@ -152,7 +146,7 @@ export default class BaseNode extends Object {
 
     if (this._undoStates || (this.style && keyExists(this.style, states))) {
       this._undoStates = this._undoStates || {};
-      let stylesToUndo = {};
+      let stylesToUndo: SolidStyles = {};
 
       for (const [state, undoStyles] of Object.entries(this._undoStates)) {
         // if state is no longer in the states undo it
@@ -160,7 +154,7 @@ export default class BaseNode extends Object {
           stylesToUndo = {
             ...stylesToUndo,
             ...undoStyles,
-          };
+          } as SolidStyles;
         }
       }
 
@@ -176,7 +170,7 @@ export default class BaseNode extends Object {
           if (this._undoStates && !this._undoStates[state]) {
             this._undoStates[state] = {};
             Object.keys(styles).forEach((key) => {
-              this._undoStates![state][key] = this[key as keyof this];
+              this._undoStates[state][key] = this[key as keyof this];
             });
           }
         }

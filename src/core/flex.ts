@@ -18,6 +18,10 @@ import { assertTruthy } from '@lightningjs/renderer/utils';
 import type { ElementNode, SolidNode } from './node/index.js';
 
 export default function (node: ElementNode): boolean {
+  if (node.display !== 'flex') {
+    return;
+  }
+
   const children = [];
   for (let i = 0; i < node.children.length; i++) {
     const c = node.children[i]!;

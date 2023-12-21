@@ -44,12 +44,7 @@ export default {
     parent.text = parent.getText();
   },
   setProperty(node: ElementNode, name: string, value: any = true): void {
-    if (name === 'animate') {
-      node._animate = value as boolean;
-      return;
-    }
-
-    node[name] = value;
+    node.setProperty(name, value);
   },
   insertNode(parent: ElementNode, node: SolidNode, anchor: SolidNode): void {
     log('INSERT: ', parent, node, anchor);

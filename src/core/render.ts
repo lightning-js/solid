@@ -40,6 +40,11 @@ export const render = solidRenderer.render as unknown as (
   node?: SolidNode,
 ) => () => void;
 
+// export const spread = (node: SolidNode, accessor, skipChildren: boolean) => {
+//   solidRenderer.spread(node, accessor, skipChildren);
+//   node.render();
+// }
+
 export const {
   effect,
   memo,

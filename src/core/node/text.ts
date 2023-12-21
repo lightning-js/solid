@@ -17,109 +17,23 @@
 
 import BaseNode from './base.js';
 import {
-  type IntrinsicCommonProps,
-  type NodeStyles,
   type TextStyles,
 } from '../../index.js';
-import calculateFlex from '../flex.js';
+
 import {
   log,
-  isArray,
-  isNumber,
-  isFunc,
-  keyExists,
-  getAnimatableValue,
 } from '../utils.js';
 import { config } from '../../config.js';
-import { setActiveElement } from '../activeElement.js';
 import type {
   INode,
-  INodeAnimatableProps,
-  INodeWritableProps,
-  ShaderRef,
-  Dimensions,
-  AnimationSettings,
   NodeLoadedPayload,
 } from '@lightningjs/renderer';
-import { assertTruthy } from '@lightningjs/renderer/utils';
 
-const LightningRendererNumberProps = [
-  'alpha',
-  'color',
-  'colorTop',
-  'colorRight',
-  'colorLeft',
-  'colorBottom',
-  'colorTl',
-  'colorTr',
-  'colorBl',
-  'colorBr',
-  'height',
-  'fontSize',
-  'lineHeight',
-  'mount',
-  'mountX',
-  'mountY',
-  'pivot',
-  'pivotX',
-  'pivotY',
-  'rotation',
-  'scale',
-  'width',
-  'worldX',
-  'worldY',
-  'x',
-  'y',
-  'zIndex',
-  'zIndexLocked',
-];
-
-const LightningRendererNonAnimatingProps = [
-  'clipping',
-  'contain',
-  'fontFamily',
-  'src',
-  'text',
-  'textAlign',
-  'texture',
-];
-
-export interface TextNode extends BaseNode {
-  name: string;
-  text: string;
-  parent: ElementNode | null;
-  zIndex?: number;
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  marginLeft?: number;
-  marginRight?: number;
-  marginTop?: number;
-  marginBottom?: number;
-  maxLines?: number;
-  fontSize?: number;
-  lineHeight?: number;
-  /**
-   * Managed by dom-inspector
-   */
-  _dom?: Text; // Public but uses _ prefix
-}
-
-export type SolidNode = ElementNode | TextNode;
-export type SolidStyles = NodeStyles | TextStyles;
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export interface ElementNode
-  extends Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>,
-    IntrinsicCommonProps {
-  [key: string]: unknown;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class TextNode extends BaseNode {
+  _renderProps: TextStyles;
+
   constructor() {
-    super('TextNode');
+    this._renderProps = { x: 0, y: 0 };
   }
 
   _resizeOnTextLoad() {
@@ -141,11 +55,18 @@ export class TextNode extends BaseNode {
     return this.children.map((c) => c.text).join('');
   }
 
+  setProperty(name: string, value: any = true): void {
+    if (this.rendered) {
+      this.lng[name] = value;
+    } else {
+      this._renderProps[name] = value;
+    }
+  }
 
   set style(value: TextStyles) {
     // Keys set in JSX are more important
-    if (!this[key as keyof SolidStyles]) {
-      this[key as keyof SolidStyles] = value[key as keyof SolidStyles];
+    if (!this[key as keyof TextStyles]) {
+      this[key as keyof TextStyles] = value[key as keyof TextStyles];
     }
     this._style = value;
   }
@@ -154,70 +75,33 @@ export class TextNode extends BaseNode {
     return this._style!;
   }
 
-  get hasChildren() {
-    return this.children.length > 0;
-  }
-
-  set maxLines(maxLines: number) {
-    this._maxLines = maxLines;
-    this.height = maxLines * (this.lineHeight || this.fontSize || 0);
-  }
-
-  get maxLines(): number {
-    return this._maxLines || 0;
-  }
-
-  updateLayout(child?: ElementNode, dimensions?: Dimensions) {
-    if (this.hasChildren) {
-      log('Layout: ', this);
-      isFunc(this.onBeforeLayout) &&
-        this.onBeforeLayout.call(this, child, dimensions);
-
-      if (this.display === 'flex') {
-        calculateFlex(this);
-      }
-
-      isFunc(this.onLayout) && this.onLayout.call(this, child, dimensions);
-    }
-  }
-
   render() {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const node = this;
     const parent = this.parent!;
-
 
     if (this.states.length) {
       this._stateChanged();
     }
 
-    let props = node._renderProps;
-
     if (parent.lng) {
-      props.parent = parent.lng;
+      this._renderProps.parent = parent.lng;
     }
 
-    props = {
+    this._renderProps = {
       ...config.fontSettings,
-      ...props,
-      text: node.getText(),
+      ...this._renderProps,
+      text: this.getText(),
     };
-    log('Rendering: ', this, props);
-    node.lng = renderer.createTextNode(props);
 
-    isFunc(this.onCreate) && this.onCreate.call(this, node);
+    log('Rendering: ', this, this._renderProps);
+    this.lng = renderer.createTextNode(this._renderProps) as INode;
 
-    if (isFunc(node.onLoad)) {
-      node.lng.on('loaded', node.onLoad);
+    if (!this.width || !this.height) {
+      this._autosized = true;
+      this._resizeOnTextLoad();
     }
 
-    if (!node.width || !node.height) {
-      node._autosized = true;
-      node._resizeOnTextLoad();
-    }
-
-    node.rendered = true;
-    node.autofocus && node.setFocus();
+    this.rendered = true;
+    this.autofocus && this.setFocus();
     // clean up after first render;
     delete this._renderProps;
   }
