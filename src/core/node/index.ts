@@ -335,7 +335,8 @@ export class ElementNode extends Object {
 
   setFocus() {
     if (this.rendered) {
-      setActiveElement<ElementNode>(this);
+      // Delay setting focus so children can render (useful for Row + Column)
+      queueMicrotask(() => setActiveElement<ElementNode>(this));
     } else {
       this.autofocus = true;
     }
