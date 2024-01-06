@@ -6,9 +6,6 @@
 
 Solid-Lightning is a UI framework for [Lightning Renderer](https://lightningjs.io/) built with [SolidJS](https://www.solidjs.com/) Universal Renderer. It allows you to declaratively construct lightning nodes with reactive primitives, just as you would construct a DOM tree in SolidJS. Also check out [Solid Lightning Primitives](https://github.com/lightning-js/solid-primitives) for additional primitives to speed up your development.
 
-## Hello World
-
-  For a Hello World type guide go to this [Page](HelloWorld.md)
 ## Quick Start
 
 Clone starter template:
@@ -35,6 +32,8 @@ render(() => (
   </Canvas>
 ));
 ```
+
+For a more detailed Hello World guide check out the [Hello World](HelloWorld.md) guide.
 
 ## Built In Components
 
@@ -192,7 +191,7 @@ Additionally, flex will automatically layout Text nodes. Anytime a View with dis
   <View gap={8} style={SupportContainer}>
     <Text style={Subline}>Support Text</Text>
     <Text style={Subline}>{data().release_date}</Text>
-    <View width={30} height={30} src={'/assets/rt-popcorn.png'}></View>
+    <View width={30} height={30} src={'/assets/rt-popcorn.png'} />
     <Text style={Subline}>90%</Text>
   </View>
 </View>
@@ -200,27 +199,16 @@ Additionally, flex will automatically layout Text nodes. Anytime a View with dis
 
 `alignItems` supports `flexStart`, `flexEnd`, and `center` but requires it's container to have a height / width set.
 
-## Animations
+## Transitions / Animations
 
-Adding an `animate` attribute to a <View> component will cause any property changes (after initial render) to be animated. This is useful for simple animations where you want to resize, move, or change alpha of a component. You can set `animationSettings` with an object to control the duration and easing function of property changes.
+You can define which properties will animate via the transition property along with setting custom `animationSettings`. If you wish to reuse or use the default `animationSettings`, you can set the property value to `true`.
 
 ```jsx
 createEffect(on(activeElement, (elm) => {
     focusRingRef.x = elm.x;
 }, { defer: true}))
 
-<FocusRing animate animationSettings={{duration: 1500}} ref={focusRingRef} />
-```
-
-You can also animate elements by setting their value to an array [newValue, animationSettings]; The second param is optional and will use the animationSettings on the JSX element or Config.animationSettings.
-
-```jsx
-let button;
-
-onMount(() => {
-  button.alpha = [1, { duration: 500 }];
-});
-<Button ref={button}>Movies</Button>;
+<FocusRing animationSettings={{duration: 1500}} ref={focusRingRef} transition={{ x: true, scale: { duration: 1500, easing: 'ease-in-out'} }} />
 ```
 
 For more complicated animations, you can access the Lightning renderer animate API directly:
@@ -234,6 +222,8 @@ onMount(() => {
 <Button ref={button}>Movies</Button>;
 ```
 
+To find out more about animations check out the [renderer example](https://github.com/lightning-js/renderer/blob/main/examples/tests/animation.ts#L70).
+
 ### Global Animation Settings
 
 You can set default animation settings for all transitions globally via Config.
@@ -242,6 +232,10 @@ You can set default animation settings for all transitions globally via Config.
 import { Config } from '@lightningjs/solid';
 Config.animationSettings = {
   duration: 250,
+  delay: 0,
+  repeat: 0,
+  loop: false,
+  stopMethod: false,
   easing: 'ease-in-out',
 };
 ```
@@ -328,10 +322,14 @@ function Button(props) {
     color: 0x000000ff,
     alpha: 0.3,
     scale: 1,
+    transition: {
+      scale: { duration: 1500, delay: 200, easing: 'easy-in' },
+      alpha: { duration: 1500, delay: 200, easing: 'easy-in' },
+    },
     focus: {
       color: [0x58807dff, { duration: 2000 }],
       scale: 1.2,
-      alpha: [1, { duration: 1500, delay: 200, easing: 'easy-in' }],
+      alpha: 1,
     },
   };
 
@@ -350,7 +348,7 @@ function Button(props) {
   };
 
   return (
-    <View {...props} forwardStates animate style={ButtonContainer}>
+    <View {...props} forwardStates style={ButtonContainer}>
       <Text style={ButtonText}>{props.children}</Text>
     </View>
   );
@@ -380,7 +378,6 @@ function Button(props) {
     <View
       {...props}
       forwardStates
-      animate
       style={buttonStyles.container}
       shader={RoundedRectangle}
     >

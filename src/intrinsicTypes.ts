@@ -19,7 +19,6 @@ import {
   type AnimationSettings,
   type Dimensions,
   type INode,
-  type INodeAnimatableProps,
   type INodeWritableProps,
   type ITextNodeWritableProps,
   type NodeFailedPayload,
@@ -33,16 +32,6 @@ type AddUndefined<T> = {
   [K in keyof T]: T[K] | undefined;
 };
 
-// Type that transforms all number typed properties to a tuple
-type TransformAnimatableNumberProps<T> = {
-  [K in keyof T]?: number extends T[K] ? number | AnimatableNumberProp : T[K];
-};
-
-export type AnimatableNumberProp = [
-  value: number,
-  settings: Partial<AnimationSettings>,
-];
-
 export interface BorderStyleObject {
   width: number;
   color: number;
@@ -51,7 +40,6 @@ export interface BorderStyleObject {
 export type BorderStyle = number | BorderStyleObject;
 
 export interface IntrinsicNodeCommonProps {
-  animate?: boolean;
   animationSettings?: Partial<AnimationSettings>;
   autofocus?: boolean;
   forwardStates?: boolean;
@@ -90,6 +78,7 @@ export interface IntrinsicNodeStyleCommonProps {
   marginLeft?: number;
   marginRight?: number;
   marginTop?: number;
+  transition?: Record<string, Partial<AnimationSettings> | true>;
 }
 
 export interface IntrinsicTextStyleCommonProps {
@@ -103,18 +92,8 @@ export type IntrinsicCommonProps = IntrinsicNodeCommonProps &
   IntrinsicNodeStyleCommonProps &
   IntrinsicTextStyleCommonProps;
 
-export type TransformableNodeWritableProps = TransformAnimatableNumberProps<
-  Omit<INodeAnimatableProps, 'zIndex' | 'zIndexLocked'>
->;
-
 export interface IntrinsicNodeStyleProps
-  extends Partial<
-      Omit<
-        INodeWritableProps,
-        'parent' | 'shader' | keyof TransformableNodeWritableProps
-      >
-    >,
-    TransformableNodeWritableProps,
+  extends Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>,
     IntrinsicNodeStyleCommonProps {
   [key: string]: unknown;
 }
