@@ -17,7 +17,6 @@
  */
 
 import { config, isDev } from '../config.js';
-import type { AnimatableNumberProp } from '../index.js';
 import type { SolidNode } from './node/index.js';
 
 export function log(msg: string, node: SolidNode, ...args: any[]) {
@@ -64,10 +63,4 @@ export function keyExists(
     }
   }
   return false;
-}
-
-export function getAnimatableValue(
-  value: number | AnimatableNumberProp | undefined,
-): number | undefined {
-  return isArray(value) ? (value as AnimatableNumberProp)[0] : value;
 }

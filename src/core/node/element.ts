@@ -17,7 +17,6 @@
 
 import { renderer, createShader } from '../renderer/index.js';
 import {
-  type AnimatableNumberProp,
   type BorderStyleObject,
   type IntrinsicCommonProps,
   type NodeStyles,
@@ -26,14 +25,7 @@ import {
 import Children from './children.js';
 import States, { type NodeStates } from './states.js';
 import calculateFlex from '../flex.js';
-import {
-  log,
-  isArray,
-  isNumber,
-  isFunc,
-  keyExists,
-  getAnimatableValue,
-} from '../utils.js';
+import { log, isArray, isNumber, isFunc, keyExists } from '../utils.js';
 import { config } from '../../config.js';
 import { setActiveElement } from '../activeElement.js';
 import type {
@@ -187,7 +179,6 @@ export class ElementNode extends Object {
   private _borderRight?: BorderStyleObject;
   private _borderTop?: BorderStyleObject;
   private _borderBottom?: BorderStyleObject;
-  public _animate?: boolean; // Public but uses _ prefix
   public _autosized?: boolean; // Public but uses _ prefix
   public _isDirty?: boolean; // Public but uses _ prefix
   /**
@@ -209,8 +200,8 @@ export class ElementNode extends Object {
         get(): number {
           return this[`_${key}`] || (this.lng && this.lng[key]);
         },
-        set(v: number | AnimatableNumberProp) {
-          this[`_${key}`] = getAnimatableValue(v);
+        set(v: number) {
+          this[`_${key}`] = v;
           this._sendToLightningAnimatable(key, v);
         },
       });
@@ -298,25 +289,18 @@ export class ElementNode extends Object {
     this._sendToLightning('shader', this._shader);
   }
 
-  _sendToLightningAnimatable(
-    name: string,
-    value: AnimatableNumberProp | number | string,
-  ) {
+  _sendToLightningAnimatable(name: string, value: number | string) {
     if (this.rendered && this.lng) {
-      if (isArray(value)) {
-        return this.createAnimation({ [name]: value[0] }, value[1]).start();
-      }
-
-      if (this._animate) {
-        return this.createAnimation({ [name]: value }).start();
+      if (this.transition && this.transition[name]) {
+        const animationSettings =
+          this.transition[name] === true
+            ? undefined
+            : (this.transition[name] as undefined | AnimationSettings);
+        return this.animate({ [name]: value }, animationSettings).start();
       }
 
       (this.lng[name as keyof INode] as number | string) = value;
     } else {
-      // Need to render before animating
-      if (isArray(value)) {
-        value = value[0];
-      }
       this._renderProps[name] = value;
     }
   }
@@ -329,7 +313,7 @@ export class ElementNode extends Object {
     }
   }
 
-  createAnimation(
+  animate(
     props: Partial<INodeAnimatableProps>,
     animationSettings?: Partial<AnimationSettings>,
   ) {
@@ -339,7 +323,8 @@ export class ElementNode extends Object {
 
   setFocus() {
     if (this.rendered) {
-      setActiveElement<ElementNode>(this);
+      // Delay setting focus so children can render (useful for Row + Column)
+      queueMicrotask(() => setActiveElement<ElementNode>(this));
     } else {
       this.autofocus = true;
     }
@@ -374,11 +359,7 @@ export class ElementNode extends Object {
 
   set style(value: SolidStyles) {
     // Keys set in JSX are more important
-    for (let key in value) {
-      if (key === 'animate') {
-        key = '_animate';
-      }
-
+    for (const key in value) {
       if (!this[key as keyof SolidStyles]) {
         this[key as keyof SolidStyles] = value[key as keyof SolidStyles];
       }
@@ -474,6 +455,11 @@ export class ElementNode extends Object {
         }
         return acc;
       }, {});
+
+      // Apply transition first
+      if ((newStyles as any).transition !== undefined) {
+        this.transition = (newStyles as any).transition;
+      }
 
       // Apply the styles
       Object.assign(this, { ...stylesToUndo, ...newStyles });
