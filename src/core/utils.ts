@@ -17,9 +17,8 @@
  */
 
 import { config, isDev } from '../config.js';
-import type { SolidNode } from './node/index.js';
 
-export function log(msg: string, node: SolidNode, ...args: any[]) {
+export function log(msg: string, node: any, ...args: any[]) {
   if (isDev) {
     if (config.debug || (isObject(node) && node.debug)) {
       console.log(msg, node, ...args);

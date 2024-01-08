@@ -16,6 +16,6 @@
  */
 
 import { type Component } from "solid-js";
-import type { IntrinsicTextProps } from "../intrinsicTypes.js";
+import type { IntrinsicTextProps } from "../types.js";
 
 export const Text: Component<IntrinsicTextProps> = (props) => <text {...props}></text>

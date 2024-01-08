@@ -17,17 +17,21 @@
 
 import { type JSX } from "solid-js";
 import { startLightningRenderer, type SolidRendererOptions } from '../core/renderer/index.js';
-import { assertTruthy } from "@lightningjs/renderer/utils";
-import { ElementNode, type SolidNode } from "../core/node/index.js";
+import type { ElementNode } from "../core/node/element.js";
+import type { SolidNode } from "../types.js";
 import { isFunc } from "../core/utils.js";
+import { TextNode } from "../core/node/text.js";
+import type { RendererMain } from "@lightningjs/renderer";
 
-function renderTopDown(node: SolidNode) {
-  if (node.name === 'TextNode') {
+function renderTopDown(renderer: RendererMain, node: SolidNode) {
+  node.render(renderer);
+
+  if (node instanceof TextNode) {
+    // TextNode children are TextHolders and not rendered
     return;
   }
-  assertTruthy(node instanceof ElementNode);
-  node.render();
-  node.children.forEach(c => renderTopDown(c))
+
+  node.children.forEach(c => renderTopDown(renderer, c));
 }
 
 export interface CanvasOptions {
@@ -49,7 +53,7 @@ export const Canvas = (props: CanvasProps) => {
   const rootRef = (root : ElementNode) => {
     init.then(() => {
       root.lng = renderer.root;
-      root.children.forEach(renderTopDown);
+      root.children.forEach(c => renderTopDown(renderer, c));
       isFunc(props.onFirstRender) && props.onFirstRender(root);
     }).catch(console.error);
   }

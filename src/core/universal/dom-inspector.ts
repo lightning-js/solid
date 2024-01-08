@@ -15,10 +15,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import universalLightning, { type SolidRendererOptions } from './lightning.js';
+import universalLightning from './lightning.js';
 import { renderer } from '../renderer/index.js';
-import type { ElementNode, SolidNode, TextNode } from '../node/index.js';
+import type { ElementNode, SolidNode } from '../../types.js';
 import { assertTruthy } from '@lightningjs/renderer/utils';
+import type { RendererMain } from '@lightningjs/renderer';
 
 const injectCSS = (css: string) => {
   const el = document.createElement('style');
@@ -83,8 +84,8 @@ export default {
     if (name !== 'canvas') {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       const origRender = node.render;
-      node.render = () => {
-        origRender.call(node);
+      node.render = (renderer: RendererMain) => {
+        origRender.call(node, renderer);
         if (node.id) {
           dom.id = node.id;
         }
@@ -117,16 +118,6 @@ export default {
     }
     universalLightning.setProperty(node, name, value);
   },
-  createTextNode(text: string): TextNode {
-    const dom = document.createTextNode(text);
-    const node = universalLightning.createTextNode(text);
-    node._dom = dom;
-    return node;
-  },
-  replaceText(textNode: TextNode, value: string): void {
-    universalLightning.replaceText(textNode, value);
-    textNode._dom!.data = value;
-  },
   insertNode(parent: ElementNode, node: SolidNode, anchor: SolidNode): void {
     if (parent) {
       if (anchor && parent._dom === anchor._dom!.parentNode) {
@@ -141,4 +132,4 @@ export default {
     parent._dom!.removeChild(node._dom!);
     universalLightning.removeNode(parent, node);
   },
-} satisfies SolidRendererOptions;
+} as const;

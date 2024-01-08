@@ -18,14 +18,13 @@
  */
 
 import type { AnimationSettings } from '@lightningjs/renderer';
-import type { IntrinsicTextNodeStyleProps } from './intrinsicTypes.js';
-import { type ElementNode } from './core/node/index.js';
+import type { SolidNode, IntrinsicTextNodeStyleProps } from './types.js';
 
 interface Config {
   debug: boolean;
   animationSettings: Partial<AnimationSettings>;
   fontSettings: Partial<IntrinsicTextNodeStyleProps>;
-  stateMapperHook?: (node: ElementNode, states: Array<string>) => Array<string>;
+  stateMapperHook?: (node: SolidNode, states: Array<string>) => Array<string>;
 }
 
 import.meta.env = import.meta.env || { MODE: 'development' };

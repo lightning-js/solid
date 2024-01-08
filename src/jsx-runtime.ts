@@ -16,10 +16,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-namespace */
-import {
-  type IntrinsicNodeProps,
-  type IntrinsicTextProps,
-} from './intrinsicTypes.js';
+import { type IntrinsicNodeProps, type IntrinsicTextProps } from './types.js';
 
 declare module 'solid-js' {
   namespace JSX {

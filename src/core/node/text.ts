@@ -16,27 +16,27 @@
  */
 
 import BaseNode from './base.js';
-import {
-  type TextStyles,
-} from '../../index.js';
-
-import {
-  log,
-} from '../utils.js';
+import { type TextStyles } from '../../index.js';
+import { log } from '../utils.js';
 import { config } from '../../config.js';
+import { TextHolder } from './textHolder.js';
 import type {
   INode,
+  RendererMain,
   NodeLoadedPayload,
 } from '@lightningjs/renderer';
 
-export class TextNode extends BaseNode {
-  _renderProps: TextStyles;
+export class TextNode extends BaseNode<TextHolder> {
+  private _renderProps?: TextStyles;
+  _style?: TextStyles;
+  text?: string;
 
   constructor() {
+    super();
     this._renderProps = { x: 0, y: 0 };
   }
 
-  _resizeOnTextLoad() {
+  _resizeOnTextLoad(): void {
     this.lng!.once(
       'loaded',
       (_node: INode, loadedPayload: NodeLoadedPayload) => {
@@ -51,7 +51,7 @@ export class TextNode extends BaseNode {
     );
   }
 
-  getText() {
+  getText(): string {
     return this.children.map((c) => c.text).join('');
   }
 
@@ -65,17 +65,19 @@ export class TextNode extends BaseNode {
 
   set style(value: TextStyles) {
     // Keys set in JSX are more important
-    if (!this[key as keyof TextStyles]) {
-      this[key as keyof TextStyles] = value[key as keyof TextStyles];
+    for (const key in value) {
+      if (!this[key as keyof TextStyles]) {
+        this[key as keyof TextStyles] = value[key as keyof TextStyles];
+      }
     }
     this._style = value;
   }
 
   get style(): TextStyles {
-    return this._style!;
+    return this._style;
   }
 
-  render() {
+  render(renderer: RendererMain) {
     const parent = this.parent!;
 
     if (this.states.length) {
@@ -93,7 +95,7 @@ export class TextNode extends BaseNode {
     };
 
     log('Rendering: ', this, this._renderProps);
-    this.lng = renderer.createTextNode(this._renderProps) as INode;
+    this.lng = renderer.createTextNode(this._renderProps);
 
     if (!this.width || !this.height) {
       this._autosized = true;
@@ -101,7 +103,6 @@ export class TextNode extends BaseNode {
     }
 
     this.rendered = true;
-    this.autofocus && this.setFocus();
     // clean up after first render;
     delete this._renderProps;
   }

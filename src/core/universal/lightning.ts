@@ -14,54 +14,57 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-import { assertTruthy } from '@lightningjs/renderer/utils';
 import { renderer } from '../renderer/index.js';
 import { createEffect } from 'solid-js';
 import { log } from '../utils.js';
-import { ElementNode, type SolidNode, type TextNode } from '../node/index.js';
+import { ElementNode } from '../node/element.js';
+import { TextNode } from '../node/text.js';
+import { TextHolder } from '../node/textHolder.js';
+import type { SolidNode, CoreNode } from '../../types.js';
 import type { createRenderer } from 'solid-js/universal';
 
 export type SolidRendererOptions = Parameters<
-  typeof createRenderer<SolidNode>
+  typeof createRenderer<CoreNode>
 >[0];
 
 export default {
   createElement(name: string): ElementNode {
     const node = new ElementNode(name);
-    renderer.root && createEffect(() => node.render());
+    renderer.root && createEffect(() => node.render(renderer));
     return node;
   },
-  createTextNode(text: string): TextNode {
-    // A text node is just a string - not the <text> node
-    return { name: 'TextNode', text, parent: null };
+  createTextNode(text: string): TextHolder {
+    // A text holder is just a string - not the <text> node
+    return new TextHolder(text);
   },
-  replaceText(node: TextNode, value: string): void {
+  replaceText(node: TextHolder, value: string): void {
     log('Replace Text: ', node, value);
     node.text = value;
     const parent = node.parent;
-    assertTruthy(parent);
-    parent._autosized && parent._resizeOnTextLoad();
-    parent.text = parent.getText();
+    if (parent instanceof TextNode) {
+      parent._autosized && parent._resizeOnTextLoad();
+      parent.text = parent.getText();
+    }
   },
-  setProperty(node: ElementNode, name: string, value: any = true): void {
+  setProperty(node: SolidNode, name: string, value: any = true): void {
     node.setProperty(name, value);
   },
-  insertNode(parent: ElementNode, node: SolidNode, anchor: SolidNode): void {
+  insertNode(parent: SolidNode, node: CoreNode, anchor: CoreNode): void {
     log('INSERT: ', parent, node, anchor);
     if (parent) {
       parent.children.insert(node, anchor);
 
-      if (node.name === 'TextNode') {
+      if (node instanceof TextHolder) {
         // TextNodes can be placed outside of <text> nodes when <Show> is used as placeholder
-        if (parent.isTextNode()) {
+        if (parent instanceof TextNode) {
           parent._autosized && parent._resizeOnTextLoad();
           parent.text = parent.getText();
         }
       }
     }
   },
-  isTextNode(node: ElementNode): boolean {
-    return node.isTextNode();
+  isTextNode(node: CoreNode): boolean {
+    return node instanceof TextNode;
   },
   removeNode(parent: ElementNode, node: SolidNode): void {
     log('REMOVE: ', parent, node);

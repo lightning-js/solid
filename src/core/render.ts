@@ -21,7 +21,7 @@ import universalLightning from './universal/lightning.js';
 import universalInspector, {
   attachInspector,
 } from './universal/dom-inspector.js';
-import type { SolidNode } from './node/index.js';
+import type { CoreNode } from '../types.js';
 import type { JSX } from 'solid-js';
 import { isDev } from '../config.js';
 
@@ -29,7 +29,7 @@ const loadInspector = isDev;
 if (loadInspector) {
   attachInspector();
 }
-const solidRenderer = createRenderer<SolidNode>(
+const solidRenderer = createRenderer<CoreNode>(
   loadInspector ? universalInspector : universalLightning,
 );
 
@@ -37,7 +37,7 @@ const solidRenderer = createRenderer<SolidNode>(
 // There's gotta be a better way to fix it
 export const render = solidRenderer.render as unknown as (
   code: () => JSX.Element,
-  node?: SolidNode,
+  node?: CoreNode,
 ) => () => void;
 
 // export const spread = (node: SolidNode, accessor, skipChildren: boolean) => {

@@ -15,28 +15,27 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { renderer, createShader } from '../renderer/index.js';
+import { createShader } from '../renderer/index.js';
 import {
   type BorderStyleObject,
   type IntrinsicCommonProps,
-  type NodeStyles,
-  type TextStyles,
 } from '../../index.js';
-import Children from './children.js';
-import States, { type NodeStates } from './states.js';
 import calculateFlex from '../flex.js';
 import { log, isArray, isNumber, isFunc, keyExists } from '../utils.js';
 import { config } from '../../config.js';
-import { setActiveElement } from '../activeElement.js';
 import type {
   INode,
   INodeAnimatableProps,
   INodeWritableProps,
   ShaderRef,
+  RendererMain,
   Dimensions,
   AnimationSettings,
   NodeLoadedPayload,
 } from '@lightningjs/renderer';
+import BaseNode from './base.js';
+import { setActiveElement } from '../activeElement.js';
+import type { SolidNode } from '../../types.js';
 import { assertTruthy } from '@lightningjs/renderer/utils';
 
 const { animationSettings: defaultAnimationSettings } = config;
@@ -120,80 +119,37 @@ const LightningRendererNonAnimatingProps = [
   'wordWrap',
 ];
 
-export interface TextNode {
-  name: string;
-  text: string;
-  parent: ElementNode | null;
-  zIndex?: number;
-  states?: States;
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export class ElementNode extends BaseNode<SolidNode> {
+  alignItems?: 'flexStart' | 'flexEnd' | 'center';
+  border?: BorderStyle;
+  borderBottom?: BorderStyle;
+  borderLeft?: BorderStyle;
+  borderRadius?: number;
+  borderRight?: BorderStyle;
+  borderTop?: BorderStyle;
+  display?: 'flex';
+  effects?: any; // Should be EffectMap
+  flexDirection?: 'row' | 'column';
+  gap?: number;
+  justifyContent?:
+    | 'flexStart'
+    | 'flexEnd'
+    | 'center'
+    | 'spaceBetween'
+    | 'spaceEvenly';
+  linearGradient?: any; // Should be typeof LinearGradientEffect
+  marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
   marginTop?: number;
-  marginBottom?: number;
-  maxLines?: number;
-  fontSize?: number;
-  lineHeight?: number;
-  /**
-   * Managed by dom-inspector
-   */
-  _dom?: Text; // Public but uses _ prefix
-}
-
-export type SolidNode = ElementNode | TextNode;
-export type SolidStyles = NodeStyles | TextStyles;
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export interface ElementNode
-  extends Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>,
-    IntrinsicCommonProps {
-  [key: string]: unknown;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export class ElementNode extends Object {
-  name: string;
-  lng: INode | null = null;
-  selected?: number;
-  rendered: boolean;
-  autofocus: boolean;
-
-  private _undoStates?: Record<string, any>;
-  private _renderProps: any;
-  private _effects: any;
-  private _parent: ElementNode | null = null;
-  private _shader?: ShaderRef;
-  private _style?: SolidStyles;
-  private _states?: States;
-  private _animationSettings?: Partial<AnimationSettings>;
-  private _width?: number;
-  private _height?: number;
-  private _color?: number;
-  private _maxLines?: number;
-  private _borderRadius?: number;
-  private _border?: BorderStyleObject;
-  private _borderLeft?: BorderStyleObject;
-  private _borderRight?: BorderStyleObject;
-  private _borderTop?: BorderStyleObject;
-  private _borderBottom?: BorderStyleObject;
-  public _autosized?: boolean; // Public but uses _ prefix
-  public _isDirty?: boolean; // Public but uses _ prefix
-  /**
-   * Managed by dom-inspector
-   */
-  public _dom?: HTMLDivElement; // Public but uses _ prefix
-  children: Children;
+  transition?: Record<string, Partial<AnimationSettings> | true>;
 
   constructor(name: string) {
-    super();
+    super(this);
     this.name = name;
     this.rendered = false;
-    this.autofocus = false;
     this._renderProps = { x: 0, y: 0 };
-    this.children = new Children(this);
 
     for (const key of LightningRendererNumberProps) {
       Object.defineProperty(this, key, {
@@ -321,17 +277,16 @@ export class ElementNode extends Object {
     return this.lng.animate(props, animationSettings || this.animationSettings);
   }
 
-  setFocus() {
-    if (this.rendered) {
-      // Delay setting focus so children can render (useful for Row + Column)
-      queueMicrotask(() => setActiveElement<ElementNode>(this));
-    } else {
-      this.autofocus = true;
-    }
+  isTextNode() {
+    return false;
   }
 
-  isTextNode() {
-    return this.name === 'text';
+  setProperty(name: string, value: any = true): void {
+    if (this.rendered) {
+      this.lng[name] = value;
+    } else {
+      this._renderProps[name] = value;
+    }
   }
 
   _resizeOnTextLoad() {
@@ -343,18 +298,10 @@ export class ElementNode extends Object {
 
           this.width = dimensions.width;
           this.height = dimensions.height;
-          this.parent!.updateLayout(this, dimensions);
+          this.parent.updateLayout(this, dimensions);
         }
       },
     );
-  }
-
-  getText() {
-    return this.children.map((c) => c.text).join('');
-  }
-
-  destroy() {
-    this.lng && renderer.destroyNode(this.lng);
   }
 
   set style(value: SolidStyles) {
@@ -369,23 +316,7 @@ export class ElementNode extends Object {
   }
 
   get style(): SolidStyles {
-    return this._style!;
-  }
-
-  get hasChildren() {
-    return this.children.length > 0;
-  }
-
-  set states(states: NodeStates) {
-    this._states = new States(this._stateChanged.bind(this), states);
-    if (this.rendered) {
-      this._stateChanged();
-    }
-  }
-
-  get states(): States {
-    this._states = this._states || new States(this._stateChanged.bind(this));
-    return this._states;
+    return this._style;
   }
 
   get animationSettings(): Partial<AnimationSettings> {
@@ -396,7 +327,16 @@ export class ElementNode extends Object {
     this._animationSettings = animationSettings;
   }
 
-  updateLayout(child?: ElementNode, dimensions?: Dimensions) {
+  setFocus() {
+    if (this.rendered) {
+      // Delay setting focus so children can render (useful for Row + Column)
+      queueMicrotask(() => setActiveElement(this));
+    } else {
+      this.autofocus = true;
+    }
+  }
+
+  updateLayout(child?: SolidNode, dimensions?: Dimensions) {
     if (this.hasChildren) {
       log('Layout: ', this);
       isFunc(this.onBeforeLayout) &&
@@ -412,61 +352,7 @@ export class ElementNode extends Object {
     }
   }
 
-  _stateChanged() {
-    log('State Changed: ', this, this.states);
-
-    if (this.forwardStates) {
-      // apply states to children first
-      const states = this.states.slice() as States;
-      this.children.forEach((c) => (c.states = states));
-    }
-
-    const states = config.stateMapperHook?.(this, this.states) || this.states;
-
-    if (this._undoStates || (this.style && keyExists(this.style, states))) {
-      this._undoStates = this._undoStates || {};
-      let stylesToUndo = {};
-
-      for (const [state, undoStyles] of Object.entries(this._undoStates)) {
-        // if state is no longer in the states undo it
-        if (!states.includes(state)) {
-          stylesToUndo = {
-            ...stylesToUndo,
-            ...undoStyles,
-          };
-        }
-      }
-
-      const newStyles = states.reduce((acc, state) => {
-        const styles = this.style[state];
-        if (styles) {
-          acc = {
-            ...acc,
-            ...styles,
-          };
-
-          // get current values to undo state
-          if (this._undoStates && !this._undoStates[state]) {
-            this._undoStates[state] = {};
-            Object.keys(styles).forEach((key) => {
-              this._undoStates![state][key] = this[key as keyof this];
-            });
-          }
-        }
-        return acc;
-      }, {});
-
-      // Apply transition first
-      if ((newStyles as any).transition !== undefined) {
-        this.transition = (newStyles as any).transition;
-      }
-
-      // Apply the styles
-      Object.assign(this, { ...stylesToUndo, ...newStyles });
-    }
-  }
-
-  render() {
+  render(renderer: RendererMain) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const node = this;
     const parent = this.parent!;
@@ -483,84 +369,46 @@ export class ElementNode extends Object {
       this._stateChanged();
     }
 
-    let props = node._renderProps;
+    const props = node._renderProps;
 
     if (parent.lng) {
       props.parent = parent.lng;
     }
 
-    if (node.isTextNode()) {
-      props = {
-        ...config.fontSettings,
-        ...props,
-        text: node.getText(),
-      };
-
-      if (props.contain) {
-        if (!props.width) {
-          props.width =
-            (parent.width || 0) - props.x - (props.marginRight || 0);
-          node._width = props.width;
-          node._autosized = true;
-        }
-
-        if (!props.height && props.contain === 'both') {
-          props.height =
-            (parent.height || 0) - props.y - (props.marginBottom || 0);
-          node._height = props.height;
-          node._autosized = true;
-        }
-      }
-
-      log('Rendering: ', this, props);
-      node.lng = renderer.createTextNode(props);
-
-      isFunc(this.onCreate) && this.onCreate.call(this, node);
-
-      if (isFunc(node.onLoad)) {
-        node.lng.on('loaded', node.onLoad);
-      }
-
-      if (!node.width || !node.height) {
+    // If its not an image or texture apply some defaults
+    if (!(props.src || props.texture)) {
+      // Set width and height to parent less offset
+      if (isNaN(props.width)) {
+        props.width = (parent.width || 0) - props.x;
+        node._width = props.width;
         node._autosized = true;
-        node._resizeOnTextLoad();
-      }
-    } else {
-      // If its not an image or texture apply some defaults
-      if (!(props.src || props.texture)) {
-        // Set width and height to parent less offset
-        if (isNaN(props.width)) {
-          props.width = (parent.width || 0) - props.x;
-          node._width = props.width;
-          node._autosized = true;
-        }
-
-        if (isNaN(props.height)) {
-          props.height = (parent.height || 0) - props.y;
-          node._height = props.height;
-          node._autosized = true;
-        }
-
-        if (!props.color) {
-          // Default color to transparent - If you later set a src, you'll need
-          // to set color '#ffffffff'
-          node._color = props.color = 0x00000000;
-        }
       }
 
-      log('Rendering: ', this, props);
-      node.lng = renderer.createNode(props);
-
-      if (node.onFail) {
-        node.lng.on('failed', node.onFail);
+      if (isNaN(props.height)) {
+        props.height = (parent.height || 0) - props.y;
+        node._height = props.height;
+        node._autosized = true;
       }
 
-      if (node.onLoad) {
-        node.lng.on('loaded', node.onLoad);
+      if (!props.color) {
+        // Default color to transparent - If you later set a src, you'll need
+        // to set color '#ffffffff'
+        node._color = props.color = 0x00000000;
       }
-
-      isFunc(this.onCreate) && this.onCreate.call(this, node);
     }
+
+    log('Rendering: ', this, props);
+    node.lng = renderer.createNode(props);
+
+    if (node.onFail) {
+      node.lng.on('failed', node.onFail);
+    }
+
+    if (node.onLoad) {
+      node.lng.on('loaded', node.onLoad);
+    }
+
+    isFunc(this.onCreate) && this.onCreate.call(this, node);
 
     node.rendered = true;
     node.autofocus && node.setFocus();

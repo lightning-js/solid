@@ -25,8 +25,23 @@ import {
   type NodeLoadedPayload,
 } from '@lightningjs/renderer';
 import { type JSX } from 'solid-js';
-import { type ElementNode } from './core/node/index.js';
 import type { NodeStates } from './core/node/states.js';
+import { TextNode } from './core/node/text.js';
+import { TextHolder } from './core/node/textHolder.js';
+import { ElementNode } from './core/node/element.js';
+
+/*
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export interface ElementNode
+  extends Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>,
+    IntrinsicCommonProps {
+  [key: string]: unknown;
+}
+*/
+
+export { ElementNode, TextNode, TextHolder };
+export type SolidNode = ElementNode | TextNode;
+export type CoreNode = SolidNode | TextHolder;
 
 type AddUndefined<T> = {
   [K in keyof T]: T[K] | undefined;
@@ -118,5 +133,6 @@ export interface IntrinsicTextProps
 
 export type NodeStyles = IntrinsicNodeStyleProps;
 export type TextStyles = IntrinsicTextNodeStyleProps;
+export type SolidStyles = NodeStyles | TextStyles;
 export type NodeProps = IntrinsicNodeProps;
 export type TextProps = IntrinsicTextProps;

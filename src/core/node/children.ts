@@ -15,29 +15,29 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ElementNode, SolidNode } from './index.js';
+import type { SolidNode } from '../../types.js';
 
 /**
  * Children class
  */
-export default class Children extends Array<SolidNode> {
-  _parent: ElementNode;
+export default class Children<Node> extends Array<Node> {
+  _parent: SolidNode;
 
-  constructor(node: ElementNode) {
+  constructor(node: SolidNode) {
     super();
     this._parent = node;
   }
 
-  get selected(): ElementNode | undefined {
+  get selected(): Node | undefined {
     // For selected Elements should always be an ElementNode
-    return this[this._parent.selected || 0] as ElementNode | undefined;
+    return this[this._parent.selected || 0];
   }
 
-  get firstChild() {
+  get firstChild(): Node | undefined {
     return this[0];
   }
 
-  insert(node: SolidNode, beforeNode: SolidNode) {
+  insert(node: Node, beforeNode: Node) {
     if (beforeNode) {
       const index = this.indexOf(beforeNode);
       this.splice(index, 0, node);
@@ -49,7 +49,7 @@ export default class Children extends Array<SolidNode> {
     this._parent._isDirty = true;
   }
 
-  remove(node: SolidNode) {
+  remove(node: Node) {
     const nodeIndexToRemove = this.indexOf(node);
     if (nodeIndexToRemove >= 0) {
       this.splice(nodeIndexToRemove, 1);

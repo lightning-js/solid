@@ -15,8 +15,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { type Component } from "solid-js";
-import { type IntrinsicNodeProps } from "../types.js";
+import { TextNode } from './text.js';
 
-export const View: Component<IntrinsicNodeProps> = (props) =>
-   <node {...props}></node>;
+export class TextHolder {
+  text = '';
+  parent: TextNode | null = null;
+
+  constructor(text: string = '') {
+    this.text = text;
+  }
+}

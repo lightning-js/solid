@@ -16,78 +16,49 @@
  */
 
 import { renderer } from '../renderer/index.js';
-import {
-  type IntrinsicCommonProps,
-  type NodeStyles,
-  type TextStyles,
-} from '../../index.js';
 import Children from './children.js';
 import States, { type NodeStates } from './states.js';
-import calculateFlex from '../flex.js';
-import {
-  log,
-  isFunc,
-  keyExists,
-} from '../utils.js';
+import { log, keyExists } from '../utils.js';
 import { config } from '../../config.js';
-import { setActiveElement } from '../activeElement.js';
-import type {
-  INode,
-  INodeAnimatableProps,
-  INodeWritableProps,
-  ShaderRef,
-  Dimensions,
-  AnimationSettings,
-} from '@lightningjs/renderer';
-import { assertTruthy } from '@lightningjs/renderer/utils';
-import type { NodeStates } from './states.js';
+import type { INode, Dimensions } from '@lightningjs/renderer';
+import type { ElementNode } from './element.js';
+import type { TextNode } from './text.js';
+import type { SolidStyles } from '../../types.js';
 
-export type SolidNode = ElementNode | TextNode;
-export type SolidStyles = NodeStyles | TextStyles;
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export interface ElementNode
-  extends Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>,
-    IntrinsicCommonProps {
-  [key: string]: unknown;
-}
-
-export default class BaseNode extends Object {
+export default class BaseNode<ChildType> extends Object {
+  id?: string;
   lng: INode | null = null;
   selected: number;
   rendered: boolean;
   forwardStates?: boolean;
-  autofocus: boolean;
-  children: Children;
-  style: SolidStyles;
-  _undoStates: SolidStyles;
+  children: Children<ChildType>;
   _parent?: ElementNode | null;
   onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
   onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
   _states?: NodeStates;
+  private _undoStates?: SolidStyles;
   display?: string;
   marginTop?: number;
   marginRight?: number;
   marginBottom?: number;
   marginLeft?: number;
+  width?: number;
+  x?: number;
+  y?: number;
+  height?: number;
+  public _isDirty?: boolean; // Public but uses _ prefix
+  public _autosized?: boolean; // Public but uses _ prefix
+
   /**
    * Managed by dom-inspector
    */
   public _dom?: HTMLDivElement; // Public but uses _ prefix
 
   constructor() {
+    super();
     this.selected = 0;
     this.rendered = false;
-    this.autofocus = false;
-    this.children = new Children(this);
-  }
-
-  setFocus() {
-    if (this.rendered) {
-      setActiveElement(this);
-    } else {
-      this.autofocus = true;
-    }
+    this.children = new Children<ChildType>(this);
   }
 
   get parent() {
@@ -119,18 +90,6 @@ export default class BaseNode extends Object {
   get states(): States {
     this._states = this._states || new States(this._stateChanged.bind(this));
     return this._states;
-  }
-
-  updateLayout(child?: ElementNode, dimensions?: Dimensions) {
-    if (this.hasChildren) {
-      log('Layout: ', this);
-      isFunc(this.onBeforeLayout) &&
-        this.onBeforeLayout.call(this, child, dimensions);
-
-      calculateFlex(this);
-
-      isFunc(this.onLayout) && this.onLayout.call(this, child, dimensions);
-    }
   }
 
   _stateChanged() {

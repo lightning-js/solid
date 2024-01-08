@@ -15,22 +15,24 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { assertTruthy } from '@lightningjs/renderer/utils';
-import type { ElementNode, SolidNode } from './node/index.js';
+import { ElementNode } from './node/element.js';
+import { TextHolder } from './node/textHolder.js';
+import { TextNode } from './node/text.js';
 
 export default function (node: ElementNode): boolean {
   if (node.display !== 'flex') {
-    return;
+    return false;
   }
 
   const children = [];
   for (let i = 0; i < node.children.length; i++) {
     const c = node.children[i]!;
     // Filter empty text nodes which are place holders for <Show> and elements missing dimensions
-    if (c.name === 'TextNode') {
+    if (c instanceof TextHolder) {
       continue;
     }
     // text node hasnt loaded yet - skip layout
-    if (c.name === 'text' && !(c.width || c.height)) {
+    if (c instanceof TextNode && !(c.width || c.height)) {
       return false;
     }
 
@@ -53,16 +55,13 @@ export default function (node: ElementNode): boolean {
   const align = node.alignItems;
   let itemSize = 0;
   if (['center', 'spaceBetween', 'spaceEvenly'].includes(justify)) {
-    itemSize = children.reduce(
-      (prev, c) => prev + (c[dimension] || 0),
-      0,
-    ) ;
+    itemSize = children.reduce((prev, c) => prev + (c[dimension] || 0), 0);
   }
 
   // Only align children if container has a cross size
   const crossAlignChild =
     containerCrossSize && align
-      ? (c: SolidNode) => {
+      ? (c: ElementNode | TextNode) => {
           if (align === 'flexStart') {
             c[crossProp] = 0;
           } else if (align === 'center') {
@@ -71,7 +70,7 @@ export default function (node: ElementNode): boolean {
             c[crossProp] = containerCrossSize - (c[crossDimension] || 0);
           }
         }
-      : (c: SolidNode) => c;
+      : (c: ElementNode | TextNode) => c;
 
   if (justify === 'flexStart') {
     let start = 0;
