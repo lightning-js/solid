@@ -289,7 +289,7 @@ export class ElementNode extends Object {
     if (this.lng) {
       if (config.animationsEnabled && this.transition) {
         const animationSettings =
-          this.transition[name] === true
+          this.transition === true || this.transition[name] === true
             ? undefined
             : (this.transition[name] as undefined | AnimationSettings);
 
