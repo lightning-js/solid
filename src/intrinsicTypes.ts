@@ -49,7 +49,7 @@ export interface IntrinsicNodeCommonProps {
   onFail?: (target: INode, nodeFailedPayload: NodeFailedPayload) => void;
   onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
   onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
-  ref?: ElementNode | ((node: ElementNode | null) => void) | null;
+  ref?: ElementNode | ((node: ElementNode) => void) | null;
   selected?: number;
   states?: NodeStates;
   text?: string;
@@ -78,7 +78,7 @@ export interface IntrinsicNodeStyleCommonProps {
   marginLeft?: number;
   marginRight?: number;
   marginTop?: number;
-  transition?: Record<string, Partial<AnimationSettings> | true>;
+  transition?: Record<string, Partial<AnimationSettings> | true> | true;
 }
 
 export interface IntrinsicTextStyleCommonProps {

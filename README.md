@@ -240,6 +240,8 @@ Config.animationSettings = {
 };
 ```
 
+Also you can disable all animations with `Config.animationsEnabled = false`
+
 ## States
 
 The style object can also be used to style components based on their state. You can add any keys with states you'd like applied like so:
@@ -416,6 +418,9 @@ import { Config } from '@lightningjs/solid';
 // Log out solid rendering information
 // This is removed for Prod builds for performance
 Config.debug = false;
+
+//Animations (transitions) are enabled by default
+Config.animationsEnabled = true;
 
 // Set defaults for all <Text>
 Config.fontSettings.fontFamily = 'Ubuntu';

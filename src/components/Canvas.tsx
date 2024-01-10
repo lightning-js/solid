@@ -15,19 +15,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createEffect, type JSX } from "solid-js";
+import { type JSX } from "solid-js";
 import { startLightningRenderer, type SolidRendererOptions } from '../core/renderer/index.js';
-import { assertTruthy } from "@lightningjs/renderer/utils";
 import { ElementNode, type SolidNode } from "../core/node/index.js";
 import { isFunc } from "../core/utils.js";
 
 function renderTopDown(node: SolidNode) {
-  if (node.name === 'TextNode') {
-    return;
+  if (node instanceof ElementNode) {
+    node.render();
+
+    if (node.name !== 'text') {
+      node.children.forEach(c => renderTopDown(c))
+    }
   }
-  assertTruthy(node instanceof ElementNode);
-  node.render();
-  node.children.forEach(c => renderTopDown(c))
 }
 
 export interface CanvasOptions {
@@ -39,24 +39,22 @@ export interface CanvasProps {
   options?: Partial<SolidRendererOptions>;
   onFirstRender?: (callback: () => void) => void;
   children?: JSX.Element;
-  ref?: (el: ElementNode) => void;
 }
 
 export const Canvas = (props: CanvasProps) => {
   const renderer = startLightningRenderer(props.options);
   const init = renderer.init();
-  let root: ElementNode | undefined;
 
-  createEffect(() => {
+  function rootRef(root : ElementNode): void {
     init.then(() => {
-      assertTruthy(root);
       root.lng = renderer.root;
       root.children.forEach(renderTopDown);
       isFunc(props.onFirstRender) && props.onFirstRender(root);
     }).catch(console.error);
-  })
+  }
+
   return (
-    <canvas ref={root}>
+    <canvas ref={rootRef}>
       {props.children}
     </canvas>
   )

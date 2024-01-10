@@ -286,12 +286,13 @@ export class ElementNode extends Object {
   }
 
   _sendToLightningAnimatable(name: string, value: number | string) {
-    if (this.rendered && this.lng) {
-      if (this.transition && this.transition[name]) {
+    if (this.lng) {
+      if (config.animationsEnabled && this.transition) {
         const animationSettings =
           this.transition[name] === true
             ? undefined
             : (this.transition[name] as undefined | AnimationSettings);
+
         return this.animate({ [name]: value }, animationSettings).start();
       }
 

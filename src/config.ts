@@ -24,6 +24,7 @@ import { type ElementNode } from './core/node/index.js';
 interface Config {
   debug: boolean;
   animationSettings: Partial<AnimationSettings>;
+  animationsEnabled: boolean;
   fontSettings: Partial<IntrinsicTextNodeStyleProps>;
   stateMapperHook?: (node: ElementNode, states: Array<string>) => Array<string>;
 }
@@ -33,6 +34,7 @@ export const isDev = import.meta.env.MODE === 'development';
 
 export const config: Config = {
   debug: false,
+  animationsEnabled: true,
   animationSettings: {
     duration: 250,
     easing: 'ease-in-out',
