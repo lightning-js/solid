@@ -287,7 +287,11 @@ export class ElementNode extends Object {
 
   _sendToLightningAnimatable(name: string, value: number | string) {
     if (this.lng) {
-      if (config.animationsEnabled && this.transition) {
+      if (
+        config.animationsEnabled &&
+        this.transition &&
+        (this.transition === true || this.transition[name])
+      ) {
         const animationSettings =
           this.transition === true || this.transition[name] === true
             ? undefined
