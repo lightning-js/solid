@@ -51,7 +51,7 @@
     "prettier": "^3.0.1",
     "rollup": "^4.1.4",
     "rollup-preset-solid": "^2.0.1",
-    "solid-js": "^1.8.6",
+    "solid-js": "^1.8.10",
     "typescript": "^5.2.2"
   },
   "lint-staged": {
@@ -62,7 +62,7 @@
     "*.{js,cjs,md}": "prettier --write"
   },
   "dependencies": {
-    "@lightningjs/renderer": "^0.6.0",
+    "@lightningjs/renderer": "^0.6.1",
     "@lightningjs/solid": "file:./"
   },
   "peerDependencies": {

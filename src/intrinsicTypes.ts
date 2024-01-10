@@ -40,6 +40,7 @@ export interface BorderStyleObject {
 export type BorderStyle = number | BorderStyleObject;
 
 export interface IntrinsicNodeCommonProps {
+  animate?: boolean;
   animationSettings?: Partial<AnimationSettings>;
   autofocus?: boolean;
   forwardStates?: boolean;

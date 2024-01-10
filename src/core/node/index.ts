@@ -287,12 +287,20 @@ export class ElementNode extends Object {
 
   _sendToLightningAnimatable(name: string, value: number | string) {
     if (this.rendered && this.lng) {
-      if (this.transition && this.transition[name]) {
-        const animationSettings =
-          this.transition[name] === true
-            ? undefined
-            : (this.transition[name] as undefined | AnimationSettings);
-        return this.animate({ [name]: value }, animationSettings).start();
+      if (config.animations !== false && this.animate === true) {
+        if (!this.transition || (this.transition && this.transition[name])) {
+          const animationSettings: Partial<AnimationSettings> | undefined =
+            this.transition && this.transition[name] !== true
+              ? (this.transition[name] as
+                  | Partial<AnimationSettings>
+                  | undefined)
+              : undefined;
+
+          return this.animateProps(
+            { [name]: value },
+            animationSettings,
+          ).start();
+        }
       }
 
       (this.lng[name as keyof INode] as number | string) = value;
@@ -309,7 +317,7 @@ export class ElementNode extends Object {
     }
   }
 
-  animate(
+  animateProps(
     props: Partial<INodeAnimatableProps>,
     animationSettings?: Partial<AnimationSettings>,
   ) {

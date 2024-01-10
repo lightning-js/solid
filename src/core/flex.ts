@@ -49,10 +49,7 @@ export default function (node: ElementNode): boolean {
   const align = node.alignItems;
   let itemSize = 0;
   if (['center', 'spaceBetween', 'spaceEvenly'].includes(justify)) {
-    itemSize = children.reduce(
-      (prev, c) => prev + (c[dimension] || 0),
-      0,
-    ) ;
+    itemSize = children.reduce((prev, c) => prev + (c[dimension] || 0), 0);
   }
 
   // Only align children if container has a cross size

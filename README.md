@@ -123,26 +123,25 @@ RGBA number 0xRRGGBBAA. If you want to use hex, `import { hexColor } from '@ligh
 
 `border` and `borderRadius` are special props which create effects for the DynamicShader found in the Lightning Renderer. These props can be set on the JSX or style object. The order in which you set the props determine how they are applied in the shader. Meaning you probably want to set borderRadius first. You can also set individual borders via `borderLeft`, `borderRight`, `borderTop`, `borderBottom`. These properties do not support animations.
 
-```
+```js
 const style = {
   borderRadius: 30,
-  border: { width: 10, color: 0x000000ff }
-}
+  border: { width: 10, color: 0x000000ff },
+};
 
 // or
 
 const style = {
   borderLeft: { width: 10, color: 0x000000ff },
-  borderRight: { width: 10, color: 0x000000ff }
-}
-
+  borderRight: { width: 10, color: 0x000000ff },
+};
 ```
 
 ### linearGradient
 
 `linearGradient` is another special effect that can be used like a style with following syntax.
 
-```
+```js
 linearGradient:
     {
       angle: 225,
@@ -201,14 +200,15 @@ Additionally, flex will automatically layout Text nodes. Anytime a View with dis
 
 ## Transitions / Animations
 
-You can define which properties will animate via the transition property along with setting custom `animationSettings`. If you wish to reuse or use the default `animationSettings`, you can set the property value to `true`.
+Adding an `animate` attribute to a <View> component will cause any property changes (after initial render) to be animated. This is useful for simple animations where you want to resize, move, or change alpha of a component.
+You can also define which properties will animate via the transition property along with setting custom `animationSettings`. If you wish to reuse or use the default `animationSettings`, you can set the property value to `true`.
 
 ```jsx
 createEffect(on(activeElement, (elm) => {
     focusRingRef.x = elm.x;
 }, { defer: true}))
 
-<FocusRing animationSettings={{duration: 1500}} ref={focusRingRef} transition={{ x: true, scale: { duration: 1500, easing: 'ease-in-out'} }} />
+<FocusRing animate animationSettings={{duration: 1500}} ref={focusRingRef} transition={{ x: true, scale: { duration: 1500, easing: 'ease-in-out'} }} />
 ```
 
 For more complicated animations, you can access the Lightning renderer animate API directly:
@@ -297,7 +297,7 @@ createEffect(() => {
 
 The `focus` state is added and removed by the [useFocusManager](https://github.com/lightning-js/solid-primitives) primitive. Also note if elements are animating and another state is applied during the animation which uses the animated value (say alpha or color) - when that state is removed it will return to some value during the animation. Be careful not to set state with styles that are also being animated.
 
-#### stateMapperHook
+### stateMapperHook
 
 For further customization of styles using states, you can change the states before styles are applied globally using Config.stateMapperHook. For instance, if you wanted to change your styles based on another property like tone you could do:
 
@@ -392,7 +392,7 @@ function Button(props) {
 
 SolidJS has built in [Directives](https://www.solidjs.com/docs/latest/api#use___) support via `use:` property. These only work on root elements `node` and `text`. Meaning you can't use `View` or `Text` with directives so instead do:
 
-```
+```jsx
 <node
   use:withPadding={[10, 15]}
   {...props}
@@ -416,6 +416,9 @@ import { Config } from '@lightningjs/solid';
 // Log out solid rendering information
 // This is removed for Prod builds for performance
 Config.debug = false;
+
+// Enable or disable all animations
+Config.animations = true;
 
 // Set defaults for all <Text>
 Config.fontSettings.fontFamily = 'Ubuntu';

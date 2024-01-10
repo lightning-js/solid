@@ -23,16 +23,20 @@ import { type ElementNode } from './core/node/index.js';
 
 interface Config {
   debug: boolean;
+  animations: boolean;
   animationSettings: Partial<AnimationSettings>;
   fontSettings: Partial<IntrinsicTextNodeStyleProps>;
   stateMapperHook?: (node: ElementNode, states: Array<string>) => Array<string>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 import.meta.env = import.meta.env || { MODE: 'development' };
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 export const isDev = import.meta.env.MODE === 'development';
 
 export const config: Config = {
   debug: false,
+  animations: true,
   animationSettings: {
     duration: 250,
     easing: 'ease-in-out',
