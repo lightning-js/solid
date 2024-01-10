@@ -100,10 +100,7 @@ To load fonts, and/or other custom code into the Core Space, you must write a Co
 Create a file for example './src/AppCoreExtensions.js' and add the following code:
 
 ```jsx
-import {
-  CoreExtension,
-  SdfTrFontFace,
-} from '@lightningjs/renderer/core';
+import { CoreExtension, SdfTrFontFace } from '@lightningjs/renderer/core';
 
 export default class AppCoreExtension extends CoreExtension {
   async run(stage) {
@@ -121,7 +118,7 @@ export default class AppCoreExtension extends CoreExtension {
 }
 ```
 
-Change to 2 lines with Ubuntu-Bold.msdf.** to your own font that you have in stored in './public/fonts/'\
+Change to 2 lines with Ubuntu-Bold.msdf.\*\* to your own font that you have in stored in './public/fonts/'\
 Here is a link to the fonts used in this Hello World: https://github.com/lightning-js/renderer/tree/main/examples/public/fonts
 
 # Usage
@@ -137,7 +134,7 @@ import { render, Canvas, Text } from '@lightningjs/solid';
 import coreExtensionModuleUrl from './AppCoreExtensions.js?importChunkUrl';
 
 render(() => (
-  <Canvas options={{coreExtensionModule: coreExtensionModuleUrl}}>
+  <Canvas options={{ coreExtensionModule: coreExtensionModuleUrl }}>
     <Text>Hello World</Text>
   </Canvas>
 ));
@@ -176,21 +173,19 @@ import { render, Canvas, View, Text } from '@lightningjs/solid';
 import coreExtensionModuleUrl from './AppCoreExtensions.js?importChunkUrl';
 
 const helloworldText = {
-  width: 1920, 
+  width: 1920,
   height: 170,
-  lineHeight: 170, 
-  y: 455, 
+  lineHeight: 170,
+  y: 455,
   contain: 'both',
   fontSize: 100,
   textAlign: 'center',
-  color: '0x000000ff'
-}
+  color: '0x000000ff',
+};
 render(() => (
-  <Canvas options={{coreExtensionModule: coreExtensionModuleUrl}}>
+  <Canvas options={{ coreExtensionModule: coreExtensionModuleUrl }}>
     <View>
-      <Text style={helloworldText} >
-        Hello World!
-      </Text>
+      <Text style={helloworldText}>Hello World!</Text>
     </View>
   </Canvas>
 ));
@@ -216,12 +211,12 @@ const styles = {
     color: 0x1e0045ff,
     border: { width: 5, color: 0x1e3345ff },
     focus: {
-      color: [0x58807dff, {duration: 1000}]
+      color: [0x58807dff, { duration: 1000 }],
     },
     disabled: {
-      color: 0x1e004533
-    }
-  }
+      color: 0x1e004533,
+    },
+  },
 };
 
 styles.text = {
@@ -230,8 +225,8 @@ styles.text = {
   textAlign: 'center',
   mountY: -0.35,
   height: styles.container.height,
-  width: styles.container.width
-}
+  width: styles.container.width,
+};
 
 export default function Button(props) {
   return (
@@ -254,22 +249,22 @@ import coreExtensionModuleUrl from './AppCoreExtensions.js?importChunkUrl';
 import Button from './Button';
 
 const helloworldText = {
-  width: 1920, 
+  width: 1920,
   height: 170,
-  lineHeight: 170, 
-  y: 455, 
+  lineHeight: 170,
+  y: 455,
   contain: 'both',
   fontSize: 100,
   textAlign: 'center',
-  color: '0x000000ff'
-}
+  color: '0x000000ff',
+};
 render(() => (
-  <Canvas options={{coreExtensionModule: coreExtensionModuleUrl}}>
+  <Canvas options={{ coreExtensionModule: coreExtensionModuleUrl }}>
     <View>
-      <Text style={helloworldText} >
-        Hello World!
-      </Text>
-      <Button autofocus onEnter={(event, el) => el.states.toggle('disabled')}>View 1</Button>
+      <Text style={helloworldText}>Hello World!</Text>
+      <Button autofocus onEnter={(event, el) => el.states.toggle('disabled')}>
+        View 1
+      </Button>
     </View>
   </Canvas>
 ));
@@ -281,7 +276,7 @@ The basic requirements to get interaction from user working is adding a focusman
 Add the following into './src/index.jsx' and you get focus on the button and when you press enter it will toggle disabled state of the button:
 
 ```jsx
-import { useFocusManager } from "@lightningjs/solid-primitives";
+import { useFocusManager } from '@lightningjs/solid-primitives';
 useFocusManager();
 ```
 
@@ -295,16 +290,16 @@ index.jsx:
 ```jsx
 import { render, Canvas, View } from '@lightningjs/solid';
 import coreExtensionModuleUrl from './AppCoreExtensions.js?importChunkUrl';
-import { Router, Route } from "@solidjs/router";
-import { useFocusManager } from "@lightningjs/solid-primitives";
+import { Router, Route } from '@solidjs/router';
+import { useFocusManager } from '@lightningjs/solid-primitives';
 
 import Page1 from './Page1';
 import Page2 from './Page2';
 
 useFocusManager();
 
-render(() =>  (
-  <Canvas options={{coreExtensionModule: coreExtensionModuleUrl}}>
+render(() => (
+  <Canvas options={{ coreExtensionModule: coreExtensionModuleUrl }}>
     <Router>
       <Route path="/" component={Page1} />
       <Route path="/page2" component={Page2} />
@@ -320,29 +315,41 @@ Now we create the 2 Pages we used inside the Routes:
 Page1.jsx:
 
 ```jsx
-import { useNavigate } from "@solidjs/router";
+import { useNavigate } from '@solidjs/router';
 import { View, Text } from '@lightningjs/solid';
 import Button from './Button';
 
 const headlineText = {
-  width: 1920, height: 170, lineHeight: 170, y: 455, contain: 'both',
+  width: 1920,
+  height: 170,
+  lineHeight: 170,
+  y: 455,
+  contain: 'both',
   fontSize: 100,
-  textAlign: 'center'
-}
+  textAlign: 'center',
+};
 const headlineSubText = {
-  width: 1920, height: 170, lineHeight: 170, y: 655, contain: 'both',
+  width: 1920,
+  height: 170,
+  lineHeight: 170,
+  y: 655,
+  contain: 'both',
   fontSize: 60,
-  textAlign: 'center'
-}
+  textAlign: 'center',
+};
 
 const Page1 = () => {
   const navigate = useNavigate();
 
-  return <View color={0x071423ff}>
+  return (
+    <View color={0x071423ff}>
       <Text style={headlineText}>Hello World!</Text>
       <Text style={headlineSubText}>Page 1</Text>
-      <Button autofocus onEnter={()=>navigate('page2')}>Page 2</Button>
+      <Button autofocus onEnter={() => navigate('page2')}>
+        Page 2
+      </Button>
     </View>
+  );
 };
 
 export default Page1;
@@ -351,29 +358,41 @@ export default Page1;
 Page2.jsx:
 
 ```jsx
-import { useNavigate } from "@solidjs/router";
+import { useNavigate } from '@solidjs/router';
 import { View, Text } from '@lightningjs/solid';
 import Button from './Button';
 
 const headlineText = {
-  width: 1920, height: 170, lineHeight: 170, y: 455, contain: 'both',
+  width: 1920,
+  height: 170,
+  lineHeight: 170,
+  y: 455,
+  contain: 'both',
   fontSize: 100,
-  textAlign: 'center'
-}
+  textAlign: 'center',
+};
 const headlineSubText = {
-  width: 1920, height: 170, lineHeight: 170, y: 655, contain: 'both',
+  width: 1920,
+  height: 170,
+  lineHeight: 170,
+  y: 655,
+  contain: 'both',
   fontSize: 60,
-  textAlign: 'center'
-}
+  textAlign: 'center',
+};
 
 const Page2 = () => {
   const navigate = useNavigate();
 
-  return <View color={0x071423ff}>
+  return (
+    <View color={0x071423ff}>
       <Text style={headlineText}>Hello World!</Text>
       <Text style={headlineSubText}>Page 2</Text>
-      <Button autofocus onEnter={()=>navigate('/')}>Page 1</Button>
+      <Button autofocus onEnter={() => navigate('/')}>
+        Page 1
+      </Button>
     </View>
+  );
 };
 
 export default Page2;
