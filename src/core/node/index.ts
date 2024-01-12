@@ -29,6 +29,7 @@ import { log, isArray, isNumber, isFunc, keyExists } from '../utils.js';
 import { config } from '../../config.js';
 import { setActiveElement } from '../activeElement.js';
 import type {
+  RendererMain,
   INode,
   INodeAnimatableProps,
   INodeWritableProps,
@@ -154,6 +155,7 @@ export interface ElementNode
 export class ElementNode extends Object {
   name: string;
   lng: INode | null = null;
+  renderer?: RendererMain;
   selected?: number;
   rendered: boolean;
   autofocus: boolean;

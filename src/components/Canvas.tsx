@@ -36,16 +36,24 @@ export interface CanvasOptions {
 }
 
 export interface CanvasProps {
+  ref?: ElementNode | ((node: ElementNode) => void) | null;
   options?: Partial<SolidRendererOptions>;
-  onFirstRender?: (callback: () => void) => void;
+  onFirstRender?: (callback: (root: ElementNode) => void) => void;
   children?: JSX.Element;
 }
 
-export const Canvas = (props: CanvasProps) => {
+export const Canvas = (props: CanvasProps = {}) => {
   const renderer = startLightningRenderer(props.options);
   const init = renderer.init();
 
   function rootRef(root : ElementNode): void {
+    root.renderer = renderer;
+    if (isFunc(props.ref)) {
+      props.ref(root);
+    } else {
+      props.ref = root;
+    }
+
     init.then(() => {
       root.lng = renderer.root;
       root.children.forEach(renderTopDown);
