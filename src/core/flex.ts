@@ -76,9 +76,9 @@ export default function (node: ElementNode): boolean {
     });
     // Update container size
     if (node._autosized) {
-      const containerSize = start - gap;
-      if (containerSize !== node[dimension]) {
-        node[dimension] = containerSize;
+      const calculatedSize = start - gap;
+      if (calculatedSize !== node[dimension]) {
+        node[dimension] = calculatedSize;
         return true;
       }
     }

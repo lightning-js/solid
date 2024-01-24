@@ -40,7 +40,6 @@ export default {
     node.text = value;
     const parent = node.parent;
     assertTruthy(parent);
-    parent._autosized && parent._resizeOnTextLoad();
     parent.text = parent.getText();
   },
   setProperty(node: ElementNode, name: string, value: any = true): void {
@@ -54,7 +53,6 @@ export default {
       if (node.name === 'TextNode') {
         // TextNodes can be placed outside of <text> nodes when <Show> is used as placeholder
         if (parent.isTextNode()) {
-          parent._autosized && parent._resizeOnTextLoad();
           parent.text = parent.getText();
         }
       }

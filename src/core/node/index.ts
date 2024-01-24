@@ -338,18 +338,20 @@ export class ElementNode extends Object {
   }
 
   _resizeOnTextLoad() {
-    this.lng!.once(
-      'loaded',
-      (_node: INode, loadedPayload: NodeLoadedPayload) => {
-        if (loadedPayload.type === 'text') {
-          const { dimensions } = loadedPayload;
-
-          this.width = dimensions.width;
-          this.height = dimensions.height;
-          this.parent!.updateLayout(this, dimensions);
+    this.lng!.on('loaded', (_node: INode, loadedPayload: NodeLoadedPayload) => {
+      if (loadedPayload.type === 'text') {
+        const { dimensions } = loadedPayload;
+        if (
+          dimensions.width === this.width &&
+          dimensions.height === this.height
+        ) {
+          return;
         }
-      },
-    );
+        this.width = dimensions.width;
+        this.height = dimensions.height;
+        this.parent!.updateLayout(this, dimensions);
+      }
+    });
   }
 
   getText() {

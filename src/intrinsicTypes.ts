@@ -60,7 +60,7 @@ export interface IntrinsicNodeStyleCommonProps {
   border?: BorderStyle;
   borderBottom?: BorderStyle;
   borderLeft?: BorderStyle;
-  borderRadius?: number;
+  borderRadius?: number | number[];
   borderRight?: BorderStyle;
   borderTop?: BorderStyle;
   display?: 'flex';
