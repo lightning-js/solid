@@ -110,7 +110,7 @@ Solid adds the following props to help with layout and offer shortcuts to the Sh
 - `marginLeft`: number
 - `marginRight`: number
 - `marginTop`: number
-- `transition`: Record<string, Partial<AnimationSettings> | true> | true
+- `transition`: Record<string, AnimationSettings> | true
 
 ### Prop Defaults
 
