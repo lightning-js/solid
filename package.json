@@ -1,6 +1,6 @@
 {
   "name": "@lightningjs/solid",
-  "version": "0.11.5",
+  "version": "0.12.0",
   "description": "Lightning renderer for solid universal",
   "type": "module",
   "source": "src/index.ts",
@@ -29,7 +29,7 @@
     "build": "npm run tsc && rollup -c",
     "tsc": "tsc",
     "watch": "tsc -w",
-"prepare": "husky install",
+    "prepare": "husky install",
     "prepack": "npm run build"
   },
   "keywords": [
