@@ -124,7 +124,7 @@ const LightningRendererNonAnimatingProps = [
 export interface TextNode {
   name: string;
   text: string;
-  parent: ElementNode | null;
+  parent: ElementNode | undefined;
   zIndex?: number;
   states?: States;
   x?: number;
@@ -153,8 +153,9 @@ export interface ElementNode
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ElementNode extends Object {
+  id?: string;
   name: string;
-  lng: INode | null = null;
+  lng: INode | undefined;
   renderer?: RendererMain;
   selected?: number;
   rendered: boolean;
@@ -163,7 +164,7 @@ export class ElementNode extends Object {
   private _undoStates?: Record<string, any>;
   private _renderProps: any;
   private _effects: any;
-  private _parent: ElementNode | null = null;
+  private _parent: ElementNode | undefined;
   private _shader?: ShaderRef;
   private _style?: SolidStyles;
   private _states?: States;

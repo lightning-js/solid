@@ -36,7 +36,7 @@ export interface CanvasOptions {
 }
 
 export interface CanvasProps {
-  ref?: ElementNode | ((node: ElementNode) => void) | null;
+  ref?: ElementNode | ((node: ElementNode) => void) | undefined;
   options?: Partial<SolidRendererOptions>;
   onFirstRender?: (callback: (root: ElementNode) => void) => void;
   children?: JSX.Element;
@@ -55,7 +55,7 @@ export const Canvas = (props: CanvasProps = {}) => {
     }
 
     init.then(() => {
-      root.lng = renderer.root;
+      root.lng = renderer.root!;
       root.children.forEach(renderTopDown);
       isFunc(props.onFirstRender) && props.onFirstRender(root);
     }).catch(console.error);

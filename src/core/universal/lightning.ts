@@ -33,7 +33,7 @@ export default {
   },
   createTextNode(text: string): TextNode {
     // A text node is just a string - not the <text> node
-    return { name: 'TextNode', text, parent: null };
+    return { name: 'TextNode', text, parent: undefined };
   },
   replaceText(node: TextNode, value: string): void {
     log('Replace Text: ', node, value);

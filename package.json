@@ -29,7 +29,7 @@
     "build": "npm run tsc && rollup -c",
     "tsc": "tsc",
     "watch": "tsc -w",
-    "prepare": "husky install",
+"prepare": "husky install",
     "prepack": "npm run build"
   },
   "keywords": [
@@ -42,17 +42,17 @@
   "author": "Chris Lorenzo",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.12.0",
-    "@typescript-eslint/parser": "^6.12.0",
-    "eslint": "^8.54.0",
-    "eslint-config-prettier": "^9.0.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.2.3",
-    "prettier": "^3.0.1",
-    "rollup": "^4.1.4",
+    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "@typescript-eslint/parser": "^6.20.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.0.7",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.4",
+    "rollup": "^4.9.6",
     "rollup-preset-solid": "^2.0.1",
-    "solid-js": "^1.8.6",
-    "typescript": "^5.2.2"
+    "solid-js": "^1.8.12",
+    "typescript": "^5.3.3"
   },
   "lint-staged": {
     "*.ts": [
