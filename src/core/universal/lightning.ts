@@ -16,7 +16,7 @@
  */
 import { assertTruthy } from '@lightningjs/renderer/utils';
 import { renderer } from '../renderer/index.js';
-import { createEffect } from 'solid-js';
+import { onMount } from 'solid-js';
 import { log } from '../utils.js';
 import { ElementNode, type SolidNode, type TextNode } from '../node/index.js';
 import type { createRenderer } from 'solid-js/universal';
@@ -28,7 +28,7 @@ export type SolidRendererOptions = Parameters<
 export default {
   createElement(name: string): ElementNode {
     const node = new ElementNode(name);
-    renderer.root && createEffect(() => node.render());
+    renderer.root && onMount(() => node.render());
     return node;
   },
   createTextNode(text: string): TextNode {
@@ -69,7 +69,7 @@ export default {
     }
   },
   getParentNode(node: SolidNode): ElementNode | undefined {
-    return node.parent ?? undefined;
+    return node.parent;
   },
   getFirstChild(node: ElementNode): SolidNode | undefined {
     return node.children[0];

@@ -88,10 +88,10 @@ export interface IntrinsicTextStyleCommonProps {
   marginBottom?: number;
 }
 
-export type IntrinsicCommonProps = IntrinsicNodeCommonProps &
-  IntrinsicNodeStyleCommonProps &
-  IntrinsicTextStyleCommonProps;
-
+export interface IntrinsicCommonProps
+  extends IntrinsicNodeCommonProps,
+    IntrinsicNodeStyleCommonProps,
+    IntrinsicTextStyleCommonProps {}
 export interface IntrinsicNodeStyleProps
   extends Partial<Omit<INodeWritableProps, 'parent' | 'shader'>>,
     IntrinsicNodeStyleCommonProps {
