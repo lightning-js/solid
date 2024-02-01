@@ -39,6 +39,19 @@ onMount(() => {
 
 To find out more about animations check out the [renderer example](https://github.com/lightning-js/renderer/blob/main/examples/tests/animation.ts#L70).
 
+You can also chain animations with
+
+```js
+sprite
+  .chain({ x: 50, y: 100 }, { duration: 100 })
+  .chain({ x: 250, y: 200 }, { duration: 200 })
+  .chain({ x: 50, y: 100 }) // will use { duration: 200 }
+  .chain({ x: 250, y: 200 }, { duration: 100 })
+  .start();
+```
+
+If you don't pass in animation settings as the second argument, it will default to the previously passed in value.
+
 ## Default Animation Settings
 
 You can set default animation settings for all transitions globally via Config.

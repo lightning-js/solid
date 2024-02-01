@@ -180,6 +180,12 @@ export class ElementNode extends Object {
   private _borderBottom?: BorderStyleObject;
   public _autosized?: boolean; // Public but uses _ prefix
   public _isDirty?: boolean; // Public but uses _ prefix
+  private _animationQueue: Array<{
+    props: Partial<INodeAnimatableProps>;
+    animationSettings?: Partial<AnimationSettings>;
+  }> = [];
+  private _animationQueueSettings: Partial<AnimationSettings> | undefined;
+  private _animationRunning: boolean = false;
   /**
    * Managed by dom-inspector
    */
@@ -323,6 +329,39 @@ export class ElementNode extends Object {
   ) {
     assertTruthy(this.lng, 'Node must be rendered before animating');
     return this.lng.animate(props, animationSettings || this.animationSettings);
+  }
+
+  chain(
+    props: Partial<INodeAnimatableProps>,
+    animationSettings?: Partial<AnimationSettings>,
+  ) {
+    if (this._animationRunning) {
+      this._animationQueue = [];
+      this._animationRunning = false;
+    }
+
+    if (animationSettings) {
+      this._animationQueueSettings = animationSettings;
+    } else if (!this._animationQueueSettings) {
+      this._animationQueueSettings =
+        animationSettings || this.animationSettings;
+    }
+    animationSettings = animationSettings || this._animationQueueSettings;
+    this._animationQueue.push({ props, animationSettings });
+    return this;
+  }
+
+  async start() {
+    let animation = this._animationQueue.pop();
+    while (animation) {
+      this._animationRunning = true;
+      await this.animate(animation.props, animation.animationSettings)
+        .start()
+        .waitUntilStopped();
+      animation = this._animationQueue.pop();
+    }
+    this._animationRunning = false;
+    this._animationQueueSettings = undefined;
   }
 
   setFocus() {
