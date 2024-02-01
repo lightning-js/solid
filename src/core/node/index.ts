@@ -405,7 +405,8 @@ export class ElementNode extends Object {
   set style(value: SolidStyles) {
     // Keys set in JSX are more important
     for (const key in value) {
-      if (!this[key as keyof SolidStyles]) {
+      // be careful of 0 values
+      if (this[key as keyof SolidStyles] === undefined) {
         this[key as keyof SolidStyles] = value[key as keyof SolidStyles];
       }
     }
