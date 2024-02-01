@@ -19,11 +19,20 @@ createEffect(on(activeElement, (elm) => {
 
 let myButton;
 onMount(() => {
-  setActiveElement(myButton)
-  //or
   myButton.setFocus();
+  // DONT Do This (prefer to use setFocus so forwardFocus works)
+  setActiveElement(myButton)
 })
 <Button ref={myButton}>Sports</Button>
+```
+
+## forwardFocus
+
+Sometimes an element is being focused via `setFocus` but you really want a child element to receive focus. In that case `forwardFocus={childIndexNumber}` will skip setting activeElement on this element and instead setFocus on `this.children[childIndexNumber]`. If you have more complicated needs, `forwardFocus` also takes a function for you to setFocus on any element you want.
+
+```jsx
+  // Focus on the column but then focus on first child
+  <Column autofocus forwardFocus={0}>
 ```
 
 ## Key Handling

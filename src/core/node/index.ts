@@ -160,6 +160,7 @@ export class ElementNode extends Object {
   selected?: number;
   rendered: boolean;
   autofocus: boolean;
+  forwardFocus?: number | ((this: ElementNode) => void);
 
   private _undoStates?: Record<string, any>;
   private _renderProps: any;
@@ -366,6 +367,17 @@ export class ElementNode extends Object {
 
   setFocus() {
     if (this.rendered) {
+      if (this.forwardFocus !== undefined) {
+        if (isFunc(this.forwardFocus)) {
+          return this.forwardFocus.call(this);
+        }
+        const focusedIndex =
+          typeof this.forwardFocus === 'number' ? this.forwardFocus : null;
+        if (focusedIndex !== null && focusedIndex < this.children.length) {
+          const child = this.children[focusedIndex];
+          child instanceof ElementNode && child.setFocus();
+        }
+      }
       // Delay setting focus so children can render (useful for Row + Column)
       queueMicrotask(() => setActiveElement<ElementNode>(this));
     } else {
