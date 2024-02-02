@@ -204,7 +204,7 @@ export class ElementNode extends Object {
     for (const key of LightningRendererNumberProps) {
       Object.defineProperty(this, key, {
         get(): number {
-          return this[`_${key}`] || (this.lng && this.lng[key]);
+          return (this.lng && this.lng[key]) || this[`_${key}`];
         },
         set(v: number) {
           this[`_${key}`] = v;
@@ -216,7 +216,7 @@ export class ElementNode extends Object {
     for (const key of LightningRendererNonAnimatingProps) {
       Object.defineProperty(this, key, {
         get() {
-          return this[`_${key}`] || (this.lng && this.lng[key]);
+          return (this.lng && this.lng[key]) || this[`_${key}`];
         },
         set(v) {
           this[`_${key}`] = v;
