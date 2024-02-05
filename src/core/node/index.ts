@@ -19,6 +19,8 @@ import { renderer, createShader } from '../renderer/index.js';
 import {
   type BorderStyleObject,
   type IntrinsicCommonProps,
+  type IntrinsicNodeProps,
+  type IntrinsicTextProps,
   type NodeStyles,
   type TextStyles,
 } from '../../index.js';
@@ -163,7 +165,7 @@ export class ElementNode extends Object {
   forwardFocus?: number | ((this: ElementNode) => void);
 
   private _undoStates?: Record<string, any>;
-  private _renderProps: any;
+  private _renderProps?: IntrinsicNodeProps | IntrinsicTextProps;
   private _effects: any;
   private _parent: ElementNode | undefined;
   private _shader?: ShaderRef;
@@ -312,7 +314,7 @@ export class ElementNode extends Object {
 
       (this.lng[name as keyof INode] as number | string) = value;
     } else {
-      this._renderProps[name] = value;
+      this._renderProps![name] = value;
     }
   }
 
@@ -320,7 +322,7 @@ export class ElementNode extends Object {
     if (this.rendered && this.lng) {
       (this.lng[name as keyof INodeWritableProps] as unknown) = value;
     } else {
-      this._renderProps[name] = value;
+      this._renderProps![name] = value;
     }
   }
 
@@ -541,7 +543,7 @@ export class ElementNode extends Object {
       this._stateChanged();
     }
 
-    let props = node._renderProps;
+    let props = node._renderProps as IntrinsicNodeProps | IntrinsicTextProps;
 
     if (parent.lng) {
       props.parent = parent.lng;
@@ -557,14 +559,14 @@ export class ElementNode extends Object {
       if (props.contain) {
         if (!props.width) {
           props.width =
-            (parent.width || 0) - props.x - (props.marginRight || 0);
+            (parent.width || 0) - (props.x || 0) - (props.marginRight || 0);
           node._width = props.width;
           node._autosized = true;
         }
 
-        if (!props.height && props.contain === 'both') {
+        if (props.contain === 'both' && !props.height && !props.maxLines) {
           props.height =
-            (parent.height || 0) - props.y - (props.marginBottom || 0);
+            (parent.height || 0) - (props.y || 0) - (props.marginBottom || 0);
           node._height = props.height;
           node._autosized = true;
         }
@@ -587,14 +589,14 @@ export class ElementNode extends Object {
       // If its not an image or texture apply some defaults
       if (!(props.src || props.texture)) {
         // Set width and height to parent less offset
-        if (isNaN(props.width)) {
-          props.width = (parent.width || 0) - props.x;
+        if (isNaN(props.width as number)) {
+          props.width = (parent.width || 0) - (props.x || 0);
           node._width = props.width;
           node._autosized = true;
         }
 
-        if (isNaN(props.height)) {
-          props.height = (parent.height || 0) - props.y;
+        if (isNaN(props.height as number)) {
+          props.height = (parent.height || 0) - (props.y || 0);
           node._height = props.height;
           node._autosized = true;
         }
