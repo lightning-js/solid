@@ -79,7 +79,10 @@ export interface IntrinsicNodeStyleCommonProps {
   marginLeft?: number;
   marginRight?: number;
   marginTop?: number;
-  transition?: Record<string, Partial<AnimationSettings> | true> | true;
+  transition?:
+    | Record<string, Partial<AnimationSettings> | true | false>
+    | true
+    | false;
 }
 
 export interface IntrinsicTextStyleCommonProps {
