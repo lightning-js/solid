@@ -378,6 +378,7 @@ export class ElementNode extends Object {
         if (focusedIndex !== null && focusedIndex < this.children.length) {
           const child = this.children[focusedIndex];
           child instanceof ElementNode && child.setFocus();
+          return;
         }
       }
       // Delay setting focus so children can render (useful for Row + Column)
