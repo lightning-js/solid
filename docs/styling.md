@@ -38,7 +38,7 @@ const Top: Component<TopProps> = (props: TopProps) => {
   return (
     <ChildComp
       {...props}
-      style={props.style ? [props.style, styles.Container] : styles.Container}
+      style={[props.style, styles.Container]}
       onSelectedChanged={chainFunctions(props.onSelectedChanged, withScrolling(props.y as number))}
     />
   );

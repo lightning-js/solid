@@ -110,7 +110,10 @@ export interface IntrinsicTextNodeStyleProps
 
 export interface IntrinsicNodeProps
   extends AddUndefined<IntrinsicNodeCommonProps & IntrinsicNodeStyleProps> {
-  style?: IntrinsicNodeStyleProps | IntrinsicNodeStyleProps[] | undefined;
+  style?:
+    | IntrinsicNodeStyleProps
+    | (IntrinsicNodeStyleProps | undefined)[]
+    | undefined;
   children?: JSX.Element | undefined;
 }
 
@@ -118,7 +121,7 @@ export interface IntrinsicTextProps
   extends AddUndefined<IntrinsicNodeCommonProps & IntrinsicTextNodeStyleProps> {
   style?:
     | IntrinsicTextNodeStyleProps
-    | IntrinsicTextNodeStyleProps[]
+    | (IntrinsicTextNodeStyleProps | undefined)[]
     | undefined;
   children: string | string[];
 }

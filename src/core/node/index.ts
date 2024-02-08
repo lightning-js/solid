@@ -417,9 +417,9 @@ export class ElementNode extends Object {
     this.lng && renderer.destroyNode(this.lng);
   }
 
-  set style(values: SolidStyles | SolidStyles[]) {
+  set style(values: SolidStyles | (SolidStyles | undefined)[]) {
     const passedArray = isArray(values);
-    const styleArray = passedArray ? values : [values];
+    const styleArray = passedArray ? values.filter((v) => v) : [values];
     // Keys set in JSX are more important
     styleArray.forEach((value) => {
       for (const key in value) {
