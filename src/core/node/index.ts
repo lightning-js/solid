@@ -417,16 +417,22 @@ export class ElementNode extends Object {
     this.lng && renderer.destroyNode(this.lng);
   }
 
-  set style(value: SolidStyles) {
+  set style(values: SolidStyles | SolidStyles[]) {
+    const passedArray = isArray(values);
+    const styleArray = passedArray ? values : [values];
     // Keys set in JSX are more important
-    for (const key in value) {
-      // be careful of 0 values
-      if (this[key as keyof SolidStyles] === undefined) {
-        this[key as keyof SolidStyles] = value[key as keyof SolidStyles];
+    styleArray.forEach((value) => {
+      for (const key in value) {
+        // be careful of 0 values
+        if (this[key as keyof SolidStyles] === undefined) {
+          this[key as keyof SolidStyles] = value[key as keyof SolidStyles];
+        }
       }
-    }
-
-    this._style = value;
+    });
+    // reverse the array so the first style is the most important
+    this._style = (
+      passedArray ? Object.assign({}, ...styleArray.reverse()) : values
+    ) as SolidStyles;
   }
 
   get style(): SolidStyles {
