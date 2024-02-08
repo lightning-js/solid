@@ -64,7 +64,7 @@ export interface IntrinsicNodeStyleCommonProps {
   borderRadius?: number | number[];
   borderRight?: BorderStyle;
   borderTop?: BorderStyle;
-  display?: 'flex';
+  display?: 'flex' | 'block';
   effects?: any; // Should be EffectMap
   flexDirection?: 'row' | 'column';
   gap?: number;
