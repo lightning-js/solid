@@ -89,3 +89,19 @@ Read more about [Solids Lifecycle](https://docs.solidjs.com/references/api-refer
   onBeforeLayout: (child: ElementNode, dimensions: Dimensions)
   onLayout: (child: ElementNode, dimensions: Dimensions)
 ```
+
+## use: (Directives) in Solid
+
+SolidJS has built in [Directives](https://www.solidjs.com/docs/latest/api#use___) support via `use:` property. These only work on root elements `node` and `text`. Meaning you can't use `View` or `Text` with directives so instead do:
+
+```
+<node
+  use:withPadding={[10, 15]}
+  {...props}
+  style={{
+    color: '#00000099',
+    borderRadius: 8,
+    border: { width: 2, color: '#ffffff' },
+  }}
+>
+```
