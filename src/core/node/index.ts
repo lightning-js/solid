@@ -355,13 +355,13 @@ export class ElementNode extends Object {
   }
 
   async start() {
-    let animation = this._animationQueue.pop();
+    let animation = this._animationQueue.shift();
     while (animation) {
       this._animationRunning = true;
       await this.animate(animation.props, animation.animationSettings)
         .start()
         .waitUntilStopped();
-      animation = this._animationQueue.pop();
+      animation = this._animationQueue.shift();
     }
     this._animationRunning = false;
     this._animationQueueSettings = undefined;
