@@ -22,7 +22,7 @@ import universalInspector, {
   attachInspector,
 } from './universal/dom-inspector.js';
 import type { SolidNode } from './node/index.js';
-import type { JSX } from 'solid-js';
+import { splitProps, type JSX, createMemo, untrack } from 'solid-js';
 import { isDev } from '../config.js';
 
 const loadInspector = isDev;
@@ -53,3 +53,34 @@ export const {
   mergeProps,
   use,
 } = solidRenderer;
+
+/**
+ * renders an arbitrary custom or native component and passes the other props
+ * ```typescript
+ * <Dynamic component={multiline() ? 'textarea' : 'input'} value={value()} />
+ * ```
+ * @description https://www.solidjs.com/docs/latest/api#dynamic
+ */
+export function Dynamic<T>(
+  props: T extends Record<any, any> ? T : never,
+): SolidNode {
+  const [p, others] = splitProps(props, ['component']);
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  const cached = createMemo<Function | string>(() => p.component);
+  return createMemo(() => {
+    const component = cached();
+    switch (typeof component) {
+      case 'function':
+        return untrack(() => component(others));
+
+      case 'string':
+        // eslint-disable-next-line no-case-declarations
+        const el = createElement(component);
+        spread(el, others);
+        return el;
+
+      default:
+        break;
+    }
+  }) as unknown as SolidNode;
+}
