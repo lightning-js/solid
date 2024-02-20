@@ -81,6 +81,7 @@ export interface IntrinsicNodeStyleCommonProps {
   marginLeft?: number;
   marginRight?: number;
   marginTop?: number;
+  $states?: Record<string, IntrinsicNodeStyleProps>;
   transition?:
     | Record<string, Partial<AnimationSettings> | true | false>
     | true
@@ -92,6 +93,7 @@ export interface IntrinsicTextStyleCommonProps {
   marginRight?: number;
   marginTop?: number;
   marginBottom?: number;
+  $states?: Record<string, IntrinsicNodeStyleProps>;
 }
 
 export interface IntrinsicCommonProps

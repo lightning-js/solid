@@ -503,7 +503,10 @@ export class ElementNode extends Object {
 
     const states = config.stateMapperHook?.(this, this.states) || this.states;
 
-    if (this._undoStates || (this.style && keyExists(this.style, states))) {
+    if (
+      this._undoStates ||
+      (this.style?.$states && keyExists(this.style.$states, states))
+    ) {
       this._undoStates = this._undoStates || {};
       let stylesToUndo = {};
 
@@ -518,7 +521,7 @@ export class ElementNode extends Object {
       }
 
       const newStyles = states.reduce((acc, state) => {
-        const styles = this.style[state];
+        const styles = this.style.$states![state];
         if (styles) {
           acc = {
             ...acc,

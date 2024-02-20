@@ -11,13 +11,15 @@ const Button = {
   color: 0x546160ff,
   alpha: 0.8,
   scale: 1,
-  focus: {
-    color: 0x58807dff,
-    scale: 1.1,
-    alpha: 1,
-  },
-  disabled: {
-    color: 0x333333ff,
+  $states: {
+    focus: {
+      color: 0x58807dff,
+      scale: 1.1,
+      alpha: 1,
+    },
+    disabled: {
+      color: 0x333333ff,
+    },
   },
 };
 ```
@@ -69,7 +71,7 @@ Config.stateMapperHook = (node, states) => {
 };
 ```
 
-Then it would apply `focusbrand` from the styles object.
+Then it would apply `focusbrand` from the styles $states object.
 
 ## forwardStates
 
@@ -87,10 +89,12 @@ function Button(props) {
       scale: { duration: 1500, delay: 200, easing: 'easy-in' },
       alpha: { duration: 1500, delay: 200, easing: 'easy-in' },
     },
-    focus: {
-      color: [0x58807dff, { duration: 2000 }],
-      scale: 1.2,
-      alpha: 1,
+    $states: {
+      focus: {
+        color: [0x58807dff, { duration: 2000 }],
+        scale: 1.2,
+        alpha: 1,
+      },
     },
   };
 
@@ -103,8 +107,10 @@ function Button(props) {
     color: 0xf6f6f9ff,
     height: Button.height,
     width: Button.width,
-    focus: {
-      color: 0xffffffff,
+    $states: {
+      focus: {
+        color: 0xffffffff,
+      },
     },
   };
 
