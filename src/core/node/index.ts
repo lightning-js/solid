@@ -431,8 +431,10 @@ export class ElementNode extends Object {
   }
 
   set style(values: SolidStyles | (SolidStyles | undefined)[]) {
-    const passedArray = isArray(values);
-    const styleArray = passedArray ? values.filter((v) => v) : [values];
+    const styleArray = (
+      isArray(values) ? values.filter((v) => v) : [values]
+    ) as SolidStyles[];
+
     // Keys set in JSX are more important
     styleArray.forEach((value) => {
       for (const key in value) {
@@ -442,10 +444,24 @@ export class ElementNode extends Object {
         }
       }
     });
-    // reverse the array so the first style is the most important
-    this._style = (
-      passedArray ? Object.assign({}, ...styleArray.reverse()) : values
-    ) as SolidStyles;
+
+    if (styleArray.length > 1) {
+      let hasStates = false;
+      const $states = styleArray.reduce((acc, val) => {
+        if (val.$states) {
+          hasStates = true;
+          return Object.assign(acc, val.$states);
+        }
+        return acc;
+      }, {}) as Record<string, IntrinsicNodeProps>;
+      // reverse the array so the first style is the most important
+      this._style = Object.assign({}, ...styleArray.reverse()) as SolidStyles;
+      if (hasStates) {
+        this._style.$states = $states;
+      }
+    } else {
+      this._style = styleArray[0];
+    }
   }
 
   get style(): SolidStyles {
