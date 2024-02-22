@@ -415,8 +415,13 @@ export class ElementNode extends Object {
         ) {
           return;
         }
-        this.width = dimensions.width;
-        this.height = dimensions.height;
+
+        if (this.contain === 'width') {
+          this.height = dimensions.height;
+        } else {
+          this.width = dimensions.width;
+          this.height = dimensions.height;
+        }
         this.parent!.updateLayout(this, dimensions);
       }
     });
