@@ -18,20 +18,10 @@
 
 import { createRenderer } from 'solid-js/universal';
 import universalLightning from './universal/lightning.js';
-import universalInspector, {
-  attachInspector,
-} from './universal/dom-inspector.js';
 import type { SolidNode } from './node/index.js';
 import { splitProps, type JSX, createMemo, untrack } from 'solid-js';
-import { isDev } from '../config.js';
 
-const loadInspector = isDev;
-if (loadInspector) {
-  attachInspector();
-}
-const solidRenderer = createRenderer<SolidNode>(
-  loadInspector ? universalInspector : universalLightning,
-);
+const solidRenderer = createRenderer<SolidNode>(universalLightning);
 
 // TODO: This is a hack to get the `render()` function to work as it is used now in the demo app
 // There's gotta be a better way to fix it
