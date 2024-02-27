@@ -436,8 +436,10 @@ export class ElementNode extends Object {
   }
 
   set style(values: SolidStyles | (SolidStyles | undefined)[]) {
-    const passedArray = isArray(values);
-    const styleArray = passedArray ? values.filter((v) => v) : [values];
+    const styleArray = (
+      isArray(values) ? values.filter((v) => v) : [values]
+    ) as SolidStyles[];
+
     // Keys set in JSX are more important
     styleArray.forEach((value) => {
       for (const key in value) {
@@ -447,10 +449,24 @@ export class ElementNode extends Object {
         }
       }
     });
-    // reverse the array so the first style is the most important
-    this._style = (
-      passedArray ? Object.assign({}, ...styleArray.reverse()) : values
-    ) as SolidStyles;
+
+    if (styleArray.length > 1) {
+      let hasStates = false;
+      const $states = styleArray.reduce((acc, val) => {
+        if (val.$states) {
+          hasStates = true;
+          return Object.assign(acc, val.$states);
+        }
+        return acc;
+      }, {}) as Record<string, IntrinsicNodeProps>;
+      // reverse the array so the first style is the most important
+      this._style = Object.assign({}, ...styleArray.reverse()) as SolidStyles;
+      if (hasStates) {
+        this._style.$states = $states;
+      }
+    } else {
+      this._style = styleArray[0];
+    }
   }
 
   get style(): SolidStyles {
@@ -508,7 +524,10 @@ export class ElementNode extends Object {
 
     const states = config.stateMapperHook?.(this, this.states) || this.states;
 
-    if (this._undoStates || (this.style && keyExists(this.style, states))) {
+    if (
+      this._undoStates ||
+      (this.style?.$states && keyExists(this.style.$states, states))
+    ) {
       this._undoStates = this._undoStates || {};
       let stylesToUndo = {};
 
@@ -523,7 +542,7 @@ export class ElementNode extends Object {
       }
 
       const newStyles = states.reduce((acc, state) => {
-        const styles = this.style[state];
+        const styles = this.style.$states![state];
         if (styles) {
           acc = {
             ...acc,
