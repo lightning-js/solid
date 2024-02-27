@@ -55,7 +55,7 @@ createEffect(() => {
 <View ref={myButton} style={Button} />
 ```
 
-Also note if elements are animating and another state is applied during the animation which uses the animated value (say alpha or color) - when that state is removed it will return to some value during the animation. Be careful not to set state with styles that are also being animated.
+Note: states always use the values in the style object. If you have a button with a base color, and an disabled and focus state which both change the color, the value applied to the button will be determined from the style object. You won't be able to set the color of the button on the JSX `<Button color={???}>` because as the states change we need to determine which color to apply. If you need this functionality, you should pass in the color to the style object.
 
 ## stateMapperHook
 
