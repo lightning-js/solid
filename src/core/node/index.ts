@@ -118,6 +118,7 @@ const LightningRendererNonAnimatingProps = [
   'maxLines',
   'offsetY',
   'overflowSuffix',
+  'rtt',
   'scrollable',
   'scrollY',
   'src',
