@@ -28,7 +28,7 @@ export type SolidRendererOptions = Parameters<
 /**
  * Recursively removes all child nodes from the given element node and destroys the node itself.
  *
- * @param {unknown} node - the node
+ * @param {SolidNode} node - the node
  * @return {void}
  */
 function removeChildrenNode(node: SolidNode) {
