@@ -601,7 +601,7 @@ export class ElementNode extends Object {
       }
     } else {
       // If its not an image or texture apply some defaults
-      if (!(props.src || props.texture)) {
+      if (!props.texture) {
         // Set width and height to parent less offset
         if (isNaN(props.width as number)) {
           props.width = (parent.width || 0) - (props.x || 0);
@@ -615,7 +615,7 @@ export class ElementNode extends Object {
           node._autosized = true;
         }
 
-        if (!props.color) {
+        if (!props.color && !props.src) {
           // Default color to transparent - If you later set a src, you'll need
           // to set color '#ffffffff'
           node._color = props.color = 0x00000000;
