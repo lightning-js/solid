@@ -31,7 +31,7 @@ export type SolidRendererOptions = Parameters<
  * @param {unknown} node - the node
  * @return {void}
  */
-function removeChildrenNode(node: unknown) {
+function removeChildrenNode(node: SolidNode) {
   if (node instanceof ElementNode) {
     for (const children of node.children ?? []) {
       removeChildrenNode(children);
