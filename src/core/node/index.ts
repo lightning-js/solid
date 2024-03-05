@@ -118,6 +118,7 @@ const LightningRendererNonAnimatingProps = [
   'maxLines',
   'offsetY',
   'overflowSuffix',
+  'rtt',
   'scrollable',
   'scrollY',
   'src',
@@ -173,7 +174,7 @@ export class ElementNode extends Object {
     | number
     | ((this: ElementNode, elm: ElementNode) => boolean | void);
 
-  private _undoStates?: Record<string, any>;
+  private _undoStyles?: string[];
   private _renderProps?: IntrinsicNodeProps | IntrinsicTextProps;
   private _effects: any;
   private _parent: ElementNode | undefined;
@@ -508,19 +509,13 @@ export class ElementNode extends Object {
 
     const states = config.stateMapperHook?.(this, this.states) || this.states;
 
-    if (this._undoStates || (this.style && keyExists(this.style, states))) {
-      this._undoStates = this._undoStates || {};
-      let stylesToUndo = {};
+    if (this._undoStyles || (this.style && keyExists(this.style, states))) {
+      this._undoStyles = this._undoStyles || [];
+      const stylesToUndo: { [key: string]: any } = {};
 
-      for (const [state, undoStyles] of Object.entries(this._undoStates)) {
-        // if state is no longer in the states undo it
-        if (!states.includes(state)) {
-          stylesToUndo = {
-            ...stylesToUndo,
-            ...undoStyles,
-          };
-        }
-      }
+      this._undoStyles.forEach((styleKey) => {
+        stylesToUndo[styleKey] = this.style[styleKey];
+      });
 
       const newStyles = states.reduce((acc, state) => {
         const styles = this.style[state];
@@ -529,17 +524,11 @@ export class ElementNode extends Object {
             ...acc,
             ...styles,
           };
-
-          // get current values to undo state
-          if (this._undoStates && !this._undoStates[state]) {
-            this._undoStates[state] = {};
-            Object.keys(styles).forEach((key) => {
-              this._undoStates![state][key] = this[key as keyof this];
-            });
-          }
         }
         return acc;
       }, {});
+
+      this._undoStyles = Object.keys(newStyles);
 
       // Apply transition first
       if ((newStyles as any).transition !== undefined) {
@@ -612,7 +601,7 @@ export class ElementNode extends Object {
       }
     } else {
       // If its not an image or texture apply some defaults
-      if (!(props.src || props.texture)) {
+      if (!props.texture) {
         // Set width and height to parent less offset
         if (isNaN(props.width as number)) {
           props.width = (parent.width || 0) - (props.x || 0);
@@ -626,7 +615,7 @@ export class ElementNode extends Object {
           node._autosized = true;
         }
 
-        if (!props.color) {
+        if (!props.color && !props.src) {
           // Default color to transparent - If you later set a src, you'll need
           // to set color '#ffffffff'
           node._color = props.color = 0x00000000;
