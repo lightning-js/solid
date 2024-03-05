@@ -1,6 +1,6 @@
 {
   "name": "@lightningjs/solid",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "Lightning renderer for solid universal",
   "type": "module",
   "source": "src/index.ts",
@@ -43,16 +43,16 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.5",
-    "@typescript-eslint/eslint-plugin": "^6.20.0",
-    "@typescript-eslint/parser": "^6.20.0",
-    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
-    "husky": "^9.0.7",
-    "lint-staged": "^15.2.0",
-    "prettier": "^3.2.4",
-    "rollup": "^4.9.6",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "rollup": "^4.12.0",
     "rollup-preset-solid": "^2.0.1",
-    "solid-js": "^1.8.12",
+    "solid-js": "^1.8.15",
     "typescript": "^5.3.3"
   },
   "lint-staged": {
@@ -63,8 +63,8 @@
     "*.{js,cjs,md}": "prettier --write"
   },
   "dependencies": {
-    "@lightningjs/renderer": "^0.7.0",
-    "@lightningjs/solid": "file:./"
+    "@lightningjs/renderer": "^0.7.5",
+    "@lightningjs/solid": "file:"
   },
   "peerDependencies": {
     "solid-js": "*"

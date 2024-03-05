@@ -145,10 +145,6 @@ export interface TextNode {
   marginRight?: number;
   marginTop?: number;
   marginBottom?: number;
-  /**
-   * Managed by dom-inspector
-   */
-  _dom?: Text; // Public but uses _ prefix
 }
 
 export type SolidNode = ElementNode | TextNode;
@@ -199,10 +195,6 @@ export class ElementNode extends Object {
   }> = [];
   private _animationQueueSettings: Partial<AnimationSettings> | undefined;
   private _animationRunning: boolean = false;
-  /**
-   * Managed by dom-inspector
-   */
-  public _dom?: HTMLDivElement; // Public but uses _ prefix
   children: Children;
 
   constructor(name: string) {
@@ -638,6 +630,13 @@ export class ElementNode extends Object {
 
     node.rendered = true;
     node.autofocus && node.setFocus();
+
+    // L3 Inspector adds div to the lng object
+    //@ts-expect-error - div is not in the typings
+    if (node.lng.div) {
+      //@ts-expect-error - div is not in the typings
+      node.lng.div.solid = node;
+    }
     // clean up after first render;
     delete this._renderProps;
   }
