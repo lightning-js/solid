@@ -26,6 +26,7 @@ interface Config {
   animationSettings: Partial<AnimationSettings>;
   animationsEnabled: boolean;
   fontSettings: Partial<IntrinsicTextNodeStyleProps>;
+  enableRecursiveRemoval: boolean;
   stateMapperHook?: (node: ElementNode, states: Array<string>) => Array<string>;
 }
 
@@ -39,6 +40,7 @@ export const config: Config = {
     duration: 250,
     easing: 'ease-in-out',
   },
+  enableRecursiveRemoval: false,
   fontSettings: {
     fontFamily: 'Ubuntu',
     fontSize: 100,
