@@ -25,6 +25,21 @@ export type SolidRendererOptions = Parameters<
   typeof createRenderer<SolidNode>
 >[0];
 
+/**
+ * Recursively removes all child nodes from the given element node and destroys the node itself.
+ *
+ * @param {SolidNode} node - the node
+ * @return {void}
+ */
+function removeChildrenNode(node: SolidNode) {
+  if (node instanceof ElementNode) {
+    for (const children of node.children ?? []) {
+      removeChildrenNode(children);
+    }
+    node.destroy();
+  }
+}
+
 export default {
   createElement(name: string): ElementNode {
     const node = new ElementNode(name);
@@ -64,9 +79,7 @@ export default {
   removeNode(parent: ElementNode, node: SolidNode): void {
     log('REMOVE: ', parent, node);
     parent.children.remove(node);
-    if (node instanceof ElementNode) {
-      node.destroy();
-    }
+    removeChildrenNode(node);
   },
   getParentNode(node: SolidNode): ElementNode | undefined {
     return node.parent;
