@@ -537,8 +537,8 @@ export class ElementNode extends Object {
     const node = this;
     const parent = this.parent;
 
-    // prevents Too many redirects error
     if (!parent) {
+      console.warn('Parent not set - no node created for: ', this);
       return;
     }
 
