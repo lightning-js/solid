@@ -9,7 +9,7 @@
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./src/index.ts",
+      "import": "./dist/esm/index.js",
       "typescript": "./src/index.ts",
       "browser": "./dist/esm/index.js",
       "solid": "./dist/source/index.js",
