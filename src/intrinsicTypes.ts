@@ -18,11 +18,17 @@
 import {
   type AnimationSettings,
   type Dimensions,
+  type FadeOutEffectProps,
+  type GlitchEffectProps,
+  type GrayscaleEffectProps,
   type INode,
   type INodeWritableProps,
   type ITextNodeWritableProps,
+  type LinearGradientEffectProps,
   type NodeFailedPayload,
   type NodeLoadedPayload,
+  type RadialGradientEffectProps,
+  type RadialProgressEffectProps,
 } from '@lightningjs/renderer';
 import { type JSX } from 'solid-js';
 import { type ElementNode } from './core/node/index.js';
@@ -38,6 +44,15 @@ export interface BorderStyleObject {
 }
 
 export type BorderStyle = number | BorderStyleObject;
+
+export interface Effects {
+  fadeOut?: FadeOutEffectProps;
+  linearGradient?: LinearGradientEffectProps;
+  radialGradient?: RadialGradientEffectProps;
+  grayscale?: GrayscaleEffectProps;
+  glitch?: GlitchEffectProps;
+  radialProgress?: RadialProgressEffectProps;
+}
 
 export interface IntrinsicNodeCommonProps {
   animationSettings?: Partial<AnimationSettings>;
@@ -67,7 +82,7 @@ export interface IntrinsicNodeStyleCommonProps {
   borderRight?: BorderStyle;
   borderTop?: BorderStyle;
   display?: 'flex' | 'block';
-  effects?: any; // Should be EffectMap
+  effects?: Effects;
   flexDirection?: 'row' | 'column';
   gap?: number;
   justifyContent?:
@@ -76,7 +91,7 @@ export interface IntrinsicNodeStyleCommonProps {
     | 'center'
     | 'spaceBetween'
     | 'spaceEvenly';
-  linearGradient?: any; // Should be typeof LinearGradientEffect
+  linearGradient?: LinearGradientEffectProps;
   marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
