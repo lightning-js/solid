@@ -535,7 +535,12 @@ export class ElementNode extends Object {
   render() {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const node = this;
-    const parent = this.parent!;
+    const parent = this.parent;
+
+    // prevents Too many redirects error
+    if (!parent) {
+      return;
+    }
 
     // Parent is dirty whenever a node is inserted after initial render
     if (parent._isDirty) {
