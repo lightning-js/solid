@@ -72,7 +72,7 @@ export default {
         }
         return;
       }
-      if (renderer.root && parent.rendered) {
+      if (renderer.root && parent.rendered && (node as ElementNode).render) {
         (node as ElementNode).render();
       }
     }
