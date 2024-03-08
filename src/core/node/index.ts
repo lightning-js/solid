@@ -425,7 +425,9 @@ export class ElementNode extends Object {
   }
 
   destroy() {
-    this.lng && renderer.destroyNode(this.lng);
+    if (this.lng && !this.parent) {
+      this.lng.destroy();
+    }
   }
 
   set style(values: SolidStyles | (SolidStyles | undefined)[]) {

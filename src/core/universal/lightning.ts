@@ -85,9 +85,12 @@ export default {
     parent.children.remove(node);
     if (node instanceof ElementNode) {
       if (config.enableRecursiveRemoval) {
-        removeChildrenNode(node);
+        queueMicrotask(() => removeChildrenNode(node));
       } else {
-        node.destroy();
+        // Solid replacesNodes to move them (via insert and remove),
+        // so we need to wait for the next microtask to destroy the node
+        // in the event it gets a new parent.
+        queueMicrotask(() => node.destroy());
       }
     }
   },
