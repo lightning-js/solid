@@ -649,7 +649,11 @@ export class ElementNode extends Object {
     delete this._renderProps;
 
     if (node.name !== 'text') {
-      node.children.forEach((c) => (c as ElementNode).render());
+      node.children.forEach((c) => {
+        if ((c as ElementNode).render) {
+          (c as ElementNode).render();
+        }
+      });
     }
 
     node.autofocus && node.setFocus();
