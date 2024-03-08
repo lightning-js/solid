@@ -542,6 +542,11 @@ export class ElementNode extends Object {
       return;
     }
 
+    if (this.rendered) {
+      console.warn('Node already rendered: ', this);
+      return;
+    }
+
     // Parent is dirty whenever a node is inserted after initial render
     if (parent._isDirty) {
       parent.updateLayout();
@@ -634,8 +639,6 @@ export class ElementNode extends Object {
     }
 
     node.rendered = true;
-    node.autofocus && node.setFocus();
-
     // L3 Inspector adds div to the lng object
     //@ts-expect-error - div is not in the typings
     if (node.lng.div) {
@@ -644,5 +647,11 @@ export class ElementNode extends Object {
     }
     // clean up after first render;
     delete this._renderProps;
+
+    if (node.name !== 'text') {
+      node.children.forEach((c) => (c as ElementNode).render());
+    }
+
+    node.autofocus && node.setFocus();
   }
 }

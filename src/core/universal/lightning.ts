@@ -44,7 +44,6 @@ function removeChildrenNode(node: SolidNode) {
 export default {
   createElement(name: string): ElementNode {
     const node = new ElementNode(name);
-    renderer.root && onMount(() => node.render());
     return node;
   },
   createTextNode(text: string): TextNode {
@@ -71,6 +70,10 @@ export default {
         if (parent.isTextNode()) {
           parent.text = parent.getText();
         }
+        return;
+      }
+      if (renderer.root && parent.rendered) {
+        (node as ElementNode).render();
       }
     }
   },

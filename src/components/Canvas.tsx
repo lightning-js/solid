@@ -20,15 +20,6 @@ import { startLightningRenderer, type SolidRendererOptions } from '../core/rende
 import { ElementNode, type SolidNode } from "../core/node/index.js";
 import { isFunc } from "../core/utils.js";
 
-function renderTopDown(node: SolidNode) {
-  if (node instanceof ElementNode) {
-    node.render();
-
-    if (node.name !== 'text') {
-      node.children.forEach(c => renderTopDown(c))
-    }
-  }
-}
 
 export interface CanvasOptions {
   coreExtensionModule?: string,
@@ -56,7 +47,7 @@ export const Canvas = (props: CanvasProps = {}) => {
 
     init.then(() => {
       root.lng = renderer.root!;
-      root.children.forEach(renderTopDown);
+      root.children.forEach(c => (c as ElementNode).render());
       isFunc(props.onFirstRender) && props.onFirstRender(root);
     }).catch(console.error);
   }
