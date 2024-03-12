@@ -72,6 +72,7 @@ export default {
         }
         return;
       }
+
       if (renderer.root && parent.rendered && (node as ElementNode).render) {
         (node as ElementNode).render();
       }
@@ -85,12 +86,12 @@ export default {
     parent.children.remove(node);
     if (node instanceof ElementNode) {
       if (config.enableRecursiveRemoval) {
-        queueMicrotask(() => removeChildrenNode(node));
+        removeChildrenNode(node);
       } else {
         // Solid replacesNodes to move them (via insert and remove),
         // so we need to wait for the next microtask to destroy the node
         // in the event it gets a new parent.
-        queueMicrotask(() => node.destroy());
+        node.destroy();
       }
     }
   },

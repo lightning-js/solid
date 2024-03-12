@@ -53,7 +53,6 @@ export default class Children extends Array<SolidNode> {
     const nodeIndexToRemove = this.indexOf(node);
     if (nodeIndexToRemove >= 0) {
       this.splice(nodeIndexToRemove, 1);
-      node.parent = undefined;
     }
   }
 }
