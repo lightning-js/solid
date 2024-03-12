@@ -29,7 +29,7 @@
     "build": "npm run tsc && rollup -c",
     "tsc": "tsc",
     "watch": "tsc -w",
-    "prepare": "husky install",
+    "prepare": "husky",
     "prepack": "npm run build"
   },
   "keywords": [
