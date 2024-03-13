@@ -15,8 +15,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { type Component } from "solid-js";
+import { onCleanup, type Component } from "solid-js";
 import { type IntrinsicNodeProps } from "../intrinsicTypes.js";
+import { Config, ElementNode } from "../index.js";
+import { removeChildrenNode } from "../core/universal/lightning.js";
 
-export const View: Component<IntrinsicNodeProps> = (props) =>
-   <node {...props}></node>;
+export const View: Component<IntrinsicNodeProps> = (props) => {
+  let node: ElementNode | ((node: ElementNode) => void) | undefined;
+
+  onCleanup(() => {
+    if (node instanceof ElementNode) {
+        if (Config.enableRecursiveRemoval) {
+          removeChildrenNode(node);
+        } else {
+          node.destroy();
+        }
+    }
+  });
+
+  return  <node {...props} ref={(ref) => {node = ref; return props.ref}}></node>;
+}

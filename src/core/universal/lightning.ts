@@ -16,9 +16,7 @@
  */
 import { assertTruthy } from '@lightningjs/renderer/utils';
 import { renderer } from '../renderer/index.js';
-import { onMount } from 'solid-js';
 import { log } from '../utils.js';
-import { config } from '../../config.js';
 import { ElementNode, type SolidNode, type TextNode } from '../node/index.js';
 import type { createRenderer } from 'solid-js/universal';
 
@@ -32,7 +30,7 @@ export type SolidRendererOptions = Parameters<
  * @param {SolidNode} node - the node
  * @return {void}
  */
-function removeChildrenNode(node: SolidNode) {
+export function removeChildrenNode(node: SolidNode) {
   if (node instanceof ElementNode) {
     for (const children of node.children ?? []) {
       removeChildrenNode(children);
@@ -84,16 +82,6 @@ export default {
   removeNode(parent: ElementNode, node: SolidNode): void {
     log('REMOVE: ', parent, node);
     parent.children.remove(node);
-    if (node instanceof ElementNode) {
-      if (config.enableRecursiveRemoval) {
-        removeChildrenNode(node);
-      } else {
-        // Solid replacesNodes to move them (via insert and remove),
-        // so we need to wait for the next microtask to destroy the node
-        // in the event it gets a new parent.
-        node.destroy();
-      }
-    }
   },
   getParentNode(node: SolidNode): ElementNode | undefined {
     return node.parent;

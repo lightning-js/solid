@@ -15,7 +15,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { type Component } from "solid-js";
+import { onCleanup, type Component } from "solid-js";
 import type { IntrinsicTextProps } from "../intrinsicTypes.js";
+import { Config, ElementNode } from "../index.js";
+import { removeChildrenNode } from "../core/universal/lightning.js";
 
-export const Text: Component<IntrinsicTextProps> = (props) => <text {...props}></text>
+export const Text: Component<IntrinsicTextProps> = (props) => {
+  let node: ElementNode | ((node: ElementNode) => void) | undefined;
+
+  onCleanup(() => {
+    if (node instanceof ElementNode) {
+        if (Config.enableRecursiveRemoval) {
+          removeChildrenNode(node);
+        } else {
+          node.destroy();
+        }
+    }
+  });
+
+  return  <text {...props} ref={(ref) => {node = ref; return props.ref}}></text>;
+}

@@ -544,6 +544,11 @@ export class ElementNode extends Object {
       return;
     }
 
+    if (this.rendered) {
+      console.warn('Node already rendered: ', this);
+      return;
+    }
+
     // Parent is dirty whenever a node is inserted after initial render
     if (parent._isDirty) {
       parent.updateLayout();
@@ -643,7 +648,7 @@ export class ElementNode extends Object {
       node.lng.div.solid = node;
     }
     // clean up after first render;
-    // delete this._renderProps;
+    delete this._renderProps;
 
     if (node.name !== 'text') {
       node.children.forEach((c) => {
