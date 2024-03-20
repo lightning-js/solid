@@ -145,6 +145,7 @@ export interface TextNode {
   marginRight?: number;
   marginTop?: number;
   marginBottom?: number;
+  _queueDelete?: boolean;
 }
 
 export type SolidNode = ElementNode | TextNode;
@@ -166,6 +167,7 @@ export class ElementNode extends Object {
   selected?: number;
   rendered: boolean;
   autofocus: boolean;
+  _queueDelete?: boolean;
   forwardFocus?:
     | number
     | ((this: ElementNode, elm: ElementNode) => boolean | void);
@@ -402,19 +404,6 @@ export class ElementNode extends Object {
     this.lng!.on('loaded', (_node: INode, loadedPayload: NodeLoadedPayload) => {
       if (loadedPayload.type === 'text') {
         const { dimensions } = loadedPayload;
-        if (
-          dimensions.width === this.width &&
-          dimensions.height === this.height
-        ) {
-          return;
-        }
-
-        if (this.contain === 'width') {
-          this.height = dimensions.height;
-        } else {
-          this.width = dimensions.width;
-          this.height = dimensions.height;
-        }
         this.parent!.updateLayout(this, dimensions);
       }
     });
@@ -425,7 +414,7 @@ export class ElementNode extends Object {
   }
 
   destroy() {
-    if (this.lng && !this.parent) {
+    if (this.lng && this._queueDelete) {
       this.lng.destroy();
     }
   }

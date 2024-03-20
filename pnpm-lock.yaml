@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@lightningjs/renderer':
-    specifier: ^0.7.5
-    version: 0.7.5
+    specifier: ^0.7.6
+    version: 0.7.6
   '@lightningjs/solid':
     specifier: 'file:'
     version: file:(solid-js@1.8.15)
@@ -1396,8 +1396,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@lightningjs/renderer@0.7.5:
-    resolution: {integrity: sha512-lh1JGfmTiY6eTZldjbQmbtNplfn5t16EPWG+YfBeEx2R7uLqNWkWn1rWTD/QTebQfsuBoXHet2go0NTIYyqUUA==}
+  /@lightningjs/renderer@0.7.6:
+    resolution: {integrity: sha512-cvdhiAe9tU1ZgsFxMTI3A6SEnRlhT4or+52D8WugXNFSaEbjn04aL5Z6GU3TEC4WCOqGDJfyY9/+dxAFytxe1A==}
     engines: {node: '>= 20.9.0', npm: '>= 10.0.0', pnpm: '>= 8.9.2'}
     requiresBuild: true
     dependencies:
@@ -3484,6 +3484,6 @@ packages:
     peerDependencies:
       solid-js: '*'
     dependencies:
-      '@lightningjs/renderer': 0.7.5
+      '@lightningjs/renderer': 0.7.6
       solid-js: 1.8.15
     dev: false

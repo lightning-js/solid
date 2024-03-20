@@ -63,7 +63,7 @@
     "*.{js,cjs,md}": "prettier --write"
   },
   "dependencies": {
-    "@lightningjs/renderer": "^0.7.5",
+    "@lightningjs/renderer": "^0.7.6",
     "@lightningjs/solid": "file:"
   },
   "peerDependencies": {

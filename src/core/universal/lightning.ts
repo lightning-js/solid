@@ -64,6 +64,7 @@ export default {
     log('INSERT: ', parent, node, anchor);
     if (parent) {
       parent.children.insert(node, anchor);
+      node._queueDelete = false;
 
       if (node.name === 'TextNode') {
         // TextNodes can be placed outside of <text> nodes when <Show> is used as placeholder
