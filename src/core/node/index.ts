@@ -414,8 +414,8 @@ export class ElementNode extends Object {
   }
 
   destroy() {
-    if (this.lng && this._queueDelete) {
-      this.lng.destroy();
+    if (this._queueDelete) {
+      this.lng?.destroy();
     }
   }
 

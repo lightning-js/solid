@@ -16,9 +16,7 @@
  */
 import { assertTruthy } from '@lightningjs/renderer/utils';
 import { renderer } from '../renderer/index.js';
-import { onMount } from 'solid-js';
 import { log } from '../utils.js';
-import { config } from '../../config.js';
 import { ElementNode, type SolidNode, type TextNode } from '../node/index.js';
 import type { createRenderer } from 'solid-js/universal';
 
@@ -26,25 +24,9 @@ export type SolidRendererOptions = Parameters<
   typeof createRenderer<SolidNode>
 >[0];
 
-/**
- * Recursively removes all child nodes from the given element node and destroys the node itself.
- *
- * @param {SolidNode} node - the node
- * @return {void}
- */
-function removeChildrenNode(node: SolidNode) {
-  if (node instanceof ElementNode) {
-    for (const children of node.children ?? []) {
-      removeChildrenNode(children);
-    }
-    node.destroy();
-  }
-}
-
 export default {
   createElement(name: string): ElementNode {
-    const node = new ElementNode(name);
-    return node;
+    return new ElementNode(name);
   },
   createTextNode(text: string): TextNode {
     // A text node is just a string - not the <text> node
@@ -62,6 +44,7 @@ export default {
   },
   insertNode(parent: ElementNode, node: SolidNode, anchor: SolidNode): void {
     log('INSERT: ', parent, node, anchor);
+    // Only the canvas tag doesnt have a parent - render second param should be the root node...
     if (parent) {
       parent.children.insert(node, anchor);
       node._queueDelete = false;
@@ -84,15 +67,13 @@ export default {
   removeNode(parent: ElementNode, node: SolidNode): void {
     log('REMOVE: ', parent, node);
     parent.children.remove(node);
+    node._queueDelete = true;
+
     if (node instanceof ElementNode) {
-      if (config.enableRecursiveRemoval) {
-        queueMicrotask(() => removeChildrenNode(node));
-      } else {
-        // Solid replacesNodes to move them (via insert and remove),
-        // so we need to wait for the next microtask to destroy the node
-        // in the event it gets a new parent.
-        queueMicrotask(() => node.destroy());
-      }
+      // Solid replacesNodes to move them (via insert and remove),
+      // so we need to wait for the next microtask to destroy the node
+      // in the event it gets a new parent.
+      queueMicrotask(() => node.destroy());
     }
   },
   getParentNode(node: SolidNode): ElementNode | undefined {
