@@ -3,6 +3,10 @@
     "text": "Getting Started",
     "items": [
       {
+        "text": "Intro",
+        "link": "/intro"
+      },
+      {
         "text": "Setup",
         "link": "/getting_started"
       }

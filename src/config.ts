@@ -30,7 +30,7 @@ interface Config {
 }
 
 //import.meta.env = import.meta.env || { 'MODE': 'development' };
-export const isDev = import.meta.env.MODE === 'development';
+export const isDev = import.meta.env.DEV;
 
 export const config: Config = {
   debug: false,
