@@ -83,7 +83,6 @@ Read more about [Solids Lifecycle](https://docs.solidjs.com/references/api-refer
 `View` and `Text` provide a set of event handlers that can be used in various stages of a node creation process.
 
 ```jsx
-  onCreate: (target: ElementNode)
   onLoad: (target: INode, nodeLoadedPayload: NodeLoadedPayload)
   onFail: (target: INode, nodeFailedPayload: NodeFailedPayload)
   onBeforeLayout: (child: ElementNode, dimensions: Dimensions)

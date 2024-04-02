@@ -19,9 +19,13 @@
 import { config, isDev } from '../config.js';
 import type { SolidNode } from './node/index.js';
 
+function hasDebug(node: any) {
+  return isObject(node) && node.debug;
+}
+
 export function log(msg: string, node: SolidNode, ...args: any[]) {
   if (isDev) {
-    if (config.debug || (isObject(node) && node.debug)) {
+    if (config.debug || hasDebug(node) || hasDebug(args[0])) {
       console.log(msg, node, ...args);
     }
   }

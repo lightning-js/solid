@@ -59,7 +59,6 @@ export interface IntrinsicNodeCommonProps {
   autofocus?: boolean;
   forwardStates?: boolean;
   id?: string;
-  onCreate?: (target: ElementNode) => void;
   onLoad?: (target: INode, nodeLoadedPayload: NodeLoadedPayload) => void;
   onFail?: (target: INode, nodeFailedPayload: NodeFailedPayload) => void;
   onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;

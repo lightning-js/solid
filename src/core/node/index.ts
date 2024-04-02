@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { renderer, createShader } from '../renderer/index.js';
+import { renderer, createShader } from '../lightningInit.js';
 import {
   type BorderStyleObject,
   type IntrinsicCommonProps,
@@ -533,6 +533,11 @@ export class ElementNode extends Object {
       return;
     }
 
+    if (!parent.rendered) {
+      console.warn('Parent not rendered yet: ', this);
+      return;
+    }
+
     if (this.rendered) {
       console.warn('Node already rendered: ', this);
       return;
@@ -582,8 +587,6 @@ export class ElementNode extends Object {
       log('Rendering: ', this, props);
       node.lng = renderer.createTextNode(props);
 
-      isFunc(this.onCreate) && this.onCreate.call(this, node);
-
       if (isFunc(node.onLoad)) {
         node.lng.on('loaded', node.onLoad);
       }
@@ -625,8 +628,6 @@ export class ElementNode extends Object {
       if (node.onLoad) {
         node.lng.on('loaded', node.onLoad);
       }
-
-      isFunc(this.onCreate) && this.onCreate.call(this, node);
     }
 
     node.rendered = true;
@@ -643,6 +644,9 @@ export class ElementNode extends Object {
       node.children.forEach((c) => {
         if ((c as ElementNode).render) {
           (c as ElementNode).render();
+        } else if (c.text !== '') {
+          // Solid Show uses an empty text node as a placeholder
+          console.warn('TextNode outside of <Text>: ', c);
         }
       });
     }
