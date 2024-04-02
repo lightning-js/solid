@@ -17,7 +17,7 @@
  */
 
 import { config, isDev } from '../config.js';
-import type { SolidNode } from './node/index.js';
+import type { SolidNode, SolidStyles } from './node/index.js';
 
 function hasDebug(node: any) {
   return isObject(node) && node.debug;
@@ -67,4 +67,25 @@ export function keyExists(
     }
   }
   return false;
+}
+
+export function flattenStyles(
+  obj: SolidStyles | undefined | (SolidStyles | undefined)[],
+  result: Record<string, unknown> = {},
+): SolidStyles {
+  if (isArray(obj)) {
+    obj.forEach((item) => {
+      flattenStyles(item, result);
+    });
+  } else if (obj) {
+    // handle the case where the object is not an array
+    for (const key in obj) {
+      // be careful of 0 values
+      if (result[key as keyof SolidStyles] === undefined) {
+        result[key as keyof SolidStyles] = obj[key as keyof SolidStyles];
+      }
+    }
+  }
+
+  return result;
 }

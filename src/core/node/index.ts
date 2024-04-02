@@ -27,7 +27,14 @@ import {
 import Children from './children.js';
 import States, { type NodeStates } from './states.js';
 import calculateFlex from '../flex.js';
-import { log, isArray, isNumber, isFunc, keyExists } from '../utils.js';
+import {
+  log,
+  isArray,
+  isNumber,
+  isFunc,
+  keyExists,
+  flattenStyles,
+} from '../utils.js';
 import { config } from '../../config.js';
 import { setActiveElement } from '../activeElement.js';
 import type {
@@ -423,21 +430,18 @@ export class ElementNode extends Object {
   }
 
   set style(values: SolidStyles | (SolidStyles | undefined)[]) {
-    const passedArray = isArray(values);
-    const styleArray = passedArray ? values.filter((v) => v) : [values];
+    if (isArray(values)) {
+      this._style = flattenStyles(values);
+    } else {
+      this._style = values;
+    }
     // Keys set in JSX are more important
-    styleArray.forEach((value) => {
-      for (const key in value) {
-        // be careful of 0 values
-        if (this[key as keyof SolidStyles] === undefined) {
-          this[key as keyof SolidStyles] = value[key as keyof SolidStyles];
-        }
+    for (const key in this._style) {
+      // be careful of 0 values
+      if (this[key as keyof SolidStyles] === undefined) {
+        this[key as keyof SolidStyles] = this._style[key as keyof SolidStyles];
       }
-    });
-    // reverse the array so the first style is the most important
-    this._style = (
-      passedArray ? Object.assign({}, ...styleArray.reverse()) : values
-    ) as SolidStyles;
+    }
   }
 
   get style(): SolidStyles {
@@ -450,6 +454,21 @@ export class ElementNode extends Object {
 
   getChildById(id: string) {
     return this.children.find((c) => c.id === id);
+  }
+
+  searchChildrenById(id: string): SolidNode | undefined {
+    // traverse all the childrens children
+    for (const child of this.children) {
+      if (child.id === id) {
+        return child;
+      }
+      if (child instanceof ElementNode) {
+        const found = child.searchChildrenById(id);
+        if (found) {
+          return found;
+        }
+      }
+    }
   }
 
   set states(states: NodeStates) {
