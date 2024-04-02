@@ -274,7 +274,9 @@ export class ElementNode extends Object {
 
   set effects(v) {
     this._effects = v;
-    this.shader = convertEffectsToShader(v);
+    if (this.rendered) {
+      this.shader = convertEffectsToShader(v);
+    }
   }
 
   get parent() {
@@ -559,6 +561,10 @@ export class ElementNode extends Object {
 
     if (parent.lng) {
       props.parent = parent.lng;
+    }
+
+    if (node._effects) {
+      this.shader = convertEffectsToShader(node._effects);
     }
 
     if (node.isTextNode()) {
