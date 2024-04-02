@@ -1,13 +1,9 @@
 ## Hello World
 
 ```jsx
-import { render, Canvas, Text } from '@lightningjs/solid';
+import { render, Text } from '@lightningjs/solid';
 
-render(() => (
-  <Canvas>
-    <Text>Hello World</Text>
-  </Canvas>
-));
+render(() => <Text>Hello World</Text>);
 ```
 
 This is all it takes to create your first Hello World app.

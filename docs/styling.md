@@ -31,7 +31,7 @@ const [alpha, setAlpha] = createSignal(1);
 
 The style attribute takes an object of properties and passes them to the Lightning Renderer on initial creation of the component. The style object will not be reapplied if it is changed after creation. This keeps the style object as Read Only in the templating system allowing you to use it for multiple components. Additionally, when the style object is applied any properties on the JSX will have greater precedent so you can override styles on individual components. After the component is created, you can further change props via signals or imperatively with the ref to the component.
 
-For UI Component libraries you can also pass an array to style. This allows for easy chaining of styling. This doesn't do a deep merge, so any state styles will be overriden by the top level style tag.
+For UI Component libraries you can also pass an array to style (with nested arrays). This allows for easy chaining of styling. This doesn't do a deep merge, so any state styles will be overriden by the top level style tag. Additional, styles are applied in the order of the array, so `props.style` will override `styles.Container`.
 
 ```jsx
 const Top: Component<TopProps> = (props: TopProps) => {

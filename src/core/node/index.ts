@@ -169,6 +169,7 @@ export interface ElementNode
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ElementNode extends Object {
   id?: string;
+  debug?: boolean;
   name: string;
   lng: INode | undefined;
   renderer?: RendererMain;
