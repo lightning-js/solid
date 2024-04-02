@@ -60,10 +60,6 @@ Config.fontSettings.fontFamily = 'Ubuntu';
 Config.fontSettings.color = 0xffffffff;
 Config.fontSettings.fontSize = 30;
 
-Config.stateMapperHook = (node, states) => {
-  const tone = node.tone || '';
-  states.map((state) => state + tone);
-};
 ```
 
 ## Table of Contents

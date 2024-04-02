@@ -22,7 +22,6 @@ import type {
   RendererMainSettings,
 } from '@lightningjs/renderer';
 import type { IntrinsicTextNodeStyleProps } from './intrinsicTypes.js';
-import { type ElementNode } from './core/node/index.js';
 
 interface Config {
   debug: boolean;
@@ -30,7 +29,6 @@ interface Config {
   animationsEnabled: boolean;
   fontSettings: Partial<IntrinsicTextNodeStyleProps>;
   rendererOptions?: Partial<RendererMainSettings>;
-  stateMapperHook?: (node: ElementNode, states: Array<string>) => Array<string>;
 }
 
 function isDevEnv(): boolean {

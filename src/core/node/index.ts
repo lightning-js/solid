@@ -132,6 +132,7 @@ const LightningRendererNonAnimatingProps = [
 ];
 
 export interface TextNode {
+  id?: string;
   name: string;
   text: string;
   parent: ElementNode | undefined;
@@ -447,6 +448,10 @@ export class ElementNode extends Object {
     return this.children.length > 0;
   }
 
+  getChildById(id: string) {
+    return this.children.find((c) => c.id === id);
+  }
+
   set states(states: NodeStates) {
     this._states = new States(this._stateChanged.bind(this), states);
     if (this.rendered) {
@@ -492,7 +497,7 @@ export class ElementNode extends Object {
       this.children.forEach((c) => (c.states = states));
     }
 
-    const states = config.stateMapperHook?.(this, this.states) || this.states;
+    const states = this.states;
 
     if (this._undoStyles || (this.style && keyExists(this.style, states))) {
       this._undoStyles = this._undoStyles || [];
@@ -637,6 +642,8 @@ export class ElementNode extends Object {
     }
 
     node.rendered = true;
+    isFunc(this.onCreate) && this.onCreate.call(this, node);
+
     // L3 Inspector adds div to the lng object
     //@ts-expect-error - div is not in the typings
     if (node.lng.div) {
