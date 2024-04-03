@@ -57,20 +57,6 @@ createEffect(() => {
 
 Note: states always use the values in the style object. If you have a button with a base color, and an disabled and focus state which both change the color, the value applied to the button will be determined from the style object. You won't be able to set the color of the button on the JSX `<Button color={???}>` because as the states change we need to determine which color to apply. If you need this functionality, you should pass in the color to the style object.
 
-## stateMapperHook
-
-For further customization of styles using states, you can change the states before styles are applied globally using Config.stateMapperHook. For instance, if you wanted to change your styles based on another property like tone you could do:
-
-```js
-import { Config } from '@lightningjs/solid';
-Config.stateMapperHook = (node, states) => {
-  const tone = node.tone || ''; // node.tone is 'brand'
-  return states.map((state) => state + tone);
-};
-```
-
-Then it would apply `focusbrand` from the styles object.
-
 ## forwardStates
 
 When you want the state to also be applied to children elements, you can add `forwardStates` attribute to the parent element. Any states set on the parent will be add / removed from the children as well. This is useful for functional components where you need to change styles of children as well.

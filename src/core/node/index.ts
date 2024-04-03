@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { renderer, createShader } from '../renderer/index.js';
+import { renderer, createShader } from '../lightningInit.js';
 import {
   type BorderStyleObject,
   type IntrinsicCommonProps,
@@ -27,7 +27,14 @@ import {
 import Children from './children.js';
 import States, { type NodeStates } from './states.js';
 import calculateFlex from '../flex.js';
-import { log, isArray, isNumber, isFunc, keyExists } from '../utils.js';
+import {
+  log,
+  isArray,
+  isNumber,
+  isFunc,
+  keyExists,
+  flattenStyles,
+} from '../utils.js';
 import { config } from '../../config.js';
 import { setActiveElement } from '../activeElement.js';
 import type {
@@ -132,6 +139,7 @@ const LightningRendererNonAnimatingProps = [
 ];
 
 export interface TextNode {
+  id?: string;
   name: string;
   text: string;
   parent: ElementNode | undefined;
@@ -161,6 +169,7 @@ export interface ElementNode
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ElementNode extends Object {
   id?: string;
+  debug?: boolean;
   name: string;
   lng: INode | undefined;
   renderer?: RendererMain;
@@ -274,7 +283,9 @@ export class ElementNode extends Object {
 
   set effects(v) {
     this._effects = v;
-    this.shader = convertEffectsToShader(v);
+    if (this.rendered) {
+      this.shader = convertEffectsToShader(v);
+    }
   }
 
   get parent() {
@@ -420,21 +431,18 @@ export class ElementNode extends Object {
   }
 
   set style(values: SolidStyles | (SolidStyles | undefined)[]) {
-    const passedArray = isArray(values);
-    const styleArray = passedArray ? values.filter((v) => v) : [values];
+    if (isArray(values)) {
+      this._style = flattenStyles(values);
+    } else {
+      this._style = values;
+    }
     // Keys set in JSX are more important
-    styleArray.forEach((value) => {
-      for (const key in value) {
-        // be careful of 0 values
-        if (this[key as keyof SolidStyles] === undefined) {
-          this[key as keyof SolidStyles] = value[key as keyof SolidStyles];
-        }
+    for (const key in this._style) {
+      // be careful of 0 values
+      if (this[key as keyof SolidStyles] === undefined) {
+        this[key as keyof SolidStyles] = this._style[key as keyof SolidStyles];
       }
-    });
-    // reverse the array so the first style is the most important
-    this._style = (
-      passedArray ? Object.assign({}, ...styleArray.reverse()) : values
-    ) as SolidStyles;
+    }
   }
 
   get style(): SolidStyles {
@@ -443,6 +451,25 @@ export class ElementNode extends Object {
 
   get hasChildren() {
     return this.children.length > 0;
+  }
+
+  getChildById(id: string) {
+    return this.children.find((c) => c.id === id);
+  }
+
+  searchChildrenById(id: string): SolidNode | undefined {
+    // traverse all the childrens children
+    for (const child of this.children) {
+      if (child.id === id) {
+        return child;
+      }
+      if (child instanceof ElementNode) {
+        const found = child.searchChildrenById(id);
+        if (found) {
+          return found;
+        }
+      }
+    }
   }
 
   set states(states: NodeStates) {
@@ -490,7 +517,7 @@ export class ElementNode extends Object {
       this.children.forEach((c) => (c.states = states));
     }
 
-    const states = config.stateMapperHook?.(this, this.states) || this.states;
+    const states = this.states;
 
     if (this._undoStyles || (this.style && keyExists(this.style, states))) {
       this._undoStyles = this._undoStyles || [];
@@ -533,6 +560,11 @@ export class ElementNode extends Object {
       return;
     }
 
+    if (!parent.rendered) {
+      console.warn('Parent not rendered yet: ', this);
+      return;
+    }
+
     if (this.rendered) {
       console.warn('Node already rendered: ', this);
       return;
@@ -554,6 +586,10 @@ export class ElementNode extends Object {
 
     if (parent.lng) {
       props.parent = parent.lng;
+    }
+
+    if (node._effects) {
+      this.shader = convertEffectsToShader(node._effects);
     }
 
     if (node.isTextNode()) {
@@ -581,8 +617,6 @@ export class ElementNode extends Object {
 
       log('Rendering: ', this, props);
       node.lng = renderer.createTextNode(props);
-
-      isFunc(this.onCreate) && this.onCreate.call(this, node);
 
       if (isFunc(node.onLoad)) {
         node.lng.on('loaded', node.onLoad);
@@ -625,11 +659,11 @@ export class ElementNode extends Object {
       if (node.onLoad) {
         node.lng.on('loaded', node.onLoad);
       }
-
-      isFunc(this.onCreate) && this.onCreate.call(this, node);
     }
 
     node.rendered = true;
+    isFunc(this.onCreate) && this.onCreate.call(this, node);
+
     // L3 Inspector adds div to the lng object
     //@ts-expect-error - div is not in the typings
     if (node.lng.div) {
@@ -643,6 +677,9 @@ export class ElementNode extends Object {
       node.children.forEach((c) => {
         if ((c as ElementNode).render) {
           (c as ElementNode).render();
+        } else if (c.text !== '') {
+          // Solid Show uses an empty text node as a placeholder
+          console.warn('TextNode outside of <Text>: ', c);
         }
       });
     }

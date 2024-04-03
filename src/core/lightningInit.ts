@@ -31,11 +31,10 @@ export interface SolidRendererOptions extends RendererMainSettings {
 
 export function startLightningRenderer(
   options: Partial<SolidRendererOptions> = {},
+  rootId: string | HTMLElement = 'app',
 ): RendererMain {
   const driver = new MainCoreDriver();
-
-  renderer = new RendererMain(options, options.rootId || 'app', driver);
-
+  renderer = new RendererMain(options, rootId, driver);
   createShader = renderer.createShader.bind(renderer);
   return renderer;
 }

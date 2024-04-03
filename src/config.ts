@@ -17,20 +17,24 @@
  * limitations under the License.
  */
 
-import type { AnimationSettings } from '@lightningjs/renderer';
+import type {
+  AnimationSettings,
+  RendererMainSettings,
+} from '@lightningjs/renderer';
 import type { IntrinsicTextNodeStyleProps } from './intrinsicTypes.js';
-import { type ElementNode } from './core/node/index.js';
 
 interface Config {
   debug: boolean;
   animationSettings: Partial<AnimationSettings>;
   animationsEnabled: boolean;
   fontSettings: Partial<IntrinsicTextNodeStyleProps>;
-  stateMapperHook?: (node: ElementNode, states: Array<string>) => Array<string>;
+  rendererOptions?: Partial<RendererMainSettings>;
 }
 
-//import.meta.env = import.meta.env || { 'MODE': 'development' };
-export const isDev = import.meta.env.DEV;
+function isDevEnv(): boolean {
+  return import.meta.env && import.meta.env.DEV;
+}
+export const isDev = isDevEnv() || false;
 
 export const config: Config = {
   debug: false,

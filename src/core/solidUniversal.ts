@@ -15,9 +15,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { assertTruthy } from '@lightningjs/renderer/utils';
-import { renderer } from '../renderer/index.js';
-import { log } from '../utils.js';
-import { ElementNode, type SolidNode, type TextNode } from '../node/index.js';
+import { log } from './utils.js';
+import { ElementNode, type SolidNode, type TextNode } from './node/index.js';
 import type { createRenderer } from 'solid-js/universal';
 
 export type SolidRendererOptions = Parameters<
@@ -44,21 +43,15 @@ export default {
   },
   insertNode(parent: ElementNode, node: SolidNode, anchor: SolidNode): void {
     log('INSERT: ', parent, node, anchor);
-    // Only the canvas tag doesnt have a parent - render second param should be the root node...
-    if (parent) {
-      parent.children.insert(node, anchor);
-      node._queueDelete = false;
 
-      if (node.name === 'TextNode') {
-        // TextNodes can be placed outside of <text> nodes when <Show> is used as placeholder
-        if (parent.isTextNode()) {
-          parent.text = parent.getText();
-        }
-        return;
-      }
-      if (renderer.root && parent.rendered && (node as ElementNode).render) {
-        (node as ElementNode).render();
-      }
+    parent.children.insert(node, anchor);
+    node._queueDelete = false;
+
+    if (node instanceof ElementNode) {
+      parent.rendered && node.render();
+    } else if (parent.isTextNode()) {
+      // TextNodes can be placed outside of <text> nodes when <Show> is used as placeholder
+      parent.text = parent.getText();
     }
   },
   isTextNode(node: ElementNode): boolean {
@@ -83,12 +76,10 @@ export default {
     return node.children[0];
   },
   getNextSibling(node: SolidNode): SolidNode | undefined {
-    if (node.parent) {
-      const children = node.parent.children || [];
-      const index = children.indexOf(node) + 1;
-      if (index < children.length) {
-        return children[index];
-      }
+    const children = node.parent!.children || [];
+    const index = children.indexOf(node) + 1;
+    if (index < children.length) {
+      return children[index];
     }
     return undefined;
   },

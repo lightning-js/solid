@@ -17,18 +17,26 @@
  */
 
 import { createRenderer } from 'solid-js/universal';
-import universalLightning from './universal/lightning.js';
-import type { SolidNode } from './node/index.js';
-import { splitProps, type JSX, createMemo, untrack } from 'solid-js';
+import { config } from '../config.js';
+import { startLightningRenderer } from './lightningInit.js';
+import universalLightning from './solidUniversal.js';
+import { ElementNode, type SolidNode } from './node/index.js';
+import { splitProps, createMemo, untrack, type JSX } from 'solid-js';
 
 const solidRenderer = createRenderer<SolidNode>(universalLightning);
 
-// TODO: This is a hack to get the `render()` function to work as it is used now in the demo app
-// There's gotta be a better way to fix it
-export const render = solidRenderer.render as unknown as (
+export const render = async function (
   code: () => JSX.Element,
-  node?: SolidNode,
-) => () => void;
+  node?: string | HTMLElement | undefined,
+) {
+  const renderer = startLightningRenderer(config.rendererOptions, node);
+  await renderer.init();
+  const rootNode = new ElementNode('App');
+  rootNode.lng = renderer.root!;
+  rootNode.rendered = true;
+  // @ts-expect-error - code is jsx element and not SolidElement yet
+  return solidRenderer.render(code, rootNode);
+};
 
 export const {
   effect,

@@ -1,21 +1,9 @@
 # Base Components
 
-There are three primitives provided by Solid Lightning:
+There are two primitives provided by Solid Lightning:
 
-- Canvas
 - View
 - Text
-
-## Canvas
-
-The `<Canvas>` component will be used once as the root component in your App to initialize Lightning and create the base canvas tag.
-
-### Props
-
-- `ref`: Reference to root node and the renderer
-- `options`: Object with options to pass to Renderer
-- `onFirstRender`: Callback to run when app is first loaded, useful for unit tests
-- `children`: JSX children to render
 
 ## View
 
