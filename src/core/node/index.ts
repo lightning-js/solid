@@ -192,12 +192,12 @@ export class ElementNode extends Object {
   private _width?: number;
   private _height?: number;
   private _color?: number;
-  private _borderRadius?: number;
-  private _border?: BorderStyleObject;
-  private _borderLeft?: BorderStyleObject;
-  private _borderRight?: BorderStyleObject;
-  private _borderTop?: BorderStyleObject;
-  private _borderBottom?: BorderStyleObject;
+  public _borderRadius?: number;
+  public _border?: BorderStyleObject;
+  public _borderLeft?: BorderStyleObject;
+  public _borderRight?: BorderStyleObject;
+  public _borderTop?: BorderStyleObject;
+  public _borderBottom?: BorderStyleObject;
   public _autosized?: boolean; // Public but uses _ prefix
   public _isDirty?: boolean; // Public but uses _ prefix
   private _animationQueue: Array<{
@@ -215,66 +215,6 @@ export class ElementNode extends Object {
     this.autofocus = false;
     this._renderProps = { x: 0, y: 0 };
     this.children = new Children(this);
-
-    for (const key of LightningRendererNumberProps) {
-      Object.defineProperty(this, key, {
-        get(): number {
-          return (this.lng && this.lng[key]) || this[`_${key}`];
-        },
-        set(v: number) {
-          this[`_${key}`] = v;
-          this._sendToLightningAnimatable(key, v);
-        },
-      });
-    }
-
-    for (const key of LightningRendererNonAnimatingProps) {
-      Object.defineProperty(this, key, {
-        get() {
-          return (this.lng && this.lng[key]) || this[`_${key}`];
-        },
-        set(v) {
-          this[`_${key}`] = v;
-          this._sendToLightning(key, v);
-        },
-      });
-    }
-
-    // Add Border Helpers
-    Object.defineProperties(this, {
-      borderRadius: {
-        set(this: ElementNode, radius) {
-          this._borderRadius = radius;
-          this.effects = {
-            ...(this.effects || {}),
-            ...{ radius: { radius } },
-          };
-        },
-        get(this: ElementNode) {
-          return this._borderRadius;
-        },
-      },
-      border: borderAccessor(),
-      borderLeft: borderAccessor('Left'),
-      borderRight: borderAccessor('Right'),
-      borderTop: borderAccessor('Top'),
-      borderBottom: borderAccessor('Bottom'),
-    });
-
-    Object.defineProperties(this, {
-      linearGradient: {
-        set(props = {}) {
-          this._linearGradient = props;
-          this.effects = {
-            ...(this.effects || {}),
-            ...{ linearGradient: props },
-          };
-        },
-        get() {
-          return this._linearGradient;
-        },
-      },
-    });
   }
 
   get effects() {
@@ -687,3 +627,63 @@ export class ElementNode extends Object {
     node.autofocus && node.setFocus();
   }
 }
+
+for (const key of LightningRendererNumberProps) {
+  Object.defineProperty(ElementNode.prototype, key, {
+    get(): number {
+      return (this.lng && this.lng[key]) || this[`_${key}`];
+    },
+    set(v: number) {
+      this[`_${key}`] = v;
+      this._sendToLightningAnimatable(key, v);
+    },
+  });
+}
+
+for (const key of LightningRendererNonAnimatingProps) {
+  Object.defineProperty(ElementNode.prototype, key, {
+    get() {
+      return (this.lng && this.lng[key]) || this[`_${key}`];
+    },
+    set(v) {
+      this[`_${key}`] = v;
+      this._sendToLightning(key, v);
+    },
+  });
+}
+
+// Add Border Helpers
+Object.defineProperties(ElementNode.prototype, {
+  borderRadius: {
+    set(this: ElementNode, radius) {
+      this._borderRadius = radius;
+      this.effects = {
+        ...(this.effects || {}),
+        ...{ radius: { radius } },
+      };
+    },
+    get(this: ElementNode) {
+      return this._borderRadius;
+    },
+  },
+  border: borderAccessor(),
+  borderLeft: borderAccessor('Left'),
+  borderRight: borderAccessor('Right'),
+  borderTop: borderAccessor('Top'),
+  borderBottom: borderAccessor('Bottom'),
+});
+
+Object.defineProperties(ElementNode.prototype, {
+  linearGradient: {
+    set(props = {}) {
+      this._linearGradient = props;
+      this.effects = {
+        ...(this.effects || {}),
+        ...{ linearGradient: props },
+      };
+    },
+    get() {
+      return this._linearGradient;
+    },
+  },
+});
