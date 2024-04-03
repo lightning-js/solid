@@ -26,7 +26,7 @@ export default function (node: ElementNode): boolean {
       continue;
     }
     // text node hasnt loaded yet - skip layout
-    if (c.name === 'text' && !(c.width || c.height)) {
+    if (c.name === 'text' && c.text !== '' && !(c.width || c.height)) {
       return false;
     }
 
