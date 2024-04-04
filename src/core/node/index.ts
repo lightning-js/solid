@@ -66,7 +66,7 @@ function borderAccessor(
   direction: '' | 'Top' | 'Right' | 'Bottom' | 'Left' = '',
 ) {
   return {
-    set(this: ElementNode, value: number | { width: number; color: number }) {
+    set(this: ElementNode, value: number | { width: number; color: number | string }) {
       // Format: width || { width, color }
       if (isNumber(value)) {
         value = { width: value, color: 0x000000ff };
@@ -191,7 +191,7 @@ export class ElementNode extends Object {
   private _animationSettings?: Partial<AnimationSettings>;
   private _width?: number;
   private _height?: number;
-  private _color?: number;
+  private _color?: number | string;
   public _borderRadius?: number;
   public _border?: BorderStyleObject;
   public _borderLeft?: BorderStyleObject;

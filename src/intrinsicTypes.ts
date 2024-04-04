@@ -40,7 +40,7 @@ type AddUndefined<T> = {
 
 export interface BorderStyleObject {
   width: number;
-  color: number;
+  color: number | string;
 }
 
 export type BorderStyle = number | BorderStyleObject;
