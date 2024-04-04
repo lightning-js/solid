@@ -29,6 +29,10 @@ export interface SolidRendererOptions extends RendererMainSettings {
   rootId: string | HTMLElement;
 }
 
+export function getRenderer(): RendererMain {
+  return renderer;
+}
+
 export function startLightningRenderer(
   options: Partial<SolidRendererOptions> = {},
   rootId: string | HTMLElement = 'app',
