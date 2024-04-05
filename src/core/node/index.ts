@@ -156,6 +156,7 @@ export interface TextNode {
   marginRight?: number;
   marginTop?: number;
   marginBottom?: number;
+  flexItem?: boolean;
   _queueDelete?: boolean;
 }
 
