@@ -179,6 +179,7 @@ export class ElementNode extends Object {
   selected?: number;
   rendered: boolean;
   autofocus: boolean;
+  flexItem?: boolean;
   _queueDelete?: boolean;
   forwardFocus?:
     | number

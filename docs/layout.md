@@ -39,6 +39,7 @@ Additionally, flex will automatically layout Text nodes. Anytime a View with dis
 - `alignItems`: 'flexStart' | 'flexEnd' | 'center'
 - `display`: 'flex'
 - `flexDirection`: 'row' | 'column'
+- `flexItem`: boolean (set to false on a child to remove it from flex calculations)
 - `gap`: number
 - `justifyContent`: 'flexStart' | 'flexEnd' | 'center' | 'spaceBetween' | 'spaceEvenly'
 

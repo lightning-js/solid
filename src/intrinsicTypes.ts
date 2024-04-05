@@ -84,6 +84,7 @@ export interface IntrinsicNodeStyleCommonProps {
   display?: 'flex' | 'block';
   effects?: Effects;
   flexDirection?: 'row' | 'column';
+  flexItem?: boolean;
   gap?: number;
   justifyContent?:
     | 'flexStart'

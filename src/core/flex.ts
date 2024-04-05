@@ -25,6 +25,12 @@ export default function (node: ElementNode): boolean {
     if (c.name === 'TextNode') {
       continue;
     }
+
+    // Skip layout for non flex items
+    if (c.flexItem === false) {
+      continue;
+    }
+
     // text node hasnt loaded yet - skip layout
     if (c.name === 'text' && c.text !== '' && !(c.width || c.height)) {
       return false;
