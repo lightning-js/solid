@@ -66,7 +66,10 @@ function borderAccessor(
   direction: '' | 'Top' | 'Right' | 'Bottom' | 'Left' = '',
 ) {
   return {
-    set(this: ElementNode, value: number | { width: number; color: number | string }) {
+    set(
+      this: ElementNode,
+      value: number | { width: number; color: number | string },
+    ) {
       // Format: width || { width, color }
       if (isNumber(value)) {
         value = { width: value, color: 0x000000ff };
@@ -188,6 +191,9 @@ export class ElementNode extends Object {
   private _shader?: ShaderRef;
   private _style?: SolidStyles;
   private _states?: States;
+  private _events?: Array<
+    [string, (target: ElementNode, event?: Event) => void]
+  >;
   private _animationSettings?: Partial<AnimationSettings>;
   private _width?: number;
   private _height?: number;
@@ -368,6 +374,16 @@ export class ElementNode extends Object {
     if (this._queueDelete) {
       this.lng?.destroy();
     }
+  }
+  // Must be set before render
+  set onEvents(
+    events: Array<[string, (target: ElementNode, event?: any) => void]>,
+  ) {
+    this._events = events;
+  }
+
+  get onEvents() {
+    return this._events || [];
   }
 
   set style(values: SolidStyles | (SolidStyles | undefined)[]) {
@@ -603,6 +619,10 @@ export class ElementNode extends Object {
 
     node.rendered = true;
     isFunc(this.onCreate) && this.onCreate.call(this, node);
+
+    node.onEvents.forEach(([name, handler]) => {
+      node.lng?.on(name, (inode, data) => handler(node, data));
+    });
 
     // L3 Inspector adds div to the lng object
     //@ts-expect-error - div is not in the typings
