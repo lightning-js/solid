@@ -19,6 +19,7 @@ import type { ElementNode, SolidNode } from './node/index.js';
 
 export default function (node: ElementNode): boolean {
   const children = [];
+  let hasOrder = false;
   for (let i = 0; i < node.children.length; i++) {
     const c = node.children[i]!;
     // Filter empty text nodes which are place holders for <Show> and elements missing dimensions
@@ -36,7 +37,15 @@ export default function (node: ElementNode): boolean {
       return false;
     }
 
+    if (c.flexOrder !== undefined) {
+      hasOrder = true;
+    }
+
     children.push(c);
+  }
+
+  if (hasOrder) {
+    children.sort((a, b) => (a.flexOrder || 0) - (b.flexOrder || 0));
   }
 
   const numChildren = children.length;
@@ -81,7 +90,7 @@ export default function (node: ElementNode): boolean {
       crossAlignChild(c);
     });
     // Update container size
-    if (node._autosized) {
+    if (node.flexBoundary === 'contain') {
       const calculatedSize = start - gap;
       if (calculatedSize !== node[dimension]) {
         node[dimension] = calculatedSize;

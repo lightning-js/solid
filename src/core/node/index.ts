@@ -118,6 +118,7 @@ const LightningRendererNumberProps = [
 ];
 
 const LightningRendererNonAnimatingProps = [
+  'autosize',
   'clipping',
   'contain',
   'fontFamily',
@@ -157,6 +158,7 @@ export interface TextNode {
   marginTop?: number;
   marginBottom?: number;
   flexItem?: boolean;
+  flexOrder?: number;
   _queueDelete?: boolean;
 }
 
@@ -181,6 +183,8 @@ export class ElementNode extends Object {
   rendered: boolean;
   autofocus: boolean;
   flexItem?: boolean;
+  flexOrder?: number;
+  flexBoundary?: 'contain'; // default is undefined aka fixed size
   _queueDelete?: boolean;
   forwardFocus?:
     | number
