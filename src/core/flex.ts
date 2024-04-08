@@ -90,7 +90,7 @@ export default function (node: ElementNode): boolean {
       crossAlignChild(c);
     });
     // Update container size
-    if (node.flexBoundary === 'contain') {
+    if (node.flexBoundary !== 'fixed') {
       const calculatedSize = start - gap;
       if (calculatedSize !== node[dimension]) {
         node[dimension] = calculatedSize;

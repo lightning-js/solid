@@ -39,7 +39,7 @@ Additionally, flex will automatically layout Text nodes. Anytime a View with dis
 - `alignItems`: 'flexStart' | 'flexEnd' | 'center'
 - `display`: 'flex'
 - `flexDirection`: 'row' | 'column'
-- `flexBoundary`: 'fixed' | 'contain' (set to contain to update container size based on children size. Requires alignItems:flexStart)
+- `flexBoundary`: 'contain' | 'fixed' (default updates container size based on children size on alignItems:flexStart only. Set to `fixed` to use parent width when width isn't set.)
 - `flexItem`: boolean (set to false on a child to remove it from flex calculations)
 - `flexOrder`: number (set the order on children to change layout order)
 - `gap`: number

@@ -184,7 +184,7 @@ export class ElementNode extends Object {
   autofocus: boolean;
   flexItem?: boolean;
   flexOrder?: number;
-  flexBoundary?: 'contain'; // default is undefined aka fixed size
+  flexBoundary?: 'contain' | 'fixed'; // default is undefined - contained for flex calculated size
   _queueDelete?: boolean;
   forwardFocus?:
     | number
