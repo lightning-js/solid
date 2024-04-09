@@ -455,9 +455,11 @@ export class ElementNode extends Object {
         this.onBeforeLayout.call(this, child, dimensions);
 
       if (this.display === 'flex') {
-        if (calculateFlex(this)) {
+        if (calculateFlex(this) || this.onBeforeLayout) {
           this.parent?.updateLayout();
         }
+      } else if (this.onBeforeLayout) {
+        this.parent?.updateLayout();
       }
 
       isFunc(this.onLayout) && this.onLayout.call(this, child, dimensions);
