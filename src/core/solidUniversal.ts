@@ -48,7 +48,7 @@ export default {
     node._queueDelete = false;
 
     if (node instanceof ElementNode) {
-      parent.rendered && node.render();
+      parent.lng && node.render();
     } else if (parent.isTextNode()) {
       // TextNodes can be placed outside of <text> nodes when <Show> is used as placeholder
       parent.text = parent.getText();

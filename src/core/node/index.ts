@@ -180,8 +180,7 @@ export class ElementNode extends Object {
   lng: INode | undefined;
   renderer?: RendererMain;
   selected?: number;
-  rendered: boolean;
-  autofocus: boolean;
+  autofocus?: boolean;
   flexItem?: boolean;
   flexOrder?: number;
   flexBoundary?: 'contain' | 'fixed'; // default is undefined - contained for flex calculated size
@@ -201,9 +200,6 @@ export class ElementNode extends Object {
     [string, (target: ElementNode, event?: Event) => void]
   >;
   private _animationSettings?: Partial<AnimationSettings>;
-  private _width?: number;
-  private _height?: number;
-  private _color?: number | string;
   public _borderRadius?: number;
   public _border?: BorderStyleObject;
   public _borderLeft?: BorderStyleObject;
@@ -223,9 +219,7 @@ export class ElementNode extends Object {
   constructor(name: string) {
     super();
     this.name = name;
-    this.rendered = false;
-    this.autofocus = false;
-    this._renderProps = { x: 0, y: 0 };
+    this._renderProps = {};
     this.children = new Children(this);
   }
 
@@ -235,7 +229,7 @@ export class ElementNode extends Object {
 
   set effects(v) {
     this._effects = v;
-    if (this.rendered) {
+    if (this.lng) {
       this.shader = convertEffectsToShader(v);
     }
   }
@@ -246,7 +240,7 @@ export class ElementNode extends Object {
 
   set parent(p) {
     this._parent = p;
-    if (this.rendered && this.lng) {
+    if (this.lng) {
       this.lng.parent = p?.lng ?? null;
     }
   }
@@ -286,7 +280,7 @@ export class ElementNode extends Object {
   }
 
   _sendToLightning(name: string, value: unknown) {
-    if (this.rendered && this.lng) {
+    if (this.lng) {
       (this.lng[name as keyof INodeWritableProps] as unknown) = value;
     } else {
       this._renderProps![name] = value;
@@ -335,7 +329,7 @@ export class ElementNode extends Object {
   }
 
   setFocus() {
-    if (this.rendered) {
+    if (this.lng) {
       // can be 0
       if (this.forwardFocus !== undefined) {
         if (isFunc(this.forwardFocus)) {
@@ -436,7 +430,7 @@ export class ElementNode extends Object {
 
   set states(states: NodeStates) {
     this._states = new States(this._stateChanged.bind(this), states);
-    if (this.rendered) {
+    if (this.lng) {
       this._stateChanged();
     }
   }
@@ -522,12 +516,12 @@ export class ElementNode extends Object {
       return;
     }
 
-    if (!parent.rendered) {
+    if (!parent.lng) {
       console.warn('Parent not rendered yet: ', this);
       return;
     }
 
-    if (this.rendered) {
+    if (this.lng) {
       console.warn('Node already rendered: ', this);
       return;
     }
@@ -538,13 +532,13 @@ export class ElementNode extends Object {
       parent._isDirty = false;
     }
 
-    node.updateLayout();
-
     if (this.states.length) {
       this._stateChanged();
     }
 
-    let props = node._renderProps as IntrinsicNodeProps | IntrinsicTextProps;
+    const props = node._renderProps as IntrinsicNodeProps | IntrinsicTextProps;
+    props.x = props.x || 0;
+    props.y = props.y || 0;
 
     if (parent.lng) {
       props.parent = parent.lng;
@@ -555,24 +549,25 @@ export class ElementNode extends Object {
     }
 
     if (node.isTextNode()) {
-      props = {
-        ...config.fontSettings,
-        ...props,
-        text: node.getText(),
-      };
+      if (config.fontSettings) {
+        for (const key in config.fontSettings) {
+          if (props[key] === undefined) {
+            props[key] = config.fontSettings[key];
+          }
+        }
+      }
+      props.text = node.getText();
 
       if (props.contain) {
         if (!props.width) {
           props.width =
-            (parent.width || 0) - (props.x || 0) - (props.marginRight || 0);
-          node._width = props.width;
+            (parent.width || 0) - props.x - (props.marginRight || 0);
           node._autosized = true;
         }
 
         if (props.contain === 'both' && !props.height && !props.maxLines) {
           props.height =
-            (parent.height || 0) - (props.y || 0) - (props.marginBottom || 0);
-          node._height = props.height;
+            (parent.height || 0) - props.y - (props.marginBottom || 0);
           node._autosized = true;
         }
       }
@@ -580,11 +575,7 @@ export class ElementNode extends Object {
       log('Rendering: ', this, props);
       node.lng = renderer.createTextNode(props);
 
-      if (isFunc(node.onLoad)) {
-        node.lng.on('loaded', node.onLoad);
-      }
-
-      if (!node.width || !node.height) {
+      if (!props.width || !props.height) {
         node._autosized = true;
         node._resizeOnTextLoad();
       }
@@ -593,37 +584,34 @@ export class ElementNode extends Object {
       if (!props.texture) {
         // Set width and height to parent less offset
         if (isNaN(props.width as number)) {
-          props.width = (parent.width || 0) - (props.x || 0);
-          node._width = props.width;
+          props.width = (parent.width || 0) - props.x;
           node._autosized = true;
         }
 
         if (isNaN(props.height as number)) {
-          props.height = (parent.height || 0) - (props.y || 0);
-          node._height = props.height;
+          props.height = (parent.height || 0) - props.y;
           node._autosized = true;
         }
 
         if (!props.color && !props.src) {
           // Default color to transparent - If you later set a src, you'll need
           // to set color '#ffffffff'
-          node._color = props.color = 0x00000000;
+          props.color = 0x00000000;
         }
       }
 
       log('Rendering: ', this, props);
       node.lng = renderer.createNode(props);
-
-      if (node.onFail) {
-        node.lng.on('failed', node.onFail);
-      }
-
-      if (node.onLoad) {
-        node.lng.on('loaded', node.onLoad);
-      }
     }
 
-    node.rendered = true;
+    if (node.onFail) {
+      node.lng.on('failed', node.onFail);
+    }
+
+    if (node.onLoad) {
+      node.lng.on('loaded', node.onLoad);
+    }
+
     isFunc(this.onCreate) && this.onCreate.call(this, node);
 
     node.onEvents.forEach(([name, handler]) => {
@@ -636,8 +624,6 @@ export class ElementNode extends Object {
       //@ts-expect-error - div is not in the typings
       node.lng.div.solid = node;
     }
-    // clean up after first render;
-    delete this._renderProps;
 
     if (node.name !== 'text') {
       node.children.forEach((c) => {
@@ -651,16 +637,17 @@ export class ElementNode extends Object {
     }
 
     node.autofocus && node.setFocus();
+    // clean up after first render;
+    delete this._renderProps;
   }
 }
 
 for (const key of LightningRendererNumberProps) {
   Object.defineProperty(ElementNode.prototype, key, {
     get(): number {
-      return (this.lng && this.lng[key]) ?? this[`_${key}`];
+      return this.lng?.[key] ?? this._renderProps?.[key];
     },
     set(v: number) {
-      this[`_${key}`] = v;
       this._sendToLightningAnimatable(key, v);
     },
   });
@@ -669,10 +656,9 @@ for (const key of LightningRendererNumberProps) {
 for (const key of LightningRendererNonAnimatingProps) {
   Object.defineProperty(ElementNode.prototype, key, {
     get() {
-      return (this.lng && this.lng[key]) ?? this[`_${key}`];
+      return this.lng?.[key] ?? this._renderProps?.[key];
     },
     set(v) {
-      this[`_${key}`] = v;
       this._sendToLightning(key, v);
     },
   });

@@ -33,7 +33,6 @@ export const render = async function (
   await renderer.init();
   const rootNode = new ElementNode('App');
   rootNode.lng = renderer.root!;
-  rootNode.rendered = true;
   // @ts-expect-error - code is jsx element and not SolidElement yet
   const dispose = solidRenderer.render(code, rootNode);
   return {
