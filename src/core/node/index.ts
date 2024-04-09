@@ -645,7 +645,7 @@ export class ElementNode extends Object {
 for (const key of LightningRendererNumberProps) {
   Object.defineProperty(ElementNode.prototype, key, {
     get(): number {
-      return this.lng?.[key] ?? this._renderProps?.[key];
+      return this.lng ? this.lng[key] : this._renderProps[key];
     },
     set(v: number) {
       this._sendToLightningAnimatable(key, v);
@@ -656,7 +656,7 @@ for (const key of LightningRendererNumberProps) {
 for (const key of LightningRendererNonAnimatingProps) {
   Object.defineProperty(ElementNode.prototype, key, {
     get() {
-      return this.lng?.[key] ?? this._renderProps?.[key];
+      return this.lng ? this.lng[key] : this._renderProps[key];
     },
     set(v) {
       this._sendToLightning(key, v);
