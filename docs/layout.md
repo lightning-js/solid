@@ -56,6 +56,6 @@ You can put the following properties on the items to control the layout further.
 
 ## Layout Callbacks
 
-When layout occurs on a container with `display: flex` during initial rendering, `updateLayout` is called calculating flex layout. If you want to tie into the layout system you can use `onBeforeLayout` and `onLayout` hooks to update the element with the following signature `(node, { width, height})`. You can use this callback to resize the parent node before flex is calculated using `onBeforeLayout` and after flex with `onLayout`. If you do, call `parent.updateLayout` for it to also resize.
+When layout occurs on a container with `display: flex` during initial rendering, `updateLayout` is called calculating flex layout. If you want to tie into the layout system you can use `onBeforeLayout` and `onLayout` hooks to update the element with the following signature `(node, { width, height})`. You can use this callback to resize the parent node before flex is calculated using `onBeforeLayout` and after flex with `onLayout`. If you do change layout with onBeforeLayout return true to force parent call `parent.updateLayout` to also resize.
 
 Additionally, if you ever reason a child element, call `updateLayout` on the parent to perform layout.

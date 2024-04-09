@@ -451,14 +451,20 @@ export class ElementNode extends Object {
   updateLayout(child?: ElementNode, dimensions?: Dimensions) {
     if (this.hasChildren) {
       log('Layout: ', this);
-      isFunc(this.onBeforeLayout) &&
-        this.onBeforeLayout.call(this, child, dimensions);
+      let changedLayout = false;
+      if (isFunc(this.onBeforeLayout)) {
+        changedLayout = this.onBeforeLayout.call(
+          this,
+          child,
+          dimensions,
+        ) as boolean;
+      }
 
       if (this.display === 'flex') {
-        if (calculateFlex(this) || this.onBeforeLayout) {
+        if (calculateFlex(this) || changedLayout) {
           this.parent?.updateLayout();
         }
-      } else if (this.onBeforeLayout) {
+      } else if (changedLayout) {
         this.parent?.updateLayout();
       }
 
