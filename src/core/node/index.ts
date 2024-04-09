@@ -508,7 +508,7 @@ export class ElementNode extends Object {
       }
 
       // Apply the styles
-      Object.assign(this, { ...stylesToUndo, ...newStyles });
+      Object.assign(this, stylesToUndo, newStyles);
     }
   }
 
