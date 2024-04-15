@@ -415,11 +415,13 @@ export class ElementNode extends Object {
 
   searchChildrenById(id: string): SolidNode | undefined {
     // traverse all the childrens children
-    for (const child of this.children) {
-      if (child.id === id) {
-        return child;
-      }
+    for (let i = 0; i < this.children.length; i++) {
+      const child = this.children[i];
       if (child instanceof ElementNode) {
+        if (child.id === id) {
+          return child;
+        }
+
         const found = child.searchChildrenById(id);
         if (found) {
           return found;

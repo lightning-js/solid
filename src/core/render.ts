@@ -19,11 +19,11 @@
 import { createRenderer } from 'solid-js/universal';
 import { config } from '../config.js';
 import { startLightningRenderer } from './lightningInit.js';
-import universalLightning from './solidUniversal.js';
-import { ElementNode, type SolidNode } from './node/index.js';
+import nodeOpts from './solidUniversal.js';
+import { type SolidNode } from './node/index.js';
 import { splitProps, createMemo, untrack, type JSX } from 'solid-js';
 
-const solidRenderer = createRenderer<SolidNode>(universalLightning);
+const solidRenderer = createRenderer<SolidNode>(nodeOpts);
 
 export const render = async function (
   code: () => JSX.Element,
@@ -31,7 +31,7 @@ export const render = async function (
 ) {
   const renderer = startLightningRenderer(config.rendererOptions, node);
   await renderer.init();
-  const rootNode = new ElementNode('App');
+  const rootNode = nodeOpts.createElement('App');
   rootNode.lng = renderer.root!;
   // @ts-expect-error - code is jsx element and not SolidElement yet
   const dispose = solidRenderer.render(code, rootNode);

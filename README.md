@@ -16,6 +16,7 @@ Solid-Lightning is a UI framework for [Lightning Renderer](https://lightningjs.i
 
 ## Playground
 
+Currently down - need to fix up the packaging to get this working again. On my backlog :-)
 [playground.solidjs.com](https://playground.solidjs.com/anonymous/667180a0-ac7c-4e54-96e8-1e8d66f41790)
 
 ## Quick Start
@@ -32,13 +33,9 @@ Clone starter template:
 ### Hello World
 
 ```jsx
-import { render, Canvas, Text } from '@lightningjs/solid';
+import { render, Text } from '@lightningjs/solid';
 
-render(() => (
-  <Canvas>
-    <Text>Hello World</Text>
-  </Canvas>
-));
+render(() => <Text>Hello World</Text>);
 ```
 
 For a more detailed Hello World guide check out the [Hello World](HelloWorld.md) guide.
