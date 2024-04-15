@@ -50,6 +50,8 @@ import type {
 import { assertTruthy } from '@lightningjs/renderer/utils';
 
 const { animationSettings: defaultAnimationSettings } = config;
+const layoutQueue: ElementNode[] = [];
+let queueLayout = true;
 
 function convertEffectsToShader(styleEffects: any) {
   const effects = [];
@@ -206,7 +208,6 @@ export class ElementNode extends Object {
   public _borderRight?: BorderStyleObject;
   public _borderTop?: BorderStyleObject;
   public _borderBottom?: BorderStyleObject;
-  public _isDirty?: boolean; // Public but uses _ prefix
   private _animationQueue: Array<{
     props: Partial<INodeAnimatableProps>;
     animationSettings?: Partial<AnimationSettings>;
@@ -537,10 +538,16 @@ export class ElementNode extends Object {
       return;
     }
 
-    // Parent is dirty whenever a node is inserted after initial render
-    if (parent._isDirty) {
-      parent.updateLayout();
-      parent._isDirty = false;
+    if (parent.display === 'flex' && layoutQueue.indexOf(parent) === -1) {
+      layoutQueue.push(parent);
+      if (queueLayout) {
+        queueMicrotask(() => {
+          layoutQueue.forEach((n) => n.updateLayout());
+          layoutQueue.length = 0;
+          queueLayout = true;
+        });
+      }
+      queueLayout = false;
     }
 
     if (this.states.length) {

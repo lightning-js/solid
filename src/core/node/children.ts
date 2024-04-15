@@ -46,7 +46,6 @@ export default class Children extends Array<SolidNode> {
     }
 
     node.parent = this._parent;
-    this._parent._isDirty = true;
   }
 
   remove(node: SolidNode) {
