@@ -357,12 +357,10 @@ export class ElementNode extends Object {
     return this.name === 'text';
   }
 
-  _layoutOnTextLoad() {
+  _layoutOnLoad() {
     this.lng!.on('loaded', (_node: INode, loadedPayload: NodeLoadedPayload) => {
-      if (loadedPayload.type === 'text') {
-        const { dimensions } = loadedPayload;
-        this.parent!.updateLayout(this, dimensions);
-      }
+      const { dimensions } = loadedPayload;
+      this.parent!.updateLayout(this, dimensions);
     });
   }
 
@@ -448,6 +446,10 @@ export class ElementNode extends Object {
 
   set animationSettings(animationSettings: Partial<AnimationSettings>) {
     this._animationSettings = animationSettings;
+  }
+
+  requiresLayout() {
+    return this.display === 'flex' || this.onBeforeLayout;
   }
 
   updateLayout(child?: ElementNode, dimensions?: Dimensions) {
@@ -538,7 +540,7 @@ export class ElementNode extends Object {
       return;
     }
 
-    if (parent.display === 'flex' && layoutQueue.indexOf(parent) === -1) {
+    if (parent.requiresLayout() && layoutQueue.indexOf(parent) === -1) {
       layoutQueue.push(parent);
       if (queueLayout) {
         queueMicrotask(() => {
@@ -591,11 +593,8 @@ export class ElementNode extends Object {
       log('Rendering: ', this, props);
       node.lng = renderer.createTextNode(props);
 
-      if (
-        (parent.display === 'flex' || parent.onBeforeLayout) &&
-        (!props.width || !props.height)
-      ) {
-        node._layoutOnTextLoad();
+      if (parent.requiresLayout() && (!props.width || !props.height)) {
+        node._layoutOnLoad();
       }
     } else {
       // If its not an image or texture apply some defaults
@@ -618,6 +617,10 @@ export class ElementNode extends Object {
 
       log('Rendering: ', this, props);
       node.lng = renderer.createNode(props);
+    }
+
+    if (props.autosize && parent.requiresLayout()) {
+      node._layoutOnLoad();
     }
 
     if (node.onFail) {
