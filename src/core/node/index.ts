@@ -206,7 +206,6 @@ export class ElementNode extends Object {
   public _borderRight?: BorderStyleObject;
   public _borderTop?: BorderStyleObject;
   public _borderBottom?: BorderStyleObject;
-  public _autosized?: boolean; // Public but uses _ prefix
   public _isDirty?: boolean; // Public but uses _ prefix
   private _animationQueue: Array<{
     props: Partial<INodeAnimatableProps>;
@@ -357,7 +356,7 @@ export class ElementNode extends Object {
     return this.name === 'text';
   }
 
-  _resizeOnTextLoad() {
+  _layoutOnTextLoad() {
     this.lng!.on('loaded', (_node: INode, loadedPayload: NodeLoadedPayload) => {
       if (loadedPayload.type === 'text') {
         const { dimensions } = loadedPayload;
@@ -517,6 +516,8 @@ export class ElementNode extends Object {
   }
 
   render() {
+    // Elements are rendered from the outside in, then `insert`ed from the inside out.
+
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const node = this;
     const parent = this.parent;
@@ -572,22 +573,22 @@ export class ElementNode extends Object {
         if (!props.width) {
           props.width =
             (parent.width || 0) - props.x - (props.marginRight || 0);
-          node._autosized = true;
         }
 
         if (props.contain === 'both' && !props.height && !props.maxLines) {
           props.height =
             (parent.height || 0) - props.y - (props.marginBottom || 0);
-          node._autosized = true;
         }
       }
 
       log('Rendering: ', this, props);
       node.lng = renderer.createTextNode(props);
 
-      if (!props.width || !props.height) {
-        node._autosized = true;
-        node._resizeOnTextLoad();
+      if (
+        (parent.display === 'flex' || parent.onBeforeLayout) &&
+        (!props.width || !props.height)
+      ) {
+        node._layoutOnTextLoad();
       }
     } else {
       // If its not an image or texture apply some defaults
@@ -595,12 +596,10 @@ export class ElementNode extends Object {
         // Set width and height to parent less offset
         if (isNaN(props.width as number)) {
           props.width = (parent.width || 0) - props.x;
-          node._autosized = true;
         }
 
         if (isNaN(props.height as number)) {
           props.height = (parent.height || 0) - props.y;
-          node._autosized = true;
         }
 
         if (!props.color && !props.src) {
