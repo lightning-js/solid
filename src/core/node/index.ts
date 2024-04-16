@@ -578,6 +578,7 @@ export class ElementNode extends Object {
       }
       props.text = node.getText();
 
+      // contain is either width or both
       if (props.contain) {
         if (!props.width) {
           props.width =
@@ -587,6 +588,10 @@ export class ElementNode extends Object {
         if (props.contain === 'both' && !props.height && !props.maxLines) {
           props.height =
             (parent.height || 0) - props.y - (props.marginBottom || 0);
+        } else if (props.maxLines === 1) {
+          props.height = (props.height ||
+            props.lineHeight ||
+            props.fontSize) as number;
         }
       }
 
