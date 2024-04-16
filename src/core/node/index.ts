@@ -192,7 +192,7 @@ export class ElementNode extends Object {
     | ((this: ElementNode, elm: ElementNode) => boolean | void);
 
   private _undoStyles?: string[];
-  private _renderProps?: IntrinsicNodeProps | IntrinsicTextProps;
+  private _renderProps: IntrinsicNodeProps | IntrinsicTextProps;
   private _effects: any;
   private _parent: ElementNode | undefined;
   private _shader?: ShaderRef;
@@ -275,7 +275,7 @@ export class ElementNode extends Object {
 
       (this.lng[name as keyof INode] as number | string) = value;
     } else {
-      this._renderProps![name] = value;
+      this._renderProps[name] = value;
     }
   }
 
@@ -283,7 +283,7 @@ export class ElementNode extends Object {
     if (this.lng) {
       (this.lng[name as keyof INodeWritableProps] as unknown) = value;
     } else {
-      this._renderProps![name] = value;
+      this._renderProps[name] = value;
     }
   }
 
@@ -556,7 +556,7 @@ export class ElementNode extends Object {
       this._stateChanged();
     }
 
-    const props = node._renderProps as IntrinsicNodeProps | IntrinsicTextProps;
+    const props = node._renderProps;
     props.x = props.x || 0;
     props.y = props.y || 0;
 
