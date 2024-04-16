@@ -93,6 +93,7 @@ export interface IntrinsicNodeStyleCommonProps {
   borderTop?: BorderStyle;
   display?: 'flex' | 'block';
   effects?: Effects;
+  flexBoundary?: 'contain' | 'fixed';
   flexDirection?: 'row' | 'column';
   flexItem?: boolean;
   gap?: number;
