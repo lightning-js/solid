@@ -74,8 +74,8 @@ Read more about [Solids Lifecycle](https://docs.solidjs.com/references/api-refer
   onCreate: (target: ElementNode)
   onLoad: (target: INode, nodeLoadedPayload: NodeLoadedPayload)
   onFail: (target: INode, nodeFailedPayload: NodeFailedPayload)
-  onBeforeLayout: (child: ElementNode, dimensions: Dimensions) => boolean
-  onLayout: (child: ElementNode, dimensions: Dimensions)
+  onBeforeLayout: (this: ElementNode, target: ElementNode, child?: ElementNode, dimensions?: Dimensions) => boolean
+  onLayout: (this: ElementNode, target: ElementNode, child?: ElementNode, dimensions?: Dimensions)
 ```
 
 ## use: (Directives) in Solid

@@ -62,8 +62,18 @@ export interface IntrinsicNodeCommonProps {
   onCreate?: (target: ElementNode) => void;
   onLoad?: (target: INode, nodeLoadedPayload: NodeLoadedPayload) => void;
   onFail?: (target: INode, nodeFailedPayload: NodeFailedPayload) => void;
-  onBeforeLayout?: (child: ElementNode, dimensions: Dimensions) => void;
-  onLayout?: (child: ElementNode, dimensions: Dimensions) => void;
+  onBeforeLayout?: (
+    this: ElementNode,
+    target: ElementNode,
+    child?: ElementNode,
+    dimensions?: Dimensions,
+  ) => boolean;
+  onLayout?: (
+    this: ElementNode,
+    target: ElementNode,
+    child?: ElementNode,
+    dimensions?: Dimensions,
+  ) => unknown;
   forwardFocus?:
     | number
     | ((this: ElementNode, elm: ElementNode) => boolean | void);
