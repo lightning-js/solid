@@ -62,11 +62,9 @@
     ],
     "*.{js,cjs,md}": "prettier --write"
   },
-  "dependencies": {
-    "@lightningjs/renderer": "^0.8.2"
-  },
   "peerDependencies": {
-    "solid-js": "*"
+    "solid-js": "*",
+    "@lightningjs/renderer": "^0.8.3"
   },
   "repository": {
     "type": "git",

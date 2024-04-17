@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@lightningjs/renderer':
-    specifier: ^0.8.2
-    version: 0.8.2
+    specifier: ^0.8.3
+    version: 0.8.3
 
 devDependencies:
   '@rollup/plugin-replace':
@@ -1393,8 +1393,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@lightningjs/renderer@0.8.2:
-    resolution: {integrity: sha512-5Hs+iEN9x5syH5Iefk28u01fxAZAuSNfFKKyh+2bRWdR/QPpAX94VC82EMTO4Bi2/cZyeoSGhmhxCXTnJwpJpg==}
+  /@lightningjs/renderer@0.8.3:
+    resolution: {integrity: sha512-MX+JRi+SFtqIvpmnm177kgsUchXNFAJG43ek1spW4YpxQLbjfU6gqTk+CQnXva4nlTsH8w71ju58snLHQGg/VQ==}
     engines: {node: '>= 20.9.0', npm: '>= 10.0.0', pnpm: '>= 8.9.2'}
     requiresBuild: true
     dependencies:
