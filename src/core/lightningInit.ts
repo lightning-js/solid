@@ -15,11 +15,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  MainCoreDriver,
-  RendererMain,
-  type RendererMainSettings,
-} from '@lightningjs/renderer';
+import type { RendererMainSettings } from '@lightningjs/renderer';
+import { MainCoreDriver, RendererMain } from '@lightningjs/renderer';
 
 export let renderer: RendererMain;
 export let createShader: RendererMain['createShader'];

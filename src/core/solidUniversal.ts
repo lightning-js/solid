@@ -16,7 +16,8 @@
  */
 import { assertTruthy } from '@lightningjs/renderer/utils';
 import { log } from './utils.js';
-import { ElementNode, type SolidNode, type TextNode } from './node/index.js';
+import type { SolidNode, TextNode } from './node/index.js';
+import { ElementNode } from './node/index.js';
 import type { createRenderer } from 'solid-js/universal';
 
 export type SolidRendererOptions = Parameters<

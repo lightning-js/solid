@@ -27,7 +27,7 @@ export {
 } from 'solid-js';
 export * from './core/activeElement.js';
 export * from './core/node/index.js';
-export * from './components/index.js';
+export { View, Text } from './components/index.js';
 export * from './core/lightningInit.js';
 export * from './core/render.js';
 export { config as Config } from './config.js';

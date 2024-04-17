@@ -32,7 +32,7 @@ import {
 } from '@lightningjs/renderer';
 import { type JSX } from 'solid-js';
 import { type ElementNode } from './core/node/index.js';
-import type { NodeStates } from './core/node/states.js';
+import { type NodeStates } from './core/node/states.js';
 
 type AddUndefined<T> = {
   [K in keyof T]: T[K] | undefined;
