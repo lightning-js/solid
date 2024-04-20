@@ -26,7 +26,6 @@ declare module 'solid-js' {
     interface IntrinsicElements {
       node: Partial<IntrinsicNodeProps>;
       text: Partial<IntrinsicTextProps>;
-      canvas: Partial<IntrinsicNodeProps>;
     }
   }
 }
