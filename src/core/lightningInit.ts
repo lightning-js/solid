@@ -21,17 +21,8 @@ import { MainCoreDriver, RendererMain } from '@lightningjs/renderer';
 export let renderer: RendererMain;
 export let createShader: RendererMain['createShader'];
 
-export interface SolidRendererOptions extends RendererMainSettings {
-  threadXCoreWorkerUrl?: string;
-  rootId: string | HTMLElement;
-}
-
-export function getRenderer(): RendererMain {
-  return renderer;
-}
-
 export function startLightningRenderer(
-  options: Partial<SolidRendererOptions> = {},
+  options: Partial<RendererMainSettings> = {},
   rootId: string | HTMLElement = 'app',
 ): RendererMain {
   const driver = new MainCoreDriver();

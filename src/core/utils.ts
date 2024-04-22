@@ -17,7 +17,7 @@
  */
 
 import { config, isDev } from '../config.js';
-import type { SolidNode, SolidStyles } from './node/index.js';
+import type { SolidNode, SolidStyles } from './node/elementNode.js';
 
 function hasDebug(node: any) {
   return isObject(node) && node.debug;

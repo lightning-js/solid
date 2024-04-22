@@ -31,7 +31,7 @@ import {
   type RadialProgressEffectProps,
 } from '@lightningjs/renderer';
 import { type JSX } from 'solid-js';
-import { type ElementNode } from './core/node/index.js';
+import { type ElementNode } from './core/node/elementNode.js';
 import { type NodeStates } from './core/node/states.js';
 
 type AddUndefined<T> = {

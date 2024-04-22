@@ -26,7 +26,7 @@ export {
   ErrorBoundary,
 } from 'solid-js';
 export * from './core/activeElement.js';
-export * from './core/node/index.js';
+export * from './core/node/elementNode.js';
 export { View, Text } from './components/index.js';
 export * from './core/lightningInit.js';
 export * from './core/render.js';

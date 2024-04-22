@@ -15,7 +15,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ElementNode, SolidNode } from './index.js';
+import type { ElementNode, SolidNode } from './elementNode.js';
 
 /**
  * Children class
