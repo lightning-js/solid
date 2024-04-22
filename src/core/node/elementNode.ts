@@ -547,9 +547,11 @@ export class ElementNode extends Object {
       if (queueLayout) {
         queueLayout = false;
         queueMicrotask(() => {
-          layoutQueue.forEach((n) => n.updateLayout());
-          layoutQueue.length = 0;
           queueLayout = true;
+          while (layoutQueue.length) {
+            const n = layoutQueue.pop();
+            n!.updateLayout();
+          }
         });
       }
     }
