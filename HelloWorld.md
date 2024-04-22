@@ -130,17 +130,16 @@ Most of the things you do with Solid will carry over to using Solid-Lightning wi
 Our first app, lets put some text in our app. Put the following code in the file './src/index.jsx'
 
 ```jsx
-import { render, Canvas, Text } from '@lightningjs/solid';
+import { render, Text, Config } from '@lightningjs/solid';
 import coreExtensionModuleUrl from './AppCoreExtensions.js?importChunkUrl';
 
-render(() => (
-  <Canvas options={{ coreExtensionModule: coreExtensionModuleUrl }}>
-    <Text>Hello World</Text>
-  </Canvas>
-));
+Config.rendererOptions = {
+  coreExtensionModule: coreExtensionModuleUrl,
+};
+render(() => <Text>Hello World</Text>);
 ```
 
-Here we also load the previously created AppCoreExtension file and pass it to the canvas as a option.
+Here we also load the previously created AppCoreExtension file and pass it to the Config.
 
 Start the development server with the following command:
 
@@ -151,10 +150,6 @@ npm start
 A page in your browser should open, and everytime you make changes in your app it should reflect in the browser.
 
 ## Built In Components
-
-### Canvas
-
-This element boots up the Lightning Renderer. This should be the first component passed into the render function. Possible parameter on this element are options\onFirstRender. The `options` param is passed to the Lightning Renderer. The `onFirstRender` can be used to pass a function which will run once the App has rendered for the first time.
 
 ### Text
 
@@ -169,7 +164,7 @@ Think of `<View>` like div tag for HTML, all encompassing.
 You can add styles to your JSX components using object notation or applying the properties directly to the JSX or via a ref:
 
 ```jsx
-import { render, Canvas, View, Text } from '@lightningjs/solid';
+import { render, View, Text } from '@lightningjs/solid';
 import coreExtensionModuleUrl from './AppCoreExtensions.js?importChunkUrl';
 
 const helloworldText = {
@@ -183,11 +178,9 @@ const helloworldText = {
   color: '0x000000ff',
 };
 render(() => (
-  <Canvas options={{ coreExtensionModule: coreExtensionModuleUrl }}>
-    <View>
-      <Text style={helloworldText}>Hello World!</Text>
-    </View>
-  </Canvas>
+  <View>
+    <Text style={helloworldText}>Hello World!</Text>
+  </View>
 ));
 ```
 
@@ -244,7 +237,7 @@ When Button is focused the focus styles will be applied. And when focus is remov
 Now we can import this file in the index.jsx and add it inside the view tag.
 
 ```jsx
-import { render, Canvas, View, Text } from '@lightningjs/solid';
+import { render, View, Text } from '@lightningjs/solid';
 import coreExtensionModuleUrl from './AppCoreExtensions.js?importChunkUrl';
 import Button from './Button';
 
@@ -259,14 +252,12 @@ const helloworldText = {
   color: '0x000000ff',
 };
 render(() => (
-  <Canvas options={{ coreExtensionModule: coreExtensionModuleUrl }}>
-    <View>
-      <Text style={helloworldText}>Hello World!</Text>
-      <Button autofocus onEnter={(event, el) => el.states.toggle('disabled')}>
-        View 1
-      </Button>
-    </View>
-  </Canvas>
+  <View>
+    <Text style={helloworldText}>Hello World!</Text>
+    <Button autofocus onEnter={(event, el) => el.states.toggle('disabled')}>
+      View 1
+    </Button>
+  </View>
 ));
 ```
 
@@ -283,12 +274,12 @@ useFocusManager();
 ### Adding navigation and multiple pages
 
 This requires us to change what we have so far so we get multiple files for different pages.
-The entry file ('./src/index.jsx') for the APP only needs to contain the Routes inside the Canvas component.
+The entry file ('./src/index.jsx') for the APP only needs to contain the Routes.
 
 index.jsx:
 
 ```jsx
-import { render, Canvas, View } from '@lightningjs/solid';
+import { render, View } from '@lightningjs/solid';
 import coreExtensionModuleUrl from './AppCoreExtensions.js?importChunkUrl';
 import { Router, Route } from '@solidjs/router';
 import { useFocusManager } from '@lightningjs/solid-primitives';
@@ -299,12 +290,10 @@ import Page2 from './Page2';
 useFocusManager();
 
 render(() => (
-  <Canvas options={{ coreExtensionModule: coreExtensionModuleUrl }}>
-    <Router>
-      <Route path="/" component={Page1} />
-      <Route path="/page2" component={Page2} />
-    </Router>
-  </Canvas>
+  <Router>
+    <Route path="/" component={Page1} />
+    <Route path="/page2" component={Page2} />
+  </Router>
 ));
 ```
 
