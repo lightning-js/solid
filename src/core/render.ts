@@ -51,7 +51,12 @@ export const render = function (
     return startLightning(undefined, node).then(() => {
       rootNode.lng = renderer.root!;
       // @ts-expect-error - code is jsx element and not SolidElement yet
-      return solidRenderer.render(code, rootNode);
+      const dispose = solidRenderer.render(code, rootNode);
+      return {
+        dispose,
+        rootNode,
+        renderer,
+      };
     });
   }
 

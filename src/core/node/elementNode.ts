@@ -545,13 +545,13 @@ export class ElementNode extends Object {
     if (parent.requiresLayout() && layoutQueue.indexOf(parent) === -1) {
       layoutQueue.push(parent);
       if (queueLayout) {
+        queueLayout = false;
         queueMicrotask(() => {
           layoutQueue.forEach((n) => n.updateLayout());
           layoutQueue.length = 0;
           queueLayout = true;
         });
       }
-      queueLayout = false;
     }
 
     if (this.states.length) {
