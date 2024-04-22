@@ -19,7 +19,7 @@
 import { createRenderer } from 'solid-js/universal';
 import { config } from '../config.js';
 import { startLightningRenderer } from './lightningInit.js';
-import nodeOpts from './solidUniversal.js';
+import nodeOpts from './solidOpts.js';
 import { type SolidNode } from './node/elementNode.js';
 import { splitProps, createMemo, untrack, type JSX } from 'solid-js';
 import type { RendererMain, RendererMainSettings } from '@lightningjs/renderer';
