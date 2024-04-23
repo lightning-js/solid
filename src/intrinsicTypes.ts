@@ -67,7 +67,7 @@ export interface IntrinsicNodeCommonProps {
     target: ElementNode,
     child?: ElementNode,
     dimensions?: Dimensions,
-  ) => boolean;
+  ) => boolean | undefined;
   onLayout?: (
     this: ElementNode,
     target: ElementNode,
