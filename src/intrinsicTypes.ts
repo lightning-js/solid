@@ -152,7 +152,7 @@ export interface IntrinsicTextProps
     | IntrinsicTextNodeStyleProps
     | (IntrinsicTextNodeStyleProps | undefined)[]
     | undefined;
-  children?: string | (string | undefined)[];
+  children?: string | number | (string | number | undefined)[];
 }
 
 export type NodeStyles = IntrinsicNodeStyleProps;
