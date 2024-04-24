@@ -16,7 +16,7 @@ Solid-Lightning is a UI framework for [Lightning Renderer](https://lightningjs.i
 
 ## Playground
 
-[playground.solidjs.com](https://playground.solidjs.com/anonymous/dfca7350-166e-4c6c-b367-74cc09bdaf09)
+[playground.solidjs.com](https://playground.solidjs.com/anonymous/ad962850-b492-4f6f-ac68-668469f5f22e)
 
 ## Quick Start
 
