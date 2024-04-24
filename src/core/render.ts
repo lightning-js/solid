@@ -27,7 +27,6 @@ import type { RendererMain, RendererMainSettings } from '@lightningjs/renderer';
 const solidRenderer = createRenderer<SolidNode>(nodeOpts);
 
 let renderer: RendererMain;
-let rendererStarted = false;
 export async function startLightning(
   options?: Partial<RendererMainSettings>,
   rootId?: string | HTMLElement,
@@ -36,30 +35,29 @@ export async function startLightning(
     options || config.rendererOptions,
     rootId || 'app',
   );
-  rendererStarted = true;
   return await renderer.init();
 }
 
-// Keep render from being Async so playground will work.
-export const render = function (
+export const render = async function (
   code: () => JSX.Element,
   node?: HTMLElement | string,
 ) {
   const rootNode = nodeOpts.createElement('App');
 
-  if (!rendererStarted) {
-    return startLightning(undefined, node).then(() => {
-      rootNode.lng = renderer.root!;
-      // @ts-expect-error - code is jsx element and not SolidElement yet
-      const dispose = solidRenderer.render(code, rootNode);
-      return {
-        dispose,
-        rootNode,
-        renderer,
-      };
-    });
-  }
+  await startLightning(undefined, node);
+  rootNode.lng = renderer.root!;
+  // @ts-expect-error - code is jsx element and not SolidElement yet
+  const dispose = solidRenderer.render(code, rootNode);
+  return {
+    dispose,
+    rootNode,
+    renderer,
+  };
+};
 
+// used for playground - must be sync so user must await startLightning
+export const renderSync = function (code: () => JSX.Element) {
+  const rootNode = nodeOpts.createElement('App');
   rootNode.lng = renderer.root!;
   // @ts-expect-error - code is jsx element and not SolidElement yet
   return solidRenderer.render(code, rootNode);
