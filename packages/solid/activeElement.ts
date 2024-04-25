@@ -15,18 +15,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/* eslint-disable @typescript-eslint/no-namespace */
-import {
-  type IntrinsicNodeProps,
-  type IntrinsicTextProps,
-} from './intrinsicTypes.js';
-
-declare module 'solid-js' {
-  namespace JSX {
-    interface IntrinsicElements {
-      node: Partial<IntrinsicNodeProps>;
-      view: Partial<IntrinsicNodeProps>;
-      text: Partial<IntrinsicTextProps>;
-    }
-  }
-}
+import { createSignal } from 'solid-js';
+import type { ElementNode } from '@lightningjs/core';
+export const [activeElement, setActiveElement] = createSignal<
+  ElementNode | undefined
+>(undefined);

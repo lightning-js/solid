@@ -14,8 +14,8 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-
-import { type Component } from "solid-js";
-import type { IntrinsicTextProps } from "../intrinsicTypes.js";
-
-export const Text: Component<IntrinsicTextProps> = (props) => <text {...props}></text>
+import './jsx-runtime.js';
+export * from '@lightningjs/core';
+export * as Types from '@lightningjs/core';
+export * from './activeElement.js';
+export * from './render.js';

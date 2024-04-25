@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.build.json",
+  "compilerOptions": {
+      "outDir": "./dist/",
+      "paths": {
+        "@activeElement": ["./activeElement.js"]
+      }
+  },
+  "include": [
+      "./**/*.ts",
+      "../core/**/*.ts",
+  ]
+}

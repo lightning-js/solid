@@ -14,6 +14,8 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-
-export * from './Text.jsx';
-export * from './View.jsx';
+export * from './node/elementNode.js';
+export * from '../core/lightningInit.js';
+export * from './utils.js';
+export * from './intrinsicTypes.js';
+export { config as Config } from './config.js';

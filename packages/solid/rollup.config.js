@@ -17,6 +17,6 @@ export default withSolid(
   },
   {
     preserveModules: true,
-    preserveModulesRoot: 'src',
+    preserveModulesRoot: './',
   },
 );

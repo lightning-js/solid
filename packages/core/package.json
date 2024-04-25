@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "name": "@lightningjs/core",
+  "description": "Core Node Implementation for Custom Renderers",
+  "type": "module",
+  "scripts": {},
+  "keywords": [],
+  "author": "Chris Lorenzo",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@lightningjs/renderer": "^0.8.3"
+  }
+}

@@ -1,7 +1,7 @@
 {
-  "name": "@lightningjs/solid",
-  "version": "0.15.15",
-  "description": "Lightning renderer for solid universal",
+  "name": "@lightningjs/vue",
+  "version": "0.0.2",
+  "description": "Lightning renderer for VueJS",
   "type": "module",
   "source": "./index.ts",
   "main": "./dist/esm/index.js",
@@ -41,9 +41,6 @@
   ],
   "author": "Chris Lorenzo",
   "license": "Apache-2.0",
-  "dependencies": {
-    "@lightningjs/core": "workspace:*"
-  },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.5",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -55,7 +52,6 @@
     "prettier": "^3.2.5",
     "rollup": "^4.13.0",
     "rollup-preset-solid": "^2.0.1",
-    "solid-js": "^1.8.16",
     "typescript": "^5.4.2"
   },
   "lint-staged": {
@@ -66,7 +62,11 @@
     "*.{js,cjs,md}": "prettier --write"
   },
   "peerDependencies": {
-    "solid-js": "*",
+    "@lightningjs/vite-plugin-import-chunk-url": "^0.3.1",
+    "@vue/reactivity": "^3.4.21",
+    "@vue/runtime-core": "^3.4.21",
+    "@vue/shared": "^3.4.21",
+    "vue": "^3.4.21",
     "@lightningjs/renderer": "^0.8.3"
   },
   "repository": {

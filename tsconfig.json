@@ -1,32 +1,9 @@
 {
+  "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "rootDir": ".",
-    "lib": ["ESNext", "DOM", "ES5"],
-    "outDir": "dist",
-    "allowJs": true,
-    "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "sourceMap": true,
-    "declaration": true,
-    "noEmit": true,
-    // Temporarily disable this until `solid-js` is released with this PR:
-    // https://github.com/solidjs/solid/pull/1913
-    "skipLibCheck": true,
-
-    // Type Checking / Syntax Rules
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "verbatimModuleSyntax": true,
-    "composite": true,
-
-    // jsx
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "types": ["solid-js"]
+    "baseUrl": "./"
   },
-  "include": ["src/**/*"]
+  "include": [
+    "./packages/*/**.ts"
+  ]
 }

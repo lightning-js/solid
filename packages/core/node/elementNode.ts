@@ -23,7 +23,7 @@ import {
   type IntrinsicTextProps,
   type NodeStyles,
   type TextStyles,
-} from '../../index.js';
+} from '../intrinsicTypes.js';
 import Children from './children.js';
 import States, { type NodeStates } from './states.js';
 import calculateFlex from '../flex.js';
@@ -35,8 +35,8 @@ import {
   keyExists,
   flattenStyles,
 } from '../utils.js';
-import { config } from '../../config.js';
-import { setActiveElement } from '../activeElement.js';
+import { config } from '../config.js';
+import { setActiveElement } from '@activeElement';
 import type {
   RendererMain,
   INode,
@@ -347,7 +347,7 @@ export class ElementNode extends Object {
         }
       }
       // Delay setting focus so children can render (useful for Row + Column)
-      queueMicrotask(() => setActiveElement<ElementNode>(this));
+      queueMicrotask(() => setActiveElement(this as ElementNode));
     } else {
       this.autofocus = true;
     }
