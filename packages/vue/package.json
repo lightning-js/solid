@@ -3,19 +3,9 @@
   "version": "0.0.2",
   "description": "Lightning renderer for VueJS",
   "type": "module",
-  "source": "./index.ts",
-  "main": "./dist/esm/index.js",
-  "browser": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./index.ts",
-      "typescript": "./index.ts",
-      "browser": "./dist/esm/index.js",
-      "solid": "./dist/source/index.js",
-      "types": "./dist/types/index.d.ts"
-    }
-  },
+  "source": "./dist/vue/index.js",
+  "main": "./dist/vue/index.js",
+  "types": "./dist/vue/index.d.ts",
   "sideEffects": false,
   "scripts": {
     "start": "npm run watch",
@@ -26,13 +16,14 @@
     "lint:fix:prettier": "prettier --write \"**/*.{ts,js,cjs,md}\"",
     "lint:eslint": "eslint .",
     "lint:fix:eslint": "eslint --fix .",
-    "build": "npm run tsc && rollup -c",
+    "build": "rm -rf dist/ && tsc --build && tsc-alias",
     "tsc": "tsc",
     "watch": "tsc -w",
     "prepare": "husky",
     "prepack": "npm run build"
   },
   "keywords": [
+    "vue",
     "lightning",
     "javascript",
     "canvas",
@@ -42,7 +33,6 @@
   "author": "Chris Lorenzo",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@rollup/plugin-replace": "^5.0.5",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.57.0",
@@ -50,8 +40,7 @@
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
-    "rollup": "^4.13.0",
-    "rollup-preset-solid": "^2.0.1",
+    "tsc-alias": "^1.8.8",
     "typescript": "^5.4.2"
   },
   "lint-staged": {
@@ -62,12 +51,11 @@
     "*.{js,cjs,md}": "prettier --write"
   },
   "peerDependencies": {
-    "@lightningjs/vite-plugin-import-chunk-url": "^0.3.1",
+    "@lightningjs/renderer": "^0.8.3",
     "@vue/reactivity": "^3.4.21",
     "@vue/runtime-core": "^3.4.21",
     "@vue/shared": "^3.4.21",
-    "vue": "^3.4.21",
-    "@lightningjs/renderer": "^0.8.3"
+    "vue": "^3.4.21"
   },
   "repository": {
     "type": "git",
@@ -75,10 +63,9 @@
   },
   "files": [
     "dist",
-    "src",
     "jsx-runtime.d.ts",
-    "LICENSE",
-    "NOTICE",
+    "../../LICENSE",
+    "../../NOTICE",
     "README.md"
   ]
 }

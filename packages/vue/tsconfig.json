@@ -1,13 +1,15 @@
 {
   "extends": "../../tsconfig.build.json",
   "compilerOptions": {
+      "baseUrl": "./",
       "outDir": "./dist/",
       "paths": {
-        "@activeElement": ["./activeElement.js"]
+        "@activeElement": ["./activeElement.ts"],
+        "@lightningjs/core": ["../core/"]
       }
   },
   "include": [
-      "./**/*.ts",
+      "*.ts",
       "../core/**/*.ts",
   ]
 }

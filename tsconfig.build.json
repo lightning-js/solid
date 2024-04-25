@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "rootDir": ".",
+    "rootDir": "./packages",
     "lib": ["ESNext", "DOM", "ES5"],
-    "outDir": "dist",
     "allowJs": true,
     "target": "ESNext",
     "module": "NodeNext",
@@ -21,14 +20,6 @@
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
     "composite": true,
-
-    // jsx
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "types": ["solid-js"],
-    "paths": {
-      "@lightningjs/core": ["./packages/core/"]
-    }
   },
   "exclude": [
     "node_modules",
