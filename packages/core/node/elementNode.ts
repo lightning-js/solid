@@ -16,16 +16,17 @@
  */
 
 import { renderer, createShader } from '../lightningInit.js';
-import {
-  type BorderStyleObject,
-  type IntrinsicCommonProps,
-  type IntrinsicNodeProps,
-  type IntrinsicTextProps,
-  type NodeStyles,
-  type TextStyles,
+import type {
+  BorderStyleObject,
+  IntrinsicCommonProps,
+  IntrinsicNodeProps,
+  IntrinsicTextProps,
+  NodeStyles,
+  TextStyles,
 } from '../intrinsicTypes.js';
 import Children from './children.js';
-import States, { type NodeStates } from './states.js';
+import States from './states.js';
+import type { NodeStates } from './states.js';
 import calculateFlex from '../flex.js';
 import {
   log,

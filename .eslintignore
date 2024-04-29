@@ -6,3 +6,4 @@ build
 releases
 .tmp
 .env
+.json

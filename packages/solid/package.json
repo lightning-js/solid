@@ -3,19 +3,9 @@
   "version": "0.15.15",
   "description": "Lightning renderer for solid universal",
   "type": "module",
-  "source": "./index.ts",
-  "main": "./dist/esm/index.js",
-  "browser": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./index.ts",
-      "typescript": "./index.ts",
-      "browser": "./dist/esm/index.js",
-      "solid": "./dist/source/index.js",
-      "types": "./dist/types/index.d.ts"
-    }
-  },
+  "main": "./dist/solid/index.js",
+  "browser": "./dist/solid/index.js",
+  "types": "./dist/solid/index.d.ts",
   "sideEffects": false,
   "scripts": {
     "start": "npm run watch",
@@ -26,7 +16,7 @@
     "lint:fix:prettier": "prettier --write \"**/*.{ts,js,cjs,md}\"",
     "lint:eslint": "eslint .",
     "lint:fix:eslint": "eslint --fix .",
-    "build": "npm run tsc && rollup -c",
+    "build": "rm -rf dist/ && tsc --build && tsc-alias",
     "tsc": "tsc",
     "watch": "tsc -w",
     "prepare": "husky",
@@ -56,6 +46,7 @@
     "rollup": "^4.13.0",
     "rollup-preset-solid": "^2.0.1",
     "solid-js": "^1.8.16",
+    "tsc-alias": "^1.8.8",
     "typescript": "^5.4.2"
   },
   "lint-staged": {
@@ -66,8 +57,8 @@
     "*.{js,cjs,md}": "prettier --write"
   },
   "peerDependencies": {
-    "solid-js": "*",
-    "@lightningjs/renderer": "^0.8.3"
+    "@lightningjs/renderer": "^0.8.3",
+    "solid-js": "*"
   },
   "repository": {
     "type": "git",
@@ -75,7 +66,6 @@
   },
   "files": [
     "dist",
-    "src",
     "jsx-runtime.d.ts",
     "LICENSE",
     "NOTICE",

@@ -29,5 +29,6 @@ export {
   ErrorBoundary,
 } from 'solid-js';
 export * from './activeElement.js';
-export { View, Text } from './components/index.js';
+export { Text } from './components/Text.jsx';
+export { View } from './components/View.jsx';
 export * from './render.js';
