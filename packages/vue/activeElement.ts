@@ -17,6 +17,7 @@
 
 import type { ElementNode } from '@lightningjs/core';
 import { ref } from '@vue/reactivity';
-export const activeElement = ref<ElementNode | undefined>();
+import type { Ref } from '@vue/reactivity';
+export const activeElement: Ref<ElementNode | undefined> = ref(undefined);
 export const setActiveElement = (val: ElementNode) =>
   (activeElement.value = val);
