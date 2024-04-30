@@ -17,12 +17,10 @@
  */
 
 import { createRenderer } from 'solid-js/universal';
-import { config } from '../config.js';
-import { startLightningRenderer } from './lightningInit.js';
-import nodeOpts from './solidOpts.js';
-import { type SolidNode } from './node/elementNode.js';
+import { type SolidNode, Config, startLightningRenderer } from '@lightningjs/core';
 import { splitProps, createMemo, untrack, type JSX } from 'solid-js';
 import type { RendererMain, RendererMainSettings } from '@lightningjs/renderer';
+import nodeOpts from './solidOpts.js';
 
 const solidRenderer = createRenderer<SolidNode>(nodeOpts);
 
@@ -32,7 +30,7 @@ export async function startLightning(
   rootId?: string | HTMLElement,
 ) {
   renderer = startLightningRenderer(
-    options || config.rendererOptions,
+    options || Config.rendererOptions,
     rootId || 'app',
   );
   return await renderer.init();

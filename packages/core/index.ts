@@ -14,23 +14,8 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-import './jsx-runtime.js';
-export {
-  For,
-  Show,
-  Suspense,
-  SuspenseList,
-  Switch,
-  Match,
-  Index,
-  ErrorBoundary,
-} from 'solid-js';
-export * from './core/activeElement.js';
-export * from './core/node/elementNode.js';
-export { View, Text } from './components/index.js';
-export * from './core/lightningInit.js';
-export * from './core/render.js';
-export { config as Config } from './config.js';
-export * from './intrinsicTypes.js';
+export * from './node/elementNode.js';
+export * from '../core/lightningInit.js';
 export * from './utils.js';
-export * as Types from './intrinsicTypes.js';
+export * from './intrinsicTypes.js';
+export { config as Config } from './config.js';

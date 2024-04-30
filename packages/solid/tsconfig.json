@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.build.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/",
+    "paths": {
+      "@activeElement": ["./activeElement.ts"],
+      "@lightningjs/core": ["../core/"]
+    },
+
+    // jsx
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "types": ["solid-js"],
+  },
+  "include": [
+    "*.ts",
+    "**/*.tsx",
+    "../core/**/*.ts",
+  ]
+}
