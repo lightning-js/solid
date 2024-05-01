@@ -166,7 +166,8 @@ export interface TextNode {
 }
 
 export type SolidNode = ElementNode | TextNode;
-export type SolidStyles = NodeStyles | TextStyles;
+
+export type SolidStyles = {[key: string]:  NodeStyles | TextStyles} & (NodeStyles | TextStyles);
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface ElementNode
