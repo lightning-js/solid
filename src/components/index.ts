@@ -14,8 +14,6 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-import './jsx-runtime.js';
-export * from '@lightningjs/core';
-export * as Types from '@lightningjs/core';
-export * from './activeElement.js';
-export * from './render.js';
+
+export * from './Text.jsx';
+export * from './View.jsx';

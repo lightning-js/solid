@@ -37,7 +37,7 @@ export default class Children extends Array<SolidNode> {
     return this[0];
   }
 
-  insert(node: SolidNode, beforeNode?: SolidNode | null) {
+  insert(node: SolidNode, beforeNode: SolidNode) {
     if (beforeNode) {
       const index = this.indexOf(beforeNode);
       this.splice(index, 0, node);

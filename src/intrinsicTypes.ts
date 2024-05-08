@@ -30,8 +30,9 @@ import {
   type RadialGradientEffectProps,
   type RadialProgressEffectProps,
 } from '@lightningjs/renderer';
-import type { ElementNode } from './node/elementNode.js';
-import type { NodeStates } from './node/states.js';
+import { type JSX } from 'solid-js';
+import { type ElementNode } from './core/node/elementNode.js';
+import { type NodeStates } from './core/node/states.js';
 
 type AddUndefined<T> = {
   [K in keyof T]: T[K] | undefined;
@@ -142,7 +143,7 @@ export interface IntrinsicNodeProps
     | IntrinsicNodeStyleProps
     | (IntrinsicNodeStyleProps | undefined)[]
     | undefined;
-  // children?: JSX.Element | undefined;
+  children?: JSX.Element | undefined;
 }
 
 export interface IntrinsicTextProps

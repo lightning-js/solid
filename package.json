@@ -3,14 +3,14 @@
   "version": "0.15.15",
   "description": "Lightning renderer for solid universal",
   "type": "module",
-  "source": "./index.ts",
+  "source": "src/index.ts",
   "main": "./dist/esm/index.js",
   "browser": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./index.ts",
-      "typescript": "./index.ts",
+      "import": "./src/index.ts",
+      "typescript": "./src/index.ts",
       "browser": "./dist/esm/index.js",
       "solid": "./dist/source/index.js",
       "types": "./dist/types/index.d.ts"
@@ -41,9 +41,6 @@
   ],
   "author": "Chris Lorenzo",
   "license": "Apache-2.0",
-  "dependencies": {
-    "@lightningjs/core": "workspace:*"
-  },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.5",
     "@typescript-eslint/eslint-plugin": "^6.21.0",

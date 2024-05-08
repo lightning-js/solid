@@ -16,6 +16,7 @@
  */
 
 import { type Component } from "solid-js";
-import type { IntrinsicTextProps } from "@lightningjs/core";
+import { type IntrinsicNodeProps } from "../intrinsicTypes.js";
 
-export const Text: Component<IntrinsicTextProps> = (props) => <text {...props}></text>
+export const View: Component<IntrinsicNodeProps> = (props) =>
+   <node {...props}></node>;

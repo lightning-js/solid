@@ -14,21 +14,8 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-import './jsx-runtime.js';
-export * from '@lightningjs/core';
-export * as Types from '@lightningjs/core';
 
-export {
-  For,
-  Show,
-  Suspense,
-  SuspenseList,
-  Switch,
-  Match,
-  Index,
-  ErrorBoundary,
-} from 'solid-js';
-export * from './activeElement.js';
-export { Text } from './components/Text.jsx';
-export { View } from './components/View.jsx';
-export * from './render.js';
+import { type Component } from "solid-js";
+import type { IntrinsicTextProps } from "../intrinsicTypes.js";
+
+export const Text: Component<IntrinsicTextProps> = (props) => <text {...props}></text>
