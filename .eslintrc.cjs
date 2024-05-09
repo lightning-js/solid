@@ -11,7 +11,7 @@ const config = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    'prettier',
+    'plugin:prettier/recommended',
   ],
   parserOptions: {
     project: ['./tsconfig.json', './tsconfig.cfg.json'],
