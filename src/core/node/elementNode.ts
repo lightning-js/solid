@@ -70,10 +70,7 @@ function borderAccessor(
   direction: '' | 'Top' | 'Right' | 'Bottom' | 'Left' = '',
 ) {
   return {
-    set(
-      this: ElementNode,
-      value: number | { width: number; color: number | string },
-    ) {
+    set(this: ElementNode, value: number | { width: number; color: number }) {
       // Format: width || { width, color }
       if (isNumber(value)) {
         value = { width: value, color: 0x000000ff };
@@ -167,7 +164,10 @@ export interface TextNode {
 }
 
 export type SolidNode = ElementNode | TextNode;
-export type SolidStyles = NodeStyles | TextStyles;
+export type SolidStyles = { [key: string]: NodeStyles | TextStyles } & (
+  | NodeStyles
+  | TextStyles
+);
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface ElementNode
