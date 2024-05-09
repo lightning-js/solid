@@ -47,13 +47,14 @@
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
-    "rollup": "^4.13.0",
+    "rollup": "^4.17.2",
     "rollup-preset-solid": "^2.0.1",
-    "solid-js": "^1.8.16",
-    "typescript": "^5.4.2"
+    "solid-js": "^1.8.17",
+    "typescript": "^5.4.5"
   },
   "lint-staged": {
     "*.ts": [
@@ -63,8 +64,8 @@
     "*.{js,cjs,md}": "prettier --write"
   },
   "peerDependencies": {
-    "solid-js": "*",
-    "@lightningjs/renderer": "^0.8.3"
+    "@lightningjs/renderer": "^0.8.4",
+    "solid-js": "*"
   },
   "repository": {
     "type": "git",

@@ -32,7 +32,7 @@ interface Config {
 }
 
 function isDevEnv(): boolean {
-  return import.meta.env && import.meta.env.DEV;
+  return !!(import.meta.env && import.meta.env.DEV);
 }
 export const isDev = isDevEnv() || false;
 

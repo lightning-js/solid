@@ -11,7 +11,7 @@ const config = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    'prettier',
+    'plugin:prettier/recommended',
   ],
   parserOptions: {
     project: ['./tsconfig.json', './tsconfig.cfg.json'],
@@ -38,9 +38,6 @@ const config = {
       },
     ],
   },
-  // Temporarily we also ignore all JavaScript files since they will be ultimately converted to TS.
-  // TODO: Remove this once we have converted all of the JavaScript files to TypeScript
-  ignorePatterns: ['**/*.js'],
 };
 
 module.exports = config;
