@@ -141,7 +141,7 @@ const LightningRendererNonAnimatingProps = [
 
 export interface TextNode {
   id?: string;
-  name: string;
+  type: NodeTypes.TextNode | NodeTypes.Text;
   text: string;
   parent: ElementNode | undefined;
   zIndex?: number;
@@ -172,11 +172,17 @@ export interface ElementNode
   [key: string]: unknown;
 }
 
+export const enum NodeTypes {
+  Element,
+  TextNode,
+  Text,
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ElementNode extends Object {
   id?: string;
   debug?: boolean;
-  name: string;
+  type: NodeTypes;
   lng: INode | undefined;
   renderer?: RendererMain;
   selected?: number;
@@ -193,7 +199,6 @@ export class ElementNode extends Object {
   private _renderProps: IntrinsicNodeProps | IntrinsicTextProps;
   private _effects?: Effects;
   private _parent: ElementNode | undefined;
-  private _shader?: ShaderRef;
   private _style?: SolidStyles;
   private _states?: States;
   private _events?: Array<
@@ -211,7 +216,7 @@ export class ElementNode extends Object {
 
   constructor(name: string) {
     super();
-    this.name = name;
+    this.type = name === 'text' ? NodeTypes.TextNode : NodeTypes.Element;
     this._renderProps = {};
     this.children = new Children(this);
   }
@@ -343,7 +348,7 @@ export class ElementNode extends Object {
   }
 
   isTextNode() {
-    return this.name === 'text';
+    return this.type === NodeTypes.TextNode;
   }
 
   _layoutOnLoad() {
@@ -354,7 +359,11 @@ export class ElementNode extends Object {
   }
 
   getText() {
-    return this.children.map((c) => c.text).join('');
+    let result = '';
+    for (let i = 0; i < this.children.length; i++) {
+      result += this.children[i]!.text;
+    }
+    return result;
   }
 
   destroy() {
@@ -638,15 +647,18 @@ export class ElementNode extends Object {
       node.lng.div.solid = node;
     }
 
-    if (node.name !== 'text') {
-      node.children.forEach((c) => {
-        if ((c as ElementNode).render) {
-          (c as ElementNode).render();
-        } else if (c.text !== '') {
+    if (node.type === NodeTypes.Element) {
+      // only element nodes will have children that need rendering
+      for (let i = 0; i < node.children.length; i++) {
+        const c = node.children[i];
+        assertTruthy(c, 'Child is undefined');
+        if ('render' in c) {
+          c.render();
+        } else if (c.text) {
           // Solid Show uses an empty text node as a placeholder
           console.warn('TextNode outside of <Text>: ', c);
         }
-      });
+      }
     }
 
     node.autofocus && node.setFocus();

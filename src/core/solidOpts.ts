@@ -17,7 +17,7 @@
 import { assertTruthy } from '@lightningjs/renderer/utils';
 import { log } from './utils.js';
 import type { SolidNode, TextNode } from './node/elementNode.js';
-import { ElementNode } from './node/elementNode.js';
+import { ElementNode, NodeTypes } from './node/elementNode.js';
 import type { createRenderer } from 'solid-js/universal';
 
 export type SolidRendererOptions = Parameters<
@@ -30,7 +30,7 @@ export default {
   },
   createTextNode(text: string): TextNode {
     // A text node is just a string - not the <text> node
-    return { name: 'TextNode', text, parent: undefined };
+    return { type: NodeTypes.Text, text, parent: undefined };
   },
   replaceText(node: TextNode, value: string): void {
     log('Replace Text: ', node, value);
