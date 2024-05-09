@@ -461,7 +461,7 @@ export class ElementNode extends Object {
       let changedLayout = false;
       if (isFunc(this.onBeforeLayout)) {
         changedLayout =
-          this.onBeforeLayout.call(this, this, child, dimensions) ?? false;
+          this.onBeforeLayout.call(this, this, child, dimensions) || false;
       }
 
       if (this.display === 'flex') {
