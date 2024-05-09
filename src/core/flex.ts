@@ -15,7 +15,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { assertTruthy } from '@lightningjs/renderer/utils';
-import type { ElementNode, SolidNode } from './node/elementNode.js';
+import {
+  type ElementNode,
+  type SolidNode,
+  NodeTypes,
+} from './node/elementNode.js';
 
 export default function (node: ElementNode): boolean {
   const children = [];
@@ -23,7 +27,7 @@ export default function (node: ElementNode): boolean {
   for (let i = 0; i < node.children.length; i++) {
     const c = node.children[i]!;
     // Filter empty text nodes which are place holders for <Show> and elements missing dimensions
-    if (c.name === 'TextNode') {
+    if (c.type === NodeTypes.Text) {
       continue;
     }
 
@@ -33,7 +37,7 @@ export default function (node: ElementNode): boolean {
     }
 
     // text node hasnt loaded yet - skip layout
-    if (c.name === 'text' && c.text !== '' && !(c.width || c.height)) {
+    if (c.type === NodeTypes.TextNode && c.text && !(c.width || c.height)) {
       return false;
     }
 
