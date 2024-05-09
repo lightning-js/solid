@@ -70,7 +70,7 @@ export function keyExists(
 
 export function flattenStyles(
   obj: SolidStyles | undefined | (SolidStyles | undefined)[],
-  result: Record<string, unknown> = {},
+  result: SolidStyles = {},
 ): SolidStyles {
   if (isArray(obj)) {
     obj.forEach((item) => {
@@ -80,8 +80,10 @@ export function flattenStyles(
     // handle the case where the object is not an array
     for (const key in obj) {
       // be careful of 0 values
-      if (result[key as keyof SolidStyles] === undefined) {
-        result[key as keyof SolidStyles] = obj[key as keyof SolidStyles];
+      if (result[key] === undefined && obj[key]) {
+        result[key as keyof SolidStyles] = obj[
+          key as keyof SolidStyles
+        ] as SolidStyles;
       }
     }
   }
