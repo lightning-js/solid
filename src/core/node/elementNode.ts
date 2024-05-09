@@ -235,17 +235,13 @@ export class ElementNode extends Object {
     }
   }
 
-  get shader(): ShaderRef | undefined {
-    return this._shader;
-  }
-
-  set shader(v: Parameters<typeof createShader> | ShaderRef | undefined) {
-    if (isArray(v)) {
-      this._shader = createShader(...v) as ShaderRef;
-    } else {
-      this._shader = v;
+  set shader(
+    shaderProps: Parameters<typeof createShader> | ShaderRef | undefined,
+  ) {
+    if (isArray(shaderProps)) {
+      shaderProps = createShader(...shaderProps) as ShaderRef;
     }
-    this._sendToLightning('shader', this._shader);
+    this._sendToLightning('shader', shaderProps);
   }
 
   _sendToLightningAnimatable(name: string, value: number | string) {
