@@ -29,6 +29,10 @@ Clone starter template:
 > npm start # or yarn or pnpm
 ```
 
+## Video Quick Start
+
+[![Watch the video](https://img.youtube.com/vi/mWJ9CEiizeE/0.jpg)](https://www.youtube.com/watch?v=mWJ9CEiizeE)
+
 ### Hello World
 
 ```jsx
