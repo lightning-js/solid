@@ -18,6 +18,7 @@
 import { renderer, createShader } from '../lightningInit.js';
 import {
   type BorderStyleObject,
+  type Effects,
   type IntrinsicCommonProps,
   type IntrinsicNodeProps,
   type IntrinsicTextProps,
@@ -46,6 +47,7 @@ import type {
   Dimensions,
   AnimationSettings,
   NodeLoadedPayload,
+  LinearGradientEffectProps,
 } from '@lightningjs/renderer';
 import { assertTruthy } from '@lightningjs/renderer/utils';
 
@@ -193,7 +195,7 @@ export class ElementNode extends Object {
 
   private _undoStyles?: string[];
   private _renderProps: IntrinsicNodeProps | IntrinsicTextProps;
-  private _effects: any;
+  private _effects?: Effects;
   private _parent: ElementNode | undefined;
   private _shader?: ShaderRef;
   private _style?: SolidStyles;
@@ -214,6 +216,7 @@ export class ElementNode extends Object {
   }> = [];
   private _animationQueueSettings: Partial<AnimationSettings> | undefined;
   private _animationRunning: boolean = false;
+
   children: Children;
 
   constructor(name: string) {
@@ -457,12 +460,8 @@ export class ElementNode extends Object {
       log('Layout: ', this);
       let changedLayout = false;
       if (isFunc(this.onBeforeLayout)) {
-        changedLayout = this.onBeforeLayout.call(
-          this,
-          this,
-          child,
-          dimensions,
-        ) as boolean;
+        changedLayout =
+          this.onBeforeLayout.call(this, this, child, dimensions) ?? false;
       }
 
       if (this.display === 'flex') {
@@ -648,7 +647,7 @@ export class ElementNode extends Object {
 
     // L3 Inspector adds div to the lng object
     //@ts-expect-error - div is not in the typings
-    if (node.lng.div) {
+    if (node.lng?.div) {
       //@ts-expect-error - div is not in the typings
       node.lng.div.solid = node;
     }
@@ -715,14 +714,14 @@ Object.defineProperties(ElementNode.prototype, {
 
 Object.defineProperties(ElementNode.prototype, {
   linearGradient: {
-    set(props = {}) {
+    set(props: LinearGradientEffectProps = {}) {
       this._linearGradient = props;
       this.effects = {
         ...(this.effects || {}),
         ...{ linearGradient: props },
       };
     },
-    get() {
+    get(): LinearGradientEffectProps {
       return this._linearGradient;
     },
   },

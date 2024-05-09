@@ -27,6 +27,7 @@ export {
 } from 'solid-js';
 export * from './core/activeElement.js';
 export * from './core/node/elementNode.js';
+export type { SolidRendererOptions } from './core/solidOpts.js';
 export { View, Text } from './components/index.js';
 export * from './core/lightningInit.js';
 export * from './core/render.js';

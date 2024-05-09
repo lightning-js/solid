@@ -31,9 +31,8 @@ export function log(msg: string, node: SolidNode, ...args: any[]) {
   }
 }
 
-export function isFunc(item: unknown): item is (...args: unknown[]) => unknown {
-  return typeof item === 'function';
-}
+export const isFunc = (obj: unknown): obj is CallableFunction =>
+  obj instanceof Function;
 
 export function isObject(
   item: unknown,
