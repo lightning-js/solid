@@ -67,13 +67,13 @@ export interface IntrinsicNodeCommonProps {
     target: ElementNode,
     child?: ElementNode,
     dimensions?: Dimensions,
-  ) => boolean | undefined;
+  ) => boolean | void;
   onLayout?: (
     this: ElementNode,
     target: ElementNode,
     child?: ElementNode,
     dimensions?: Dimensions,
-  ) => unknown;
+  ) => void;
   forwardFocus?:
     | number
     | ((this: ElementNode, elm: ElementNode) => boolean | void);

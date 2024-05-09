@@ -21,7 +21,13 @@ import { config } from '../config.js';
 import { startLightningRenderer } from './lightningInit.js';
 import nodeOpts from './solidOpts.js';
 import { type SolidNode } from './node/elementNode.js';
-import { splitProps, createMemo, untrack, type JSX } from 'solid-js';
+import {
+  splitProps,
+  createMemo,
+  untrack,
+  type JSXElement,
+  type ValidComponent,
+} from 'solid-js';
 import type { RendererMain, RendererMainSettings } from '@lightningjs/renderer';
 
 const solidRenderer = createRenderer<SolidNode>(nodeOpts);
@@ -39,7 +45,7 @@ export async function startLightning(
 }
 
 export const render = async function (
-  code: () => JSX.Element,
+  code: () => JSXElement,
   node?: HTMLElement | string,
 ) {
   const rootNode = nodeOpts.createElement('App');
@@ -56,7 +62,7 @@ export const render = async function (
 };
 
 // used for playground - must be sync so user must await startLightning
-export const renderSync = function (code: () => JSX.Element) {
+export const renderSync = function (code: () => JSXElement) {
   const rootNode = nodeOpts.createElement('App');
   rootNode.lng = renderer.root!;
   // @ts-expect-error - code is jsx element and not SolidElement yet
@@ -85,25 +91,28 @@ export const {
  * @description https://www.solidjs.com/docs/latest/api#dynamic
  */
 export function Dynamic<T>(
-  props: T extends Record<any, any> ? T : never,
-): SolidNode {
+  props: T & {
+    component?: ValidComponent;
+  },
+): JSXElement {
   const [p, others] = splitProps(props, ['component']);
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  const cached = createMemo<Function | string>(() => p.component);
+
+  const cached = createMemo(() => p.component);
+
   return createMemo(() => {
     const component = cached();
     switch (typeof component) {
       case 'function':
         return untrack(() => component(others));
 
-      case 'string':
-        // eslint-disable-next-line no-case-declarations
+      case 'string': {
         const el = createElement(component);
         spread(el, others);
         return el;
+      }
 
       default:
         break;
     }
-  }) as unknown as SolidNode;
+  }) as unknown as JSXElement;
 }
