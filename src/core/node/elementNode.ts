@@ -80,10 +80,6 @@ function borderAccessor(
         ...(this.effects || {}),
         ...{ [`border${direction}`]: value },
       };
-      this[`_border${direction}`] = value;
-    },
-    get(this: ElementNode) {
-      return this[`_border${direction}`];
     },
   };
 }
@@ -202,12 +198,6 @@ export class ElementNode extends Object {
     [string, (target: ElementNode, event?: Event) => void]
   >;
   private _animationSettings?: Partial<AnimationSettings>;
-  public _borderRadius?: number;
-  public _border?: BorderStyleObject;
-  public _borderLeft?: BorderStyleObject;
-  public _borderRight?: BorderStyleObject;
-  public _borderTop?: BorderStyleObject;
-  public _borderBottom?: BorderStyleObject;
   private _animationQueue: Array<{
     props: Partial<INodeAnimatableProps>;
     animationSettings?: Partial<AnimationSettings>;
@@ -696,14 +686,10 @@ for (const key of LightningRendererNonAnimatingProps) {
 Object.defineProperties(ElementNode.prototype, {
   borderRadius: {
     set(this: ElementNode, radius) {
-      this._borderRadius = radius;
       this.effects = {
         ...(this.effects || {}),
         ...{ radius: { radius } },
       };
-    },
-    get(this: ElementNode) {
-      return this._borderRadius;
     },
   },
   border: borderAccessor(),
@@ -716,14 +702,10 @@ Object.defineProperties(ElementNode.prototype, {
 Object.defineProperties(ElementNode.prototype, {
   linearGradient: {
     set(props = {}) {
-      this._linearGradient = props;
       this.effects = {
         ...(this.effects || {}),
         ...{ linearGradient: props },
       };
-    },
-    get() {
-      return this._linearGradient;
     },
   },
 });
