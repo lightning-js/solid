@@ -25,9 +25,7 @@ import {
   splitProps,
   createMemo,
   untrack,
-  type JSX,
   type JSXElement,
-  type Component,
   type ValidComponent,
 } from 'solid-js';
 import type { RendererMain, RendererMainSettings } from '@lightningjs/renderer';
@@ -47,7 +45,7 @@ export async function startLightning(
 }
 
 export const render = async function (
-  code: () => JSX.Element,
+  code: () => JSXElement,
   node?: HTMLElement | string,
 ) {
   const rootNode = nodeOpts.createElement('App');
@@ -64,7 +62,7 @@ export const render = async function (
 };
 
 // used for playground - must be sync so user must await startLightning
-export const renderSync = function (code: () => JSX.Element) {
+export const renderSync = function (code: () => JSXElement) {
   const rootNode = nodeOpts.createElement('App');
   rootNode.lng = renderer.root!;
   // @ts-expect-error - code is jsx element and not SolidElement yet
