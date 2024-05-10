@@ -75,10 +75,12 @@ function borderAccessor(
       if (isNumber(value)) {
         value = { width: value, color: 0x000000ff };
       }
-      this.effects = {
-        ...(this.effects || {}),
-        ...{ [`border${direction}`]: value },
-      };
+      this.effects = this.effects
+        ? {
+            ...(this.effects || {}),
+            ...{ [`border${direction}`]: value },
+          }
+        : { [`border${direction}`]: value };
     },
   };
 }
@@ -684,10 +686,12 @@ for (const key of LightningRendererNonAnimatingProps) {
 Object.defineProperties(ElementNode.prototype, {
   borderRadius: {
     set(this: ElementNode, radius) {
-      this.effects = {
-        ...(this.effects || {}),
-        ...{ radius: { radius } },
-      };
+      this.effects = this.effects
+        ? {
+            ...this.effects,
+            ...{ radius: { radius } },
+          }
+        : { radius: { radius } };
     },
   },
   border: borderAccessor(),
@@ -700,10 +704,12 @@ Object.defineProperties(ElementNode.prototype, {
 Object.defineProperties(ElementNode.prototype, {
   linearGradient: {
     set(props: LinearGradientEffectProps = {}) {
-      this.effects = {
-        ...(this.effects || {}),
-        ...{ linearGradient: props },
-      };
+      this.effects = this.effects
+        ? {
+            ...this.effects,
+            ...{ linearGradient: props },
+          }
+        : { linearGradient: props };
     },
   },
 });
