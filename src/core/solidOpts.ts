@@ -17,7 +17,8 @@
 import { assertTruthy } from '@lightningjs/renderer/utils';
 import { log } from './utils.js';
 import type { SolidNode, TextNode } from './node/elementNode.js';
-import { ElementNode, NodeTypes } from './node/elementNode.js';
+import { ElementNode } from './node/elementNode.js';
+import { NodeTypes } from './node/nodeTypes.js';
 import type { createRenderer } from 'solid-js/universal';
 
 export type SolidRendererOptions = Parameters<
@@ -49,7 +50,7 @@ export default {
     node._queueDelete = false;
 
     if (node instanceof ElementNode) {
-      parent.lng && node.render();
+      parent.rendered && node.render();
     } else if (parent.isTextNode()) {
       // TextNodes can be placed outside of <text> nodes when <Show> is used as placeholder
       parent.text = parent.getText();
@@ -62,13 +63,11 @@ export default {
     log('REMOVE: ', parent, node);
     parent.children.remove(node);
     node._queueDelete = true;
-
-    if (node instanceof ElementNode) {
-      // Solid replacesNodes to move them (via insert and remove),
-      // so we need to wait for the next microtask to destroy the node
-      // in the event it gets a new parent.
-      queueMicrotask(() => node.destroy());
-    }
+    assertTruthy(node instanceof ElementNode, 'Only destroy ElementNodes');
+    // Solid replacesNodes to move them (via insert and remove),
+    // so we need to wait for the next microtask to destroy the node
+    // in the event it gets a new parent.
+    queueMicrotask(() => node.destroy());
   },
   getParentNode(node: SolidNode): ElementNode | undefined {
     return node.parent;

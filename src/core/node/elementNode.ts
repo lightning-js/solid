@@ -17,7 +17,6 @@
 
 import { renderer, createShader } from '../lightningInit.js';
 import {
-  type BorderStyleObject,
   type Effects,
   type IntrinsicCommonProps,
   type IntrinsicNodeProps,
@@ -50,6 +49,7 @@ import type {
   LinearGradientEffectProps,
 } from '@lightningjs/renderer';
 import { assertTruthy } from '@lightningjs/renderer/utils';
+import { NodeTypes } from './nodeTypes.js';
 
 const { animationSettings: defaultAnimationSettings } = config;
 const layoutQueue: ElementNode[] = [];
@@ -172,18 +172,13 @@ export interface ElementNode
   [key: string]: unknown;
 }
 
-export const enum NodeTypes {
-  Element,
-  TextNode,
-  Text,
-}
-
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ElementNode extends Object {
   id?: string;
   debug?: boolean;
   type: NodeTypes;
-  lng: INode | undefined;
+  lng: INode | IntrinsicNodeProps | IntrinsicTextProps;
+  rendered: boolean;
   renderer?: RendererMain;
   selected?: number;
   autofocus?: boolean;
@@ -196,7 +191,6 @@ export class ElementNode extends Object {
     | ((this: ElementNode, elm: ElementNode) => boolean | void);
 
   private _undoStyles?: string[];
-  private _renderProps: IntrinsicNodeProps | IntrinsicTextProps;
   private _effects?: Effects;
   private _parent: ElementNode | undefined;
   private _style?: SolidStyles;
@@ -217,7 +211,8 @@ export class ElementNode extends Object {
   constructor(name: string) {
     super();
     this.type = name === 'text' ? NodeTypes.TextNode : NodeTypes.Element;
-    this._renderProps = {};
+    this.rendered = false;
+    this.lng = {};
     this.children = new Children(this);
   }
 
@@ -227,7 +222,7 @@ export class ElementNode extends Object {
 
   set effects(v) {
     this._effects = v;
-    if (this.lng) {
+    if (this.rendered) {
       this.shader = convertEffectsToShader(v);
     }
   }
@@ -238,55 +233,45 @@ export class ElementNode extends Object {
 
   set parent(p) {
     this._parent = p;
-    if (this.lng) {
+    if (this.rendered) {
       this.lng.parent = p?.lng ?? null;
     }
   }
 
-  set shader(
-    shaderProps: Parameters<typeof createShader> | ShaderRef | undefined,
-  ) {
+  set shader(shaderProps: Parameters<typeof createShader> | ShaderRef) {
     if (isArray(shaderProps)) {
       shaderProps = createShader(...shaderProps) as ShaderRef;
     }
-    this._sendToLightning('shader', shaderProps);
+    this.lng.shader = shaderProps;
   }
 
   _sendToLightningAnimatable(name: string, value: number | string) {
-    if (this.lng) {
-      if (
-        config.animationsEnabled &&
-        this.transition &&
-        (this.transition === true || this.transition[name])
-      ) {
-        const animationSettings =
-          this.transition === true || this.transition[name] === true
-            ? undefined
-            : (this.transition[name] as undefined | AnimationSettings);
+    if (
+      this.rendered &&
+      config.animationsEnabled &&
+      this.transition &&
+      (this.transition === true || this.transition[name])
+    ) {
+      const animationSettings =
+        this.transition === true || this.transition[name] === true
+          ? undefined
+          : (this.transition[name] as undefined | AnimationSettings);
 
-        return this.animate({ [name]: value }, animationSettings).start();
-      }
-
-      (this.lng[name as keyof INode] as number | string) = value;
-    } else {
-      this._renderProps[name] = value;
+      return this.animate({ [name]: value }, animationSettings).start();
     }
-  }
 
-  _sendToLightning(name: string, value: unknown) {
-    if (this.lng) {
-      (this.lng[name as keyof INodeWritableProps] as unknown) = value;
-    } else {
-      this._renderProps[name] = value;
-    }
+    (this.lng[name as keyof INode] as number | string) = value;
   }
 
   animate(
     props: Partial<INodeAnimatableProps>,
     animationSettings?: Partial<AnimationSettings>,
   ) {
-    assertTruthy(this.lng, 'Node must be rendered before animating');
-    return this.lng.animate(props, animationSettings || this.animationSettings);
+    assertTruthy(this.rendered, 'Node must be rendered before animating');
+    return (this.lng as INode).animate(
+      props,
+      animationSettings || this.animationSettings,
+    );
   }
 
   chain(
@@ -323,7 +308,7 @@ export class ElementNode extends Object {
   }
 
   setFocus() {
-    if (this.lng) {
+    if (this.rendered) {
       // can be 0
       if (this.forwardFocus !== undefined) {
         if (isFunc(this.forwardFocus)) {
@@ -352,10 +337,13 @@ export class ElementNode extends Object {
   }
 
   _layoutOnLoad() {
-    this.lng!.on('loaded', (_node: INode, loadedPayload: NodeLoadedPayload) => {
-      const { dimensions } = loadedPayload;
-      this.parent!.updateLayout(this, dimensions);
-    });
+    (this.lng as INode).on(
+      'loaded',
+      (_node: INode, loadedPayload: NodeLoadedPayload) => {
+        const { dimensions } = loadedPayload;
+        this.parent!.updateLayout(this, dimensions);
+      },
+    );
   }
 
   getText() {
@@ -368,7 +356,7 @@ export class ElementNode extends Object {
 
   destroy() {
     if (this._queueDelete) {
-      this.lng?.destroy();
+      (this.lng as INode).destroy();
     }
   }
   // Must be set before render
@@ -378,8 +366,10 @@ export class ElementNode extends Object {
     this._events = events;
   }
 
-  get onEvents() {
-    return this._events || [];
+  get onEvents():
+    | Array<[string, (target: ElementNode, event?: any) => void]>
+    | undefined {
+    return this._events;
   }
 
   set style(values: SolidStyles | (SolidStyles | undefined)[]) {
@@ -428,7 +418,7 @@ export class ElementNode extends Object {
 
   set states(states: NodeStates) {
     this._states = new States(this._stateChanged.bind(this), states);
-    if (this.lng) {
+    if (this.rendered) {
       this._stateChanged();
     }
   }
@@ -526,12 +516,12 @@ export class ElementNode extends Object {
       return;
     }
 
-    if (!parent.lng) {
+    if (!parent.rendered) {
       console.warn('Parent not rendered yet: ', this);
       return;
     }
 
-    if (this.lng) {
+    if (this.rendered) {
       console.warn('Node already rendered: ', this);
       return;
     }
@@ -554,11 +544,11 @@ export class ElementNode extends Object {
       this._stateChanged();
     }
 
-    const props = node._renderProps;
+    const props = node.lng as IntrinsicNodeProps | IntrinsicTextProps;
     props.x = props.x || 0;
     props.y = props.y || 0;
 
-    if (parent.lng) {
+    if (parent.rendered) {
       props.parent = parent.lng;
     }
 
@@ -622,7 +612,9 @@ export class ElementNode extends Object {
       node.lng = renderer.createNode(props);
     }
 
-    if (props.autosize && parent.requiresLayout()) {
+    node.rendered = true;
+
+    if (node.autosize && parent.requiresLayout()) {
       node._layoutOnLoad();
     }
 
@@ -636,15 +628,16 @@ export class ElementNode extends Object {
 
     isFunc(this.onCreate) && this.onCreate.call(this, node);
 
-    node.onEvents.forEach(([name, handler]) => {
-      node.lng?.on(name, (inode, data) => handler(node, data));
-    });
+    node.onEvents &&
+      node.onEvents.forEach(([name, handler]) => {
+        (node.lng as INode).on(name, (inode, data) => handler(node, data));
+      });
 
     // L3 Inspector adds div to the lng object
     //@ts-expect-error - div is not in the typings
     if (node.lng?.div) {
       //@ts-expect-error - div is not in the typings
-      node.lng.div.solid = node;
+      node.lng.div.element = node;
     }
 
     if (node.type === NodeTypes.Element) {
@@ -662,15 +655,13 @@ export class ElementNode extends Object {
     }
 
     node.autofocus && node.setFocus();
-    // clean up after first render;
-    this._renderProps = {};
   }
 }
 
 for (const key of LightningRendererNumberProps) {
   Object.defineProperty(ElementNode.prototype, key, {
     get(): number {
-      return this.lng ? this.lng[key] : this._renderProps[key];
+      return this.lng[key];
     },
     set(v: number) {
       this._sendToLightningAnimatable(key, v);
@@ -681,10 +672,10 @@ for (const key of LightningRendererNumberProps) {
 for (const key of LightningRendererNonAnimatingProps) {
   Object.defineProperty(ElementNode.prototype, key, {
     get() {
-      return this.lng ? this.lng[key] : this._renderProps[key];
+      return this.lng[key];
     },
     set(v) {
-      this._sendToLightning(key, v);
+      this.lng[key] = v;
     },
   });
 }
