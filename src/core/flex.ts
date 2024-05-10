@@ -15,11 +15,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { assertTruthy } from '@lightningjs/renderer/utils';
-import {
-  type ElementNode,
-  type SolidNode,
-  NodeTypes,
-} from './node/elementNode.js';
+import { type ElementNode, type SolidNode } from './node/elementNode.js';
+import { NodeTypes } from './node/nodeTypes.js';
 
 export default function (node: ElementNode): boolean {
   const children = [];
