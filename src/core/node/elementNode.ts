@@ -17,6 +17,7 @@
 
 import { renderer, createShader } from '../lightningInit.js';
 import {
+  type BorderStyleObject,
   type Effects,
   type IntrinsicCommonProps,
   type IntrinsicNodeProps,
@@ -81,6 +82,11 @@ function borderAccessor(
             ...{ [`border${direction}`]: value },
           }
         : { [`border${direction}`]: value };
+
+      this[`_border${direction}`] = value;
+    },
+    get(this: ElementNode) {
+      return this[`_border${direction}`];
     },
   };
 }
@@ -162,10 +168,9 @@ export interface TextNode {
 }
 
 export type SolidNode = ElementNode | TextNode;
-export type SolidStyles = { [key: string]: NodeStyles | TextStyles } & (
-  | NodeStyles
-  | TextStyles
-);
+export type SolidStyles = {
+  [key: string]: NodeStyles | TextStyles | undefined;
+} & (NodeStyles | TextStyles);
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface ElementNode
@@ -201,6 +206,12 @@ export class ElementNode extends Object {
     [string, (target: ElementNode, event?: Event) => void]
   >;
   private _animationSettings?: Partial<AnimationSettings>;
+  public _borderRadius?: number | number[];
+  private _border?: BorderStyleObject;
+  private _borderLeft?: BorderStyleObject;
+  private _borderRight?: BorderStyleObject;
+  private _borderTop?: BorderStyleObject;
+  private _borderBottom?: BorderStyleObject;
   private _animationQueue: Array<{
     props: Partial<INodeAnimatableProps>;
     animationSettings?: Partial<AnimationSettings>;
@@ -694,13 +705,17 @@ for (const key of LightningRendererNonAnimatingProps) {
 // Add Border Helpers
 Object.defineProperties(ElementNode.prototype, {
   borderRadius: {
-    set(this: ElementNode, radius) {
+    set(this: ElementNode, radius: number | number[]) {
       this.effects = this.effects
         ? {
             ...this.effects,
             ...{ radius: { radius } },
           }
         : { radius: { radius } };
+      this._borderRadius = radius;
+    },
+    get(this: ElementNode) {
+      return this._borderRadius;
     },
   },
   border: borderAccessor(),
