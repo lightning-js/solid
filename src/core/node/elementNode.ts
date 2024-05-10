@@ -555,7 +555,7 @@ export class ElementNode extends Object {
     }
 
     if (node._effects) {
-      this.shader = convertEffectsToShader(node._effects);
+      props.shader = convertEffectsToShader(node._effects);
     }
 
     if (node.isTextNode()) {
