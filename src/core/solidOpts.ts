@@ -63,11 +63,12 @@ export default {
     log('REMOVE: ', parent, node);
     parent.children.remove(node);
     node._queueDelete = true;
-    assertTruthy(node instanceof ElementNode, 'Only destroy ElementNodes');
-    // Solid replacesNodes to move them (via insert and remove),
-    // so we need to wait for the next microtask to destroy the node
-    // in the event it gets a new parent.
-    queueMicrotask(() => node.destroy());
+    if (node instanceof ElementNode) {
+      // Solid replacesNodes to move them (via insert and remove),
+      // so we need to wait for the next microtask to destroy the node
+      // in the event it gets a new parent.
+      queueMicrotask(() => node.destroy());
+    }
   },
   getParentNode(node: SolidNode): ElementNode | undefined {
     return node.parent;
