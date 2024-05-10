@@ -694,7 +694,7 @@ for (const key of LightningRendererNonAnimatingProps) {
 // Add Border Helpers
 Object.defineProperties(ElementNode.prototype, {
   borderRadius: {
-    set(this: ElementNode, radius) {
+    set(this: ElementNode, radius: number | number[]) {
       this.effects = this.effects
         ? {
             ...this.effects,
