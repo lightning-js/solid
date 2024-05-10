@@ -608,6 +608,10 @@ export class ElementNode extends Object {
           props.height = (parent.height || 0) - props.y;
         }
 
+        if (props.rtt && !props.color) {
+          props.color = 0xffffffff;
+        }
+
         if (!props.color && !props.src) {
           // Default color to transparent - If you later set a src, you'll need
           // to set color '#ffffffff'
