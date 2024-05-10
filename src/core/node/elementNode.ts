@@ -52,7 +52,7 @@ import { assertTruthy } from '@lightningjs/renderer/utils';
 import { NodeTypes } from './nodeTypes.js';
 
 const { animationSettings: defaultAnimationSettings } = config;
-const layoutQueue: ElementNode[] = [];
+const layoutQueue = new Set<ElementNode>();
 let queueLayout = true;
 
 function convertEffectsToShader(styleEffects: any) {
@@ -528,15 +528,16 @@ export class ElementNode extends Object {
       return;
     }
 
-    if (parent.requiresLayout() && layoutQueue.indexOf(parent) === -1) {
-      layoutQueue.push(parent);
+    if (parent.requiresLayout() && !layoutQueue.has(parent)) {
+      layoutQueue.add(parent);
       if (queueLayout) {
         queueLayout = false;
         queueMicrotask(() => {
           queueLayout = true;
-          while (layoutQueue.length) {
-            const n = layoutQueue.pop();
-            n!.updateLayout();
+          const queue = [...layoutQueue];
+          layoutQueue.clear();
+          for (let i = queue.length - 1; i >= 0; i--) {
+            queue[i]!.updateLayout();
           }
         });
       }
@@ -567,6 +568,10 @@ export class ElementNode extends Object {
         }
       }
       props.text = node.getText();
+
+      if (props.textAlign && !props.contain) {
+        console.warn('Text align requires contain: ', node.getText());
+      }
 
       // contain is either width or both
       if (props.contain) {
