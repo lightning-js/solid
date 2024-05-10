@@ -84,12 +84,13 @@ export default function (node: ElementNode): boolean {
 
   if (justify === 'flexStart') {
     let start = 0;
-    children.forEach((c) => {
+    for (let i = 0; i < children.length; i++) {
+      const c = children[i]!;
       c[prop] = start + (c[marginOne] || 0);
       start +=
         (c[dimension] || 0) + gap + (c[marginOne] || 0) + (c[marginTwo] || 0);
       crossAlignChild(c);
-    });
+    }
     // Update container size
     if (node.flexBoundary !== 'fixed') {
       const calculatedSize = start - gap;
@@ -110,27 +111,30 @@ export default function (node: ElementNode): boolean {
     }
   } else if (justify === 'center') {
     let start = (containerSize - (itemSize + gap * (numChildren - 1))) / 2;
-    children.forEach((c) => {
+    for (let i = 0; i < children.length; i++) {
+      const c = children[i]!;
       c[prop] = start;
       start += (c[dimension] || 0) + gap;
       crossAlignChild(c);
-    });
+    }
   } else if (justify === 'spaceBetween') {
     const toPad = (containerSize - itemSize) / (numChildren - 1);
     let start = 0;
-    children.forEach((c) => {
+    for (let i = 0; i < children.length; i++) {
+      const c = children[i]!;
       c[prop] = start;
       start += (c[dimension] || 0) + toPad;
       crossAlignChild(c);
-    });
+    }
   } else if (justify === 'spaceEvenly') {
     const toPad = (containerSize - itemSize) / (numChildren + 1);
     let start = toPad;
-    children.forEach((c) => {
+    for (let i = 0; i < children.length; i++) {
+      const c = children[i]!;
       c[prop] = start;
       start += (c[dimension] || 0) + toPad;
       crossAlignChild(c);
-    });
+    }
   }
 
   // Container was not updated
