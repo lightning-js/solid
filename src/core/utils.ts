@@ -81,9 +81,7 @@ export function flattenStyles(
     for (const key in obj) {
       // be careful of 0 values
       if (result[key] === undefined) {
-        result[key as keyof SolidStyles] = obj[
-          key as keyof SolidStyles
-        ] as SolidStyles;
+        result[key as keyof SolidStyles] = obj[key as keyof SolidStyles];
       }
     }
   }

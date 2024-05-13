@@ -17,12 +17,15 @@
 
 import { renderer, createShader } from '../lightningInit.js';
 import {
-  type Effects,
+  type BorderRadius,
+  type BorderStyle,
   type IntrinsicCommonProps,
   type IntrinsicNodeProps,
   type IntrinsicTextProps,
+  type StyleEffects,
   type NodeStyles,
   type TextStyles,
+  type ShaderEffectDesc,
 } from '../../index.js';
 import Children from './children.js';
 import States, { type NodeStates } from './states.js';
@@ -55,22 +58,21 @@ const { animationSettings: defaultAnimationSettings } = config;
 const layoutQueue = new Set<ElementNode>();
 let queueLayout = true;
 
-function convertEffectsToShader(styleEffects: any) {
-  const effects = [];
+function convertEffectsToShader(styleEffects: StyleEffects) {
+  // Should be EffectDesc
+  const effects: ShaderEffectDesc[] = [];
 
-  for (const [type, props] of Object.entries<Record<string, any>>(
-    styleEffects,
-  )) {
-    effects.push({ type, props });
+  for (const [type, props] of Object.entries(styleEffects)) {
+    effects.push({ type, props } as ShaderEffectDesc);
   }
-  return createShader('DynamicShader', { effects: effects as any });
+  return createShader('DynamicShader', { effects: effects as any[] });
 }
 
 function borderAccessor(
   direction: '' | 'Top' | 'Right' | 'Bottom' | 'Left' = '',
 ) {
   return {
-    set(this: ElementNode, value: number | { width: number; color: number }) {
+    set(this: ElementNode, value: BorderStyle) {
       // Format: width || { width, color }
       if (isNumber(value)) {
         value = { width: value, color: 0x000000ff };
@@ -81,6 +83,9 @@ function borderAccessor(
             ...{ [`border${direction}`]: value },
           }
         : { [`border${direction}`]: value };
+    },
+    get(this: ElementNode): BorderStyle | undefined {
+      return this.effects?.[`border${direction}`];
     },
   };
 }
@@ -162,10 +167,9 @@ export interface TextNode {
 }
 
 export type SolidNode = ElementNode | TextNode;
-export type SolidStyles = { [key: string]: NodeStyles | TextStyles } & (
-  | NodeStyles
-  | TextStyles
-);
+export type SolidStyles = {
+  [key: string]: NodeStyles | TextStyles | undefined;
+} & (NodeStyles | TextStyles);
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface ElementNode
@@ -193,7 +197,7 @@ export class ElementNode extends Object {
     | ((this: ElementNode, elm: ElementNode) => boolean | void);
 
   private _undoStyles?: string[];
-  private _effects?: Effects;
+  private _effects?: StyleEffects;
   private _parent: ElementNode | undefined;
   private _style?: SolidStyles;
   private _states?: States;
@@ -218,11 +222,11 @@ export class ElementNode extends Object {
     this.children = new Children(this);
   }
 
-  get effects() {
+  get effects(): StyleEffects | undefined {
     return this._effects;
   }
 
-  set effects(v) {
+  set effects(v: StyleEffects) {
     this._effects = v;
     if (this.rendered) {
       this.shader = convertEffectsToShader(v);
@@ -483,7 +487,7 @@ export class ElementNode extends Object {
         stylesToUndo[styleKey] = this.style[styleKey];
       });
 
-      const newStyles = states.reduce((acc, state) => {
+      const newStyles: NodeStyles | TextStyles = states.reduce((acc, state) => {
         const styles = this.style[state];
         if (styles) {
           acc = {
@@ -497,8 +501,8 @@ export class ElementNode extends Object {
       this._undoStyles = Object.keys(newStyles);
 
       // Apply transition first
-      if ((newStyles as any).transition !== undefined) {
-        this.transition = (newStyles as any).transition;
+      if (newStyles.transition !== undefined) {
+        this.transition = newStyles.transition as NodeStyles['transition'];
       }
 
       // Apply the styles
@@ -674,7 +678,7 @@ for (const key of LightningRendererNumberProps) {
     get(): number {
       return this.lng[key];
     },
-    set(v: number) {
+    set(this: ElementNode, v: number) {
       this._sendToLightningAnimatable(key, v);
     },
   });
@@ -694,13 +698,17 @@ for (const key of LightningRendererNonAnimatingProps) {
 // Add Border Helpers
 Object.defineProperties(ElementNode.prototype, {
   borderRadius: {
-    set(this: ElementNode, radius: number | number[]) {
+    set(this: ElementNode, radius: BorderRadius) {
       this.effects = this.effects
         ? {
             ...this.effects,
-            ...{ radius: { radius } },
+            ...{ radius: radius },
           }
-        : { radius: { radius } };
+        : { radius: radius };
+    },
+
+    get(this: ElementNode): BorderRadius | undefined {
+      return this.effects?.radius;
     },
   },
   border: borderAccessor(),
@@ -712,13 +720,16 @@ Object.defineProperties(ElementNode.prototype, {
 
 Object.defineProperties(ElementNode.prototype, {
   linearGradient: {
-    set(props: LinearGradientEffectProps = {}) {
+    set(this: ElementNode, props: LinearGradientEffectProps = {}) {
       this.effects = this.effects
         ? {
             ...this.effects,
             ...{ linearGradient: props },
           }
         : { linearGradient: props };
+    },
+    get(this: ElementNode): LinearGradientEffectProps | undefined {
+      return this.effects?.linearGradient;
     },
   },
 });
