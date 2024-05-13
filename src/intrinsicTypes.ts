@@ -53,7 +53,7 @@ export interface Effects {
   grayscale?: GrayscaleEffectProps;
   glitch?: GlitchEffectProps;
   radialProgress?: RadialProgressEffectProps;
-  // holePunch?: HolePunchEffectProps;
+  holePunch?: any; // shoud be HolePunchEffectProps;
 }
 
 export interface BorderEffects {
