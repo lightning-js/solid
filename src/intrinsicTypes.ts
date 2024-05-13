@@ -57,7 +57,7 @@ export interface Effects {
 }
 
 export interface BorderEffects {
-  radius?: BorderRadius;
+  radius?: { radius: BorderRadius };
   border?: BorderStyle;
   borderTop?: BorderStyle;
   borderRight?: BorderStyle;

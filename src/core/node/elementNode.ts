@@ -702,13 +702,13 @@ Object.defineProperties(ElementNode.prototype, {
       this.effects = this.effects
         ? {
             ...this.effects,
-            ...{ radius: radius },
+            ...{ radius: { radius } },
           }
-        : { radius: radius };
+        : { radius: { radius } };
     },
 
     get(this: ElementNode): BorderRadius | undefined {
-      return this.effects?.radius;
+      return this.effects?.radius?.radius;
     },
   },
   border: borderAccessor(),
