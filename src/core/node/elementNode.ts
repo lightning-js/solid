@@ -122,6 +122,8 @@ const LightningRendererNumberProps = [
 ];
 
 const LightningRendererNonAnimatingProps = [
+  'absX',
+  'absY',
   'autosize',
   'clipping',
   'contain',
