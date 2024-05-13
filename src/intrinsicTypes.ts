@@ -44,6 +44,7 @@ export interface BorderStyleObject {
 }
 
 export type BorderStyle = number | BorderStyleObject;
+export type BorderRadius = number | number[];
 
 export interface Effects {
   fadeOut?: FadeOutEffectProps;
@@ -52,7 +53,25 @@ export interface Effects {
   grayscale?: GrayscaleEffectProps;
   glitch?: GlitchEffectProps;
   radialProgress?: RadialProgressEffectProps;
+  holePunch?: any; // shoud be HolePunchEffectProps;
 }
+
+export interface BorderEffects {
+  radius?: { radius: BorderRadius };
+  border?: BorderStyle;
+  borderTop?: BorderStyle;
+  borderRight?: BorderStyle;
+  borderBottom?: BorderStyle;
+  borderLeft?: BorderStyle;
+}
+
+export type StyleEffects = Effects & BorderEffects;
+
+// Renderer should export EffectDesc
+export type ShaderEffectDesc = {
+  type: keyof StyleEffects;
+  props: StyleEffects[keyof StyleEffects];
+};
 
 export interface IntrinsicNodeCommonProps {
   animationSettings?: Partial<AnimationSettings>;
@@ -88,7 +107,7 @@ export interface IntrinsicNodeStyleCommonProps {
   border?: BorderStyle;
   borderBottom?: BorderStyle;
   borderLeft?: BorderStyle;
-  borderRadius?: number | number[];
+  borderRadius?: BorderRadius;
   borderRight?: BorderStyle;
   borderTop?: BorderStyle;
   display?: 'flex' | 'block';
