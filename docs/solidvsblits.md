@@ -1,3 +1,14 @@
+<style>
+  img {
+      transition:transform 0.25s ease;
+  }
+
+  img:hover {
+      -webkit-transform:scale(1.8);
+      transform:scale(1.8);
+  }
+</style>
+
 # Evaluating Lightning 3 Frameworks
 
 Lightning 3 provides the flexibility to choose between bringing your own framework (SolidJS, Vue, or React) or utilizing the official Blits framework developed from scratch by the Core Lightning team. How should you make this decision?
