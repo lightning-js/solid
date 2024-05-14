@@ -23,3 +23,7 @@ Solid-Lightning is a UI framework for the [Lightning 3 Renderer](https://github.
 - Familiar and easy to use JSX + React like syntax
 - Typescript support
 - [Lightning UI Library](https://github.com/lightning-js/ui-components) of components with Theming
+
+## Solid vs Blits
+
+For further comparison about which framework you should use read [Solid vs Blits](solidvsblits.md)
