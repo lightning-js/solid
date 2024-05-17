@@ -47,4 +47,8 @@ export const config: Config = {
     fontFamily: 'Ubuntu',
     fontSize: 100,
   },
+  rendererOptions: {
+    appHeight: window.innerHeight,
+    appWidth: window.innerWidth,
+  },
 };
