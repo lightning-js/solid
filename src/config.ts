@@ -47,4 +47,7 @@ export const config: Config = {
     fontFamily: 'Ubuntu',
     fontSize: 100,
   },
+  rendererOptions: {
+    deviceLogicalPixelRatio: window.innerHeight / 1080,
+  },
 };
