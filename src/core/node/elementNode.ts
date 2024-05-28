@@ -265,7 +265,16 @@ export class ElementNode extends Object {
           ? undefined
           : (this.transition[name] as undefined | AnimationSettings);
 
-      return this.animate({ [name]: value }, animationSettings).start();
+      const animationController = this.animate(
+        { [name]: value },
+        animationSettings,
+      ).start();
+
+      void animationController.waitUntilStopped().then(() => {
+        (this.lng as INode).emit('animationFinished', { name, value });
+      });
+
+      return animationController;
     }
 
     (this.lng[name as keyof INode] as number | string) = value;
