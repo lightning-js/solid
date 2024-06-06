@@ -8,4 +8,3 @@
 - [Images](images.md)
 - [Effects](effects.md)
 - [Accessibility / Announcer](a11y.md)
-- [Solid / Blits Framework Comparison](solidvsblits.md)
